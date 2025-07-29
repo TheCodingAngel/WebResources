@@ -1,0 +1,165 @@
+// Parse the file with categories - it has all code points but CJKV and Hangul syllables (but it has Hangul letters):
+// https://www.unicode.org/notes/tn36/Categories.txt
+// More details about this file:
+// https://www.unicode.org/notes/tn36/
+// Name + General Category for more characters - UnicodeData.txt
+// https://raw.githubusercontent.com/unicode-org/icu/master/icu4c/source/data/unidata/UnicodeData.txt
+
+class CodePointParser {
+    #characters = [];
+    #categories = [];
+    
+    // For some reason all names of control characters are "<control>" in the file with categories...
+    #unicodeControlChars = new Map([
+        [0, "<Null>"],
+        [1, "<Start of Heading>"],
+        [2, "<Start of Text>"],
+        [3, "<End-of-text>"],
+        [4, "<End-of-transmission>"],
+        [5, "<Enquiry>"],
+        [6, "<Acknowledge>"],
+        [7, "<Bell>"],
+        [8, "<Backspace>"],
+        [9, "<Horizontal tab>"],
+        [10, "<Line feed>"],
+        [11, "<Vertical tab>"],
+        [12, "<Form feed>"],
+        [13, "<Carriage return>"],
+        [14, "<Shift Out>"],
+        [15, "<Shift In>"],
+        [16, "<Data Link Escape>"],
+        [17, "<Device Control 1>"],
+        [18, "<Device Control 2>"],
+        [19, "<Device Control 3>"],
+        [20, "<Device Control 4>"],
+        [21, "<Negative-acknowledge>"],
+        [22, "<Synchronous Idle>"],
+        [23, "<End of Transmission Block>"],
+        [24, "<Cancel>"],
+        [25, "<End of Medium>"],
+        [26, "<Substitute>"],
+        [27, "<Escape>"],
+        [28, "<File Separator>"],
+        [29, "<Group Separator>"],
+        [30, "<Record Separator>"],
+        [31, "<Unit Separator>"],
+
+        [127, "<Delete>"],
+        [128, "<Padding>"],
+        [129, "<High Octet Preset>"],
+        [130, "<Break Permitted Here>"],
+        [131, "<No Break Here>"],
+        [132, "<Index>"],
+        [133, "<Next Line>"],
+        [134, "<Start of Selected Area>"],
+        [135, "<End of Selected Area>"],
+        [136, "<Character Tabulation Set>"],
+        [137, "<Character Tabulation with Justification>"],
+        [138, "<Line Tabulation Set>"],
+        [139, "<Partial Line Forward>"],
+        [140, "<Partial Line Backward>"],
+        [141, "<Reverse Line Feed>"],
+        [142, "<Single-Shift Two>"],
+        [143, "<Single-Shift Three>"],
+        [144, "<Device Control String>"],
+        [145, "<Private Use 1>"],
+        [146, "<Private Use 2>"],
+        [147, "<Set Transmit State>"],
+        [148, "<Cancel>"],
+        [149, "<Message Waiting>"],
+        [150, "<Start of Protected Area>"],
+        [151, "<End of Protected Area>"],
+        [152, "<Start of String>"],
+        [153, "<Single Graphic Character Introducer>"],
+        [154, "<Single Character Intro Introducer>"],
+        [155, "<Control Sequence Introducer>"],
+        [156, "<String Terminator>"],
+        [157, "<Operating System Command>"],
+        [158, "<Private Message>"],
+        [159, "<Application Program Command>"],
+    ]);
+    
+    constructor(text) {
+        let codePoints = text.split("\n");
+        let rootCategory = new Map();
+        
+        for (let line of codePoints) {
+            if (!line) continue;
+            
+            let properties = line.split("\t");
+            
+            let codeValue = parseInt(properties[0], 16);
+            if (isNaN(codeValue)) {
+                throw {name : "InvalidNumberError", message : "Invalid hexadecimal number for code"};
+            }
+            
+            let name = properties[properties.length - 1];
+            if (this.#unicodeControlChars.has(codeValue)) {
+                name = this.#unicodeControlChars.get(codeValue);
+            }
+            
+            let categoryStack = [rootCategory];
+            let characterCategories = [];
+            for(let i = 2; i < properties.length - 1; i++) {
+                let cat = properties[i];
+                if (cat) {
+                    characterCategories.push(cat);
+                    
+                    // Build category tree; (i - 2) is the depth of the tree
+                    let categoryLevel = categoryStack[i - 2];
+                    if (!categoryLevel.has(cat)) {
+                        let nextLevel = new Map();
+                        categoryLevel.set(cat, nextLevel);
+                        categoryStack.push(nextLevel);
+                    } else {
+                        let nextLevel = categoryLevel.get(cat)
+                        categoryStack.push(nextLevel);
+                    }
+                }
+            }
+            
+            this._addSortedCharacter({
+                Code: codeValue,
+                Character: String.fromCodePoint(codeValue),
+                Name: name,
+                GeneralCategory: properties[1],
+                Categories: characterCategories
+            });
+        }
+    
+        this._mapToArray(this.#categories, rootCategory);
+    }
+    
+    toString() {
+        return `//Generated by ${this.constructor.name} \n\nlet UnicodeCategories = ` +
+            JSON.stringify(this.#categories, null, "\t") + "\n\n" +
+            "let CodePoints = " + JSON.stringify(this.#characters, null, "\t");
+    }
+    
+    // The input data is supposed to be sorted so this logic is "just in case".
+    _addSortedCharacter(characterData) {
+        if (this.#characters.length <= 0 || characterData.Code > this.#characters[this.#characters.length - 1].Code) {
+            this.#characters.push(characterData);
+            return;
+        }
+        let index = binarySearch(this.#characters, characterData, (ch, item) => ch.Code - item.Code);
+        if (index >= 0) {
+            // That code point was already added - should not be possible (so, just ignore).
+            return;
+        }
+        // The "not found" results are offset with 1 to support "-0" (which becomes "-1" with the offset).
+        this.#characters.splice(-index - 1, 0, characterData);
+    }
+    
+    _mapToArray(array, map) {
+        for (const [key, value] of map) {
+            if (value.size > 0) {
+                let subCategories = [];
+                this._mapToArray(subCategories, value);
+                array.push({Name: key, SubCategories: subCategories});
+            } else {
+                array.push({Name: key});
+            }
+        }
+    }
+}

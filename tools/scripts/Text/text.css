@@ -1,0 +1,280 @@
+.data-big {
+  font-family: Consolas,Monaco,Lucida Console,Liberation Mono,DejaVu Sans Mono,Bitstream Vera Sans Mono,Courier New, monospace;
+  font-size: xx-large;
+}
+
+.data {
+  font-family: Consolas,Monaco,Lucida Console,Liberation Mono,DejaVu Sans Mono,Bitstream Vera Sans Mono,Courier New, monospace;
+  font-size: small;
+}
+
+.data:invalid, .data-big:invalid {
+  border: red solid 2px;
+}
+
+.data-cell {
+  border: black solid 1px;
+  margin: 1px;
+}
+
+.bullet-no {
+  list-style-type: none;
+}
+
+.bullet-root {
+  margin: 0 10px 0 10px;
+  padding: 0;
+}
+
+.bullet-offset {
+  margin: 0;
+  padding: 0 0 0 1rem;
+}
+
+.resizeable {
+  resize: both;
+}
+
+.scroll-horizontal {
+  overflow-x:auto;
+}
+
+.scroll-horizontal {
+  overflow-y:auto;
+}
+
+.category-filter {
+  min-width: 130px;
+}
+
+.popup-background {
+  display: block;
+  position: fixed;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  /* Page customization follows */
+  z-index: 99;
+  background-color: #888;
+  opacity: 0.7;
+}
+
+.vertical-margins {
+  margin-top: var(--margin-s);
+  margin-bottom: var(--margin-xxs);
+}
+
+.section-codepoint {
+  background-color: var(--panel-bg);
+  margin-top: var(--margin-s);
+  margin-right: var(--margin-s);
+  margin-bottom: var(--margin-s);
+  box-shadow: 0px 2px 4px -1px rgba(0,0,0,0.2),0px 4px 5px 0px rgba(0,0,0,0.14),0px 1px 10px 0px rgba(0,0,0,0.12);
+}
+
+.codepoint-panel-tree {
+  overflow: auto;
+  min-width: 22rem;
+  height: 24rem;
+}
+
+.codepoint-panel, .codepoint-panel-table {
+  width: 45em;
+  overflow: auto;
+  margin: 3px;
+  font-family:Consolas,Monaco,Lucida Console,Liberation Mono,DejaVu Sans Mono,Bitstream Vera Sans Mono,Courier New, monospace;
+}
+
+.codepoint-panel-table {
+  padding: 0px; /* non-zero values would lead to problems with the table's scrolling*/
+  user-select: none;
+  max-height: 12rem;
+}
+
+/* For very long character names (for example: U+FBF9) */
+.character-name {
+  width: 28rem;
+  /*max-width: 28rem;*/
+}
+
+.info-active {
+  color: red;
+}
+
+.info-inactive {
+  color: black;
+}
+
+.info-modified {
+  color: blue;
+}
+
+.info-static {
+  color: green;
+}
+
+.info-ignore {
+  color: #880;
+}
+
+
+/*************   Tree    *************/
+
+ /* Remove default bullets */
+.tree-item {
+  list-style-type: none;
+}
+
+.tree-item > label {
+  margin-left: 1em;
+  cursor: text;
+}
+
+.tree-item > button {
+  margin-left: 1em;
+}
+
+/* Remove margins and padding from the parent ul */
+.tree {
+  margin: 0;
+  padding: 0;
+}
+
+/* Style the caret/arrow */
+.caret {
+  cursor: pointer;
+  user-select: none; /* Prevent text selection */
+}
+
+/* Create the caret/arrow with a unicode, and style it */
+.caret::before {
+  content: "\25B6";
+  color: black;
+  display: inline-block;
+  margin-right: 6px;
+}
+
+/* Rotate the caret/arrow icon when clicked on (using JavaScript)
+   90 deg causes "Error in parsing value transform" at random times so use wheel turns instead*/
+.caret-down::before {
+  transform: rotate(0.25turn);
+}
+
+/* Hide the nested list */
+.nested {
+  display: none;
+}
+
+/* Show the nested list when the user clicks on the caret/arrow (with JavaScript) */
+.active {
+  display: block;
+}
+
+
+
+/*************   Table    *************/
+
+.clear-table  {
+  table-layout: fixed;
+  border-collapse: collapse;
+  width: 100%;
+}
+
+.encoding-table {
+  table-layout: fixed;
+  border-collapse: collapse;
+  width: 25rem;
+}
+
+.clear-table th, .clear-table td {
+  padding: 4px 8px;
+  text-align: center;
+}
+
+.table-header {
+  /* keep the header at the top during scroll */
+  position: sticky;
+  top: 0;
+  z-index: 1;
+
+  text-align: center;
+  color: #fff;
+  background-color: #000;
+}
+
+.digit-cell:nth-of-type(8n - 1) {
+  background-color:#d6dddd;
+}
+
+.digit-cell:nth-of-type(8n) {
+  background-color:#d6dddd;
+}
+
+.digit-cell:nth-of-type(8n + 1) {
+  background-color:#d6dddd;
+}
+
+.digit-cell:nth-of-type(8n + 2) {
+  background-color:#d6dddd;
+}
+
+.digit-cell:nth-of-type(8n + 3) {
+  background-color:#ebeeee;
+}
+
+.digit-cell:nth-of-type(8n + 4) {
+  background-color:#ebeeee;
+}
+
+.digit-cell:nth-of-type(8n + 5) {
+  background-color:#ebeeee;
+}
+
+.digit-cell:nth-of-type(8n + 6) {
+  background-color:#ebeeee;
+}
+
+.digit-cell:hover {
+  background-color: #d6eeee;
+  cursor: pointer;
+}
+
+.digit-indexes {
+  background-color: #aaa;
+}
+
+.character-cell:nth-of-type(2n) {
+  background-color:#d6dddd;
+}
+
+.character-cell:nth-of-type(2n + 1) {
+  background-color:#ebeeee;
+}
+
+.character-cell:hover {
+  background-color: #d6eeee;
+  cursor: pointer;
+}
+
+.character-indexes {
+  background-color: #aaa;
+}
+
+.byte-cell:nth-of-type(2n) {
+  background-color:#d6dddd;
+}
+
+.byte-cell:nth-of-type(2n + 1) {
+  background-color:#ebeeee;
+}
+
+.byte-cell:hover {
+  background-color: #d6eeee;
+  cursor: pointer;
+}
+
+.byte-indexes {
+  background-color: #aaa;
+}
+

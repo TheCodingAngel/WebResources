@@ -1,0 +1,685 @@
+var instructions;
+
+class InstructionError extends Error {
+    constructor(message) {
+        super("\n" + message);
+        // Using this.constructor.name leads to weird names when minifying
+        this.name = "InstructionError";
+    }
+}
+
+class Instructions {
+    #memory;
+    #io;
+    #cpu;
+
+    #haltOpcode = '.';
+
+    #all = new Map([
+        [' ', this._nop.bind(this)],
+
+        ['M', this._move.bind(this)],
+        ['T', this._moveString.bind(this)],
+        ['S', this._storeString.bind(this)],
+
+        ['?', this._compare.bind(this)],
+        ['C', this._compareString.bind(this)],
+        ['F', this._find.bind(this)],
+
+        ['J', this._jump.bind(this)],
+        ['=', this._jumpIfEqual.bind(this)],
+        ['!', this._jumpIfNotEqual.bind(this)],
+        ['<', this._jumpIfLess.bind(this)],
+        ['>', this._jumpIfGreater.bind(this)],
+        ['L', this._jumpIfLessOrEqual.bind(this)],
+        ['G', this._jumpIfGreaterOrEqual.bind(this)],
+        ['$', this._jumpIfOverflow.bind(this)],
+
+        ['+', this._add.bind(this)],
+        ['-', this._subtract.bind(this)],
+        ['*', this._multiply.bind(this)],
+        ['/', this._divide.bind(this)],
+        ['%', this._modulus.bind(this)],
+        ['#', this._increment.bind(this)],
+        ['D', this._decrement.bind(this)],
+
+        ['I', this._in.bind(this)],
+        ['O', this._out.bind(this)],
+    ]);
+
+    #forcedCharacterCount = new Map([
+        ['R', CPU.registerSize], // for a Register
+        ['A', 0],                // for an Address in a register
+        ['V', CPU.registerSize], // for a Value
+        ['P', 0],                // for a Pointer (an address given as value)
+    ]);
+
+    static ForcedCharCount = {
+        None: 0,
+        NoLeftValue: 1,
+        Full: 2,
+    }
+
+    #twoValueSufixes = new Map([
+        ['C', ['R', 'R']],
+        ['D', ['R', 'A']],
+        ['E', ['R', 'V']],
+        ['F', ['R', 'P']],
+
+        ['H', ['A', 'R']],
+        ['I', ['A', 'A']],
+        ['J', ['A', 'V']],
+        ['K', ['A', 'P']],
+
+        ['M', ['V', 'R']],
+        ['N', ['V', 'A']],
+        ['O', ['V', 'V']],
+        ['Q', ['V', 'P']],
+
+        ['W', ['P', 'R']],
+        ['X', ['P', 'A']],
+        ['Y', ['P', 'V']],
+        ['Z', ['P', 'P']],
+    ]);
+
+    constructor(memory, io, cpu) {
+        this.#memory = memory;
+        this.#io = io;
+        this.#cpu = cpu;
+    }
+
+    executeInstruction(characters) {
+        if (typeof(characters) != "string") {
+            throw new InstructionError("Invalid instruction data");
+        }
+        if (characters.length != CPU.instructionSize) {
+            throw new InstructionError(`Instructions must have ${CPU.instructionSize} characters but the next one is with ${characters.length}. Maybe EIP has incorrect value?`);
+        }
+
+        let opcode = characters[0];
+        if (opcode == this.#haltOpcode) {
+            alert("Reached the end of execution:\nSystem halted");
+            return false;
+        }
+
+        let instruction = this.#all.get(opcode);
+        if (!instruction) {
+            throw new InstructionError("Unknown opcode: " + opcode);
+        }
+        let nextInstructionAddress = instruction(opcode, characters[1], characters.substring(2, 6), characters.substring(6));
+
+        if (typeof(nextInstructionAddress) == "undefined" || nextInstructionAddress == null) {
+            this.#cpu.incrementInstructionPointer();
+        } else if (typeof(nextInstructionAddress) == "number") {
+            this.#cpu.setInstructionPointer(nextInstructionAddress);
+        } else {
+            throw new InstructionError("Incorrect result for instruction with opcode " + opcode);
+        }
+        
+        return true;
+    }
+
+    _nop(opcode, suffix, a, b) {
+        if (suffix != ' ') {
+            throw new InstructionError(`Incorrect suffix "${suffix}" for instruction " " (nop); only the default suffix of empty space is allowed as a suffix.`);
+        }
+    }
+
+    _move(opcode, suffix, a, b) {
+        let valueTypePair = this._getValueTypePair("move", opcode, suffix, ['R', 'V']);
+        this._verifyInstructionPointer("move", opcode, "set", valueTypePair[0], a);
+        
+        let valuesInfo = this._getValuesInfo(valueTypePair[0], valueTypePair[1], a, b);
+        let value = valuesInfo.getValue(valueTypePair[1], b, ValuesInfo.IndirectionType.None);
+        
+        valuesInfo.setValue(valueTypePair[0], a, value);
+        if (valuesInfo.isUsingCustomCounter()) {
+            this.#cpu.setCustomCounter(0);
+        }
+    }
+
+    _moveString(opcode, suffix, a, b) {
+
+    }
+
+    _storeString(opcode, suffix, a, b) {
+        let valueTypePair = this._getValueTypePair("stos", opcode, suffix, ['A', 'P']);
+        this._verifyInstructionPointer("stos", opcode, "change", valueTypePair[0], a);
+        
+        let valuesInfo = this._getValuesInfo(valueTypePair[0], valueTypePair[1], a, b);
+        let value = valuesInfo.getValue(valueTypePair[1], b, ValuesInfo.IndirectionType.None);
+
+        let destinationValue = "".padEnd(this.#cpu.getCustomCounter(), value.charAt(0));
+        valuesInfo.setValue(valueTypePair[0], a, destinationValue, true);
+        
+        this.#cpu.setCustomCounter(0);
+    }
+
+    _compare(opcode, suffix, a, b) {
+        let valueTypePair = this._getValueTypePair("compare", opcode, suffix, ['R', 'V']);
+        let valuesInfo = this._getValuesInfo(valueTypePair[0], valueTypePair[1], a, b, Instructions.ForcedCharCount.Full);
+
+        let valueA = valuesInfo.getValue(valueTypePair[0], a, ValuesInfo.IndirectionType.None);
+        let valueANum = parseIntOrNull(valueA);
+
+        let valueB = valuesInfo.getValue(valueTypePair[1], b, ValuesInfo.IndirectionType.None);
+        let valueBNum = parseIntOrNull(valueB);
+
+        if (valueANum != null && valueBNum != null) {
+            this.#cpu.setFlags(valueANum > valueBNum, valueANum < valueBNum, null);
+        } else {
+            let cmp = valueA.localeCompare(valueB);
+            this.#cpu.setFlags(cmp > 0, cmp < 0, null);
+            // Setting both positive and negative flags means "Invalid" state
+            //this.#cpu.setFlags(true, true, null);
+        }
+
+        if (valuesInfo.isUsingCustomCounter()) {
+            this.#cpu.setCustomCounter(0);
+        }
+    }
+
+    _compareString(opcode, suffix, a, b) {
+        let valueTypePair = this._getValueTypePair("compare", opcode, suffix, ['P', 'P']);
+        let valuesInfo = this._getValuesInfo(valueTypePair[0], valueTypePair[1], a, b, Instructions.ForcedCharCount.None);
+
+        let valueA = valuesInfo.getValue(valueTypePair[0], a, ValuesInfo.IndirectionType.MemoryAndRegisters);
+        let valueB = valuesInfo.getValue(valueTypePair[1], b, ValuesInfo.IndirectionType.MemoryAndRegisters);
+
+        for (let i = 0; i < valuesInfo.getCharacterCount(); i++) {
+            let charA = valueA.charAt(i);
+            let charB = valueB.charAt(i);
+            let cmp = charA.localeCompare(charB);
+            if (cmp != 0) {
+                this.#cpu.setFlags(cmp > 0, cmp < 0, null);
+                if (valuesInfo.isUsingCustomCounter()) {
+                    this.#cpu.setCustomCounter(i);
+                }
+                return;
+            }
+        }
+
+        this.#cpu.setFlags(false, false, null);
+        if (valuesInfo.isUsingCustomCounter()) {
+            this.#cpu.setCustomCounter(0);
+        }
+    }
+
+    _find(opcode, suffix, a, b) {
+        let valueType = this._getValueType("find", opcode, suffix, 'R');
+        let valuesInfo = this._getValuesInfo(valueType, null, a, b, Instructions.ForcedCharCount.None);
+
+        let count = parseInt(b[0]);
+        let chars = []
+        if (count) {
+            for (let i = 0; i < count; i++) {
+                chars.push(b[b.length - i - 1]);
+            }
+        } else {
+            throw new InstructionError(`Incorrect characters value (${b}) used in "find" - the first character can be 1, 2 or 3.`);
+        }
+
+        let valueStr = valuesInfo.getValue(valueType, a, ValuesInfo.IndirectionType.MemoryAndRegisters);
+        for (let i = 0; i < valuesInfo.getCharacterCount(); i++){
+            if (chars.some(ch => ch == valueStr.charAt(i))) {
+                this.#cpu.setFlags(false, false, false);
+                if (valuesInfo.isUsingCustomCounter()) {
+                    this.#cpu.setCustomCounter(i);
+                }
+                return;
+            }
+        }
+
+        this.#cpu.setFlags(false, false, true);
+        if (valuesInfo.isUsingCustomCounter()) {
+            this.#cpu.setCustomCounter(0);
+        }
+    }
+
+    _jump(opcode, suffix, a, b) {
+        return this._jumpInternal("jump", opcode, suffix, a, b, null, null);
+    }
+
+    _jumpIfEqual(opcode, suffix, a, b) {
+        return this._jumpInternal("jumpIfEqual", opcode, suffix, a, b, null, (isPositive, isNegative) => {
+            return !isPositive && !isNegative;
+        });
+    }
+
+    _jumpIfNotEqual(opcode, suffix, a, b) {
+        return this._jumpInternal("jumpIfNotEqual", opcode, suffix, a, b, null, (isPositive, isNegative) => {
+            return isPositive || isNegative;
+        });
+    }
+
+    _jumpIfLess(opcode, suffix, a, b) {
+        return this._jumpInternal("jumpIfLess", opcode, suffix, a, b, null, (isPositive, isNegative) => {
+            return isNegative;
+        });
+    }
+
+    _jumpIfGreater(opcode, suffix, a, b) {
+        return this._jumpInternal("jumpIfGreater", opcode, suffix, a, b, null, (isPositive, isNegative) => {
+            return isPositive;
+        });
+    }
+
+    _jumpIfLessOrEqual(opcode, suffix, a, b) {
+        return this._jumpInternal("jumpIfLessOrEqual", opcode, suffix, a, b, null, (isPositive, isNegative) => {
+            return !isPositive;
+        });
+    }
+
+    _jumpIfGreaterOrEqual(opcode, suffix, a, b) {
+        return this._jumpInternal("jumpIfGreaterOrEqual", opcode, suffix, a, b, null, (isPositive, isNegative) => {
+            return !isNegative;
+        });
+    }
+
+    _jumpIfOverflow(opcode, suffix, a, b) {
+        return this._jumpInternal("jumpIfOverflow", opcode, suffix, a, b, () => {
+            return this.#cpu.isFlagsMaskSet(CPU.FlagsMask.Overflown);
+        }, null);
+    }
+
+    _jumpInternal(name, opcode, suffix, a, b, condition, conditionPosNeg) {
+        let valueType = this._getValueType(name, opcode, suffix, 'V');
+        if (condition) {
+            if (!condition()) {
+                return;
+            }
+        }
+        if (conditionPosNeg) {
+            let isPositive = this.#cpu.isFlagsMaskSet(CPU.FlagsMask.Positive);
+            let isNegative = this.#cpu.isFlagsMaskSet(CPU.FlagsMask.Negative);
+            if (isPositive && isNegative) {
+                // it is not valid to have both positive and negative state
+                return;
+            }
+            if (!conditionPosNeg(isPositive, isNegative)) {
+                return;
+            }
+        }
+        let valuesInfo = new ValuesInfo(this.#cpu, this.#memory, CPU.registerSize, false);
+        let newAddressStr = valuesInfo.getValue(valueType, a, ValuesInfo.IndirectionType.None);
+        let newAddress = parseIntOrNull(newAddressStr);
+        if (newAddress == null) {
+            switch (valueType) {
+                case 'R':
+                    throw new InstructionError(`"${name}" expects address while register ${a} does not contain a number: ${newAddressStr}.`);
+                case 'A':
+                    throw new InstructionError(`"${name}" expects address while register ${a} does not point to a number: ${newAddressStr}.`);
+                case 'P':
+                    throw new InstructionError(`"${name}" expects address while at address ${a} there is no number: ${newAddressStr}.`);
+                default:
+                    throw new InstructionError(`"${name}" expects address while the first operand is not a number: ${newAddressStr}.`);
+            }
+        }
+        return newAddress;
+    }
+
+    _add(opcode, suffix, a, b) {
+        this._arithmetic_2("add", opcode, suffix, a, b, (valueA, valueB) => {
+            return valueA + valueB;
+        });
+    }
+
+    _subtract(opcode, suffix, a, b) {
+        this._arithmetic_2("subtract", opcode, suffix, a, b, (valueA, valueB) => {
+            return valueA - valueB;
+        });
+    }
+
+    _multiply(opcode, suffix, a, b) {
+        this._arithmetic_2("mul", opcode, suffix, a, b, (valueA, valueB) => {
+            return valueA * valueB;
+        });
+    }
+
+    _divide(opcode, suffix, a, b) {
+        this._arithmetic_2("div", opcode, suffix, a, b, (valueA, valueB) => {
+            return Math.floor(valueA / valueB);
+        });
+    }
+
+    _modulus(opcode, suffix, a, b) {
+        this._arithmetic_2("mod", opcode, suffix, a, b, (valueA, valueB) => {
+            return valueA % valueB;
+        });
+    }
+
+    _increment(opcode, suffix, a, b) {
+        this._arithmetic_1("increment", opcode, suffix, a, valueA => {
+            return valueA + 1;
+        });
+    }
+
+    _decrement(opcode, suffix, a, b) {
+        this._arithmetic_1("decrement", opcode, suffix, a, valueA => {
+            return valueA - 1;
+        });
+    }
+
+    _in(opcode, suffix, a, b) {
+        let valueType = this._getValueType("input", opcode, suffix, 'V');
+        this._verifyInstructionPointer("input", opcode, "change", valueType, a);
+        
+        let port = parseIntOrNull(b);
+        if (port == null) {
+            throw new InstructionError("Invalid port value (must be a number): " + b);
+        }
+
+        let valuesInfo = this._getValuesInfo(valueType, null, a, b);
+        
+        let characterCount = valuesInfo.getCharacterCount();
+        let newValue = this.#io.readFromPort(port, characterCount);
+        
+        if (newValue == null) {
+            throw new InstructionError("Device not found on port " + port);
+        } else if (typeof newValue != 'string') {
+            throw new InstructionError("Input not supported for the device on port " + port);
+        }
+
+        valuesInfo.setValue(valueType, a, newValue, true);
+        this.#cpu.setCustomCounter(characterCount - newValue.length);
+        this.#cpu.setFlags(null, null, !valuesInfo.isUsingCustomCounter());
+    }
+
+    _out(opcode, suffix, a, b) {
+        let valueType = this._getValueType("output", opcode, suffix, 'P');
+        
+        let port = parseIntOrNull(a);
+        if (port == null) {
+            throw new InstructionError("Invalid port value (must be a number): " + a);
+        }
+
+        let valuesInfo = this._getValuesInfo(null, valueType, a, b);
+        let value = valuesInfo.getValue(valueType, b, ValuesInfo.IndirectionType.None);
+
+        let charsNotWritten = this.#io.writeToPort(port, value, valuesInfo.getCharacterCount());
+        if (charsNotWritten == null) {
+            throw new InstructionError("Device not found on port " + port);
+        } else if (charsNotWritten < 0) {
+            throw new InstructionError("Output not supported for the device on port " + port);
+        }
+        
+        this.#cpu.setCustomCounter(charsNotWritten);
+        this.#cpu.setFlags(null, null, valueType == 'P' || valueType == 'A' ?
+            !valuesInfo.isUsingCustomCounter() : charsNotWritten > 0);
+    }
+
+    _arithmetic_2(name, opcode, suffix, a, b, operation) {
+        let valueTypePair = this._getValueTypePair(name, opcode, suffix, ['R', 'V']);
+        this._verifyInstructionPointer(name, opcode, "change", valueTypePair[0], a);
+        
+        let valuesInfo = this._getValuesInfo(valueTypePair[0], valueTypePair[1], a, b);
+        let valueA = parseIntOrNull(valuesInfo.getValue(valueTypePair[0], a, ValuesInfo.IndirectionType.Memory));
+        let valueB = parseIntOrNull(valuesInfo.getValue(valueTypePair[1], b, ValuesInfo.IndirectionType.None));
+        
+        let newValue = 0;
+        if (valueA != null && valueB != null) {
+            newValue = operation(valueA, valueB);
+            let fixedValue = fixIfOverflown(newValue, valuesInfo.getCharacterCount());
+            this.#cpu.setFlags(fixedValue > 0, fixedValue < 0, fixedValue != newValue);
+            newValue = fixedValue;
+        } else {
+            // Setting both positive and negative flags means "Invalid" state
+            this.#cpu.setFlags(true, true, null);
+        }
+
+        valuesInfo.setValue(valueTypePair[0], a, newValue);
+        if (valuesInfo.isUsingCustomCounter()) {
+            this.#cpu.setCustomCounter(0);
+        }
+    }
+
+    _arithmetic_1(name, opcode, suffix, a, operation) {
+        let valueType = this._getValueType(name, opcode, suffix, 'R');
+        this._verifyInstructionPointer(name, opcode, "change", valueType, a);
+        
+        let valuesInfo = this._getValuesInfo(valueType, null, a, null);
+        let value = parseIntOrNull(valuesInfo.getValue(valueType, a, ValuesInfo.IndirectionType.Memory));
+        
+        let newValue = 0;
+        if (value != null) {
+            newValue = operation(value);
+            let isOverflown = newValue.toString(10).length > valuesInfo.getCharacterCount();
+            this.#cpu.setFlags(newValue > 0, newValue < 0, isOverflown);
+        } else {
+            // Setting both positive and negative flags means "Invalid" state
+            this.#cpu.setFlags(true, true, null);
+        }
+
+        valuesInfo.setValue(valueType, a, newValue);
+        if (valuesInfo.isUsingCustomCounter()) {
+            this.#cpu.setCustomCounter(0);
+        }
+    }
+    
+    _getValueTypePair(name, opcode, suffix, defaultValueTypePair) {
+        let valueTypePair = suffix != ' ' ? this.#twoValueSufixes.get(suffix) : defaultValueTypePair;
+        if (!valueTypePair) {
+            throw new InstructionError(`Incorrect suffix "${suffix}" for instruction "${opcode}" (${name}).\n` +
+                `Allowed suffixes: ${Array.from(this.#twoValueSufixes.keys()).join(", ")}.\n` +
+                `The default suffix of empty space treats the operands as [${defaultValueTypePair.join(", ")}].`);
+        }
+        return valueTypePair;
+    }
+    
+    _getValueType(name, opcode, suffix, defaultValueType) {
+        let valueType = suffix != ' ' ? suffix : defaultValueType;
+        if (!this.#forcedCharacterCount.has(valueType)) {
+            throw new InstructionError(`Incorrect suffix "${suffix}" for instruction "${opcode}" (${name}).\n` +
+            `Allowed suffixes: ${Array.from(this.#forcedCharacterCount.keys()).join(", ")}.\n` +
+            `The default suffix of empty space is the same as ${defaultValueType}.`);
+        }
+        return valueType;
+    }
+    
+    _verifyInstructionPointer(name, opcode, action, valueType, a) {
+        if (valueType == 'R' && this.#cpu.isOperandInstructionPointer(a)) {
+            throw new InstructionError(`Cannot ${action} with "${opcode}" (${name}) the instruction pointer (EIP or register identifier ${a}).\n` +
+                `Either change the register identifier or use a jump instruction instead.`);
+        }
+    }
+
+    _getValuesInfo(valueTypeLeft, valueTypeRight, a, b, forceCharCount = Instructions.ForcedCharCount.NoLeftValue) {
+        let charCountLeft = 0;
+        let charCountRight = 0;
+
+        switch (forceCharCount) {
+            case Instructions.ForcedCharCount.Full:
+                charCountLeft = this.#forcedCharacterCount.get(valueTypeLeft);
+                charCountRight = this.#forcedCharacterCount.get(valueTypeRight);
+                break;
+            case Instructions.ForcedCharCount.NoLeftValue:
+                if (valueTypeLeft != 'V') {
+                    charCountLeft = this.#forcedCharacterCount.get(valueTypeLeft);
+                }
+                charCountRight = this.#forcedCharacterCount.get(valueTypeRight);
+                break;
+        }
+
+        if (charCountLeft > 0 && valueTypeLeft == 'R') {
+            let regSize = CPU.getRegisterSizeByOperand(a);
+            if (regSize) {
+                charCountLeft = Math.min(charCountLeft, regSize);
+            }
+        }
+
+        if (charCountRight > 0 && valueTypeRight == 'R') {
+            let regSize = CPU.getRegisterSizeByOperand(b);
+            if (regSize) {
+                charCountRight = Math.min(charCountRight, regSize);
+            }
+        }
+
+        let characterCount = 0;
+        let isUsingCustomCounter = false;
+        if (charCountLeft > 0 && charCountRight > 0) {
+            characterCount = Math.min(charCountLeft, charCountRight);
+        } else if (charCountLeft > 0) {
+            characterCount = charCountLeft;
+        } else if (charCountRight > 0) {
+            characterCount = charCountRight;
+        } else {
+            characterCount = this.#cpu.getCustomCounter();
+            if (characterCount != null && characterCount > 0) {
+                isUsingCustomCounter = true;
+            } else {
+                characterCount = CPU.registerSize;
+            }
+        }
+        return new ValuesInfo(this.#cpu, this.#memory, characterCount, isUsingCustomCounter);
+    }
+
+    /*
+    _getRegisterId(operand) {
+        switch(operand[3]) {
+            case '1':
+                return this._compileRegisterId('a', operand[2]);
+            case '2':
+                return this._compileRegisterId('b', operand[2]);
+            case '3':
+                return this._compileRegisterId('c', operand[2]);
+            case '4':
+                return "esp";
+            case '5':
+                return "ebp";
+        }
+        return null;
+    }
+
+    _compileRegisterId(letter, type) {
+        switch (type) {
+            case '1':
+                return letter + 'l';
+            case '2':
+                return letter + 'h';
+            case '3':
+                return letter + 'x';
+            case '4':
+                return 'e' + letter + 'x';
+        }
+        return null;
+    }
+    */
+}
+
+class ValuesInfo {
+    static IndirectionType = {
+        None: 0,
+        Memory: 1,
+        MemoryAndRegisters: 2,
+    }
+
+    #cpu;
+    #memory;
+    #characterCount;
+    #isUsingCustomCounter;
+
+    constructor(cpu, memory, characterCount, isUsingCustomCounter) {
+        this.#cpu = cpu;
+        this.#memory = memory;
+        this.#characterCount = characterCount;
+        this.#isUsingCustomCounter = isUsingCustomCounter;
+    }
+
+    isUsingCustomCounter() {
+        return this.#isUsingCustomCounter;
+    }
+
+    getCharacterCount() {
+        return this.#characterCount;
+    }
+
+    getValue(valueType, operand, indirection) {
+        let value = this._getValueInternal(valueType, operand, indirection);
+        // value might be limited by using a subregister or an address near the end of the memory
+        this.#characterCount = Math.min(this.#characterCount, value.length);
+        return value;
+    }
+
+    setValue(valueType, operand, value, ignoreCharCount = false) {
+        switch (valueType) {
+            case 'R':
+                if (!this.#cpu.setRegisterValueByOperand(operand, value)) {
+                    throw new InstructionError(`Could not set value "${value}" to register "${operand}".`);
+                }
+                break;
+            case 'A':
+                let address = this.#cpu.getRegisterValueByOperand(operand);
+                if (address == null) {
+                    throw new InstructionError("Invalid register identifier: " + operand);
+                }
+                this._setInMemory(address, value, ignoreCharCount ? value.length : this.#characterCount);
+                break;
+            case 'V':
+                this._setInMemory(operand, value, ignoreCharCount ? value.length : this.#characterCount);
+                break;
+            case 'P':
+                this._setInMemory(this._dereference(operand, 0), value, ignoreCharCount ? value.length : this.#characterCount);
+                break;
+            default:
+                throw new InstructionError("Incorrect value type (expected R, A, V or P): " + valueType);
+        }
+    }
+
+    _getValueInternal(valueType, operand, indirection) {
+        let indirectRegisters = indirection == ValuesInfo.IndirectionType.MemoryAndRegisters;
+        let indirectMemory = indirectRegisters || indirection == ValuesInfo.IndirectionType.Memory;
+        switch (valueType) {
+            case 'R':
+                let value = this.#cpu.getRegisterValueByOperand(operand);
+                if (value == null) {
+                    throw new InstructionError("Invalid register identifier: " + operand);
+                }
+                if (indirectRegisters) {
+                    return this._dereference(value, this.#characterCount);
+                }
+                // numeric values come from registers with no subregisters
+                return typeof(value) == "string" ? value : padOrCutNumber(value, 4);
+            case 'A':
+                let address = this.#cpu.getRegisterValueByOperand(operand);
+                if (address == null) {
+                    throw new InstructionError("Invalid register identifier: " + operand);
+                }
+                if (indirectRegisters) {
+                    address = this._dereference(address, 0);
+                }
+                return this._dereference(address, this.#characterCount);
+            case 'V':
+                return indirectMemory ? this._dereference(operand, this.#characterCount) : operand;
+            case 'P':
+                if (indirectMemory) {
+                    operand = this._dereference(operand, 0);
+                }
+                return this._dereference(operand, this.#characterCount);
+            default:
+                throw new InstructionError("Incorrect value type (expected R, A, V or P): " + valueType);
+        }
+    }
+
+    _dereference(address, characterCount) {
+        let addressNumber = this._getValidAddress(address);
+        return this.#memory.getTextAtAddress(addressNumber, characterCount > 0 ? characterCount : CPU.registerSize);
+    }
+
+    _setInMemory(address, value, characterCount) {
+        let addressNumber = this._getValidAddress(address);
+        this.#memory.setTextAtAddress(addressNumber, typeof(value) == "string" ?
+            padWithHaltOrCut(value, characterCount) :
+            padOrCutNumber(value, characterCount));
+    }
+
+    _getValidAddress(address) {
+        if (!isValid(address)) {
+            throw new InstructionError("Empty address.");
+        }
+        let addressNumber = typeof(address) == "string" ? parseInt(address, 10) : address;
+        if (isNaN(addressNumber)) {
+            throw new InstructionError("Invalid address.");
+        }
+        return addressNumber;
+    }
+}
