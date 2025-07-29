@@ -31,6 +31,9 @@ if %ERRORLEVEL% neq 0 (
 pushd %~dp0
 
 
+md arch > NUL 2>&1
+
+
 
 set "FN_RCA_301=RCA-301"
 echo %FN_RCA_301%.zip
