@@ -2,6 +2,11 @@ var ascii;
 var popupText;
 
 class ExtendedAscii {
+    // Add this to ASCII character codes from 0 to 32 (0x20) and you get Unicode symbols to visualize them
+    static #asciiControlToSymbol = 0x2400;
+    // Unicode symbol for visualizing ASCII 127 (DEL)
+    static #asciiDelSymbol = '\u2421';
+    
     // There are more code pages here:
     // https://github.com/inexorabletash/text-encoding/blob/master/lib/encoding-indexes.js
     // Information about the code pages:
@@ -32,8 +37,9 @@ class ExtendedAscii {
     
     #defaultText = [
         ["windows-1251, iso-8859- 5", "cake ~ саке"],
-        ["windows-1252, iso-8859- 1 (2, 3), 4", "he is disappointed = il est déçu"],
-        ["iso-8859- 2, 3, 16", "simți șef ~ simţi şef"],
+        //["windows-1252, iso-8859- 1 (2, 3), 4", "he is disappointed = il est déçu"],
+        ["iso-8859- 2, 16", "simți șef ~ simţi şef"],
+        ["iso-8859- 1, 15", "ï»¿ASCII or UTF-8 with BOM - ½ chance ®"],
         //["___________", null],
     ];
     
@@ -46,13 +52,18 @@ class ExtendedAscii {
     
     #encodePage;
     #decodePage;
+
+    #encodeTextPopup;
+    #asciiCharactersData;
+    #popupAsciiTable;
     
     #codePagePopup;
     #codePageTitle;
     #comboCodePage;
     #codePageCharactersData;
+    #popupCodePageTable;
+    
     #popupDialog;
-    #popupTable;
     
     #MIN_ENCODED_ROWS = 7;
     #INVALID_ASCII_CODE = 256;
@@ -62,6 +73,7 @@ class ExtendedAscii {
     
     
     constructor(comboDefaultTextId, textEncodeId, comboEncodePageId,
+                encodeTextPopupId, asciiCharactersDataId,
                 codePagePopupId, codePageTitleId, comboCodePageId, codePageCharactersDataId,
                 asciiBytesId, comboDecodePageId, textDecodeId) {
         this.#comboDefaultText = document.getElementById(comboDefaultTextId);
@@ -97,18 +109,28 @@ class ExtendedAscii {
         this.#encodePage = this.#codePages.get(this.#DEFAULT_CODE_PAGE);
         this.#decodePage = this.#encodePage;
         
+        this.#encodeTextPopup = document.getElementById(encodeTextPopupId);
+        this.#asciiCharactersData = document.getElementById(asciiCharactersDataId);
+        this.#popupAsciiTable = new Table(this.#asciiCharactersData, -1, "character-indexes", "character-cell")
+            .initCells(null, 1, 1, (cellAddress, row, column, data) => toHexString(cellAddress, 2))
+            .cellEvent('click', (cell, e, data) => {
+                _this.setText(_this._addCharacterToEncode(ExtendedAscii.visualToActualAsciiCharacter(cell.textContent)));
+                _this.closePopup();
+            });
+        this.#popupAsciiTable.setRows(8, (cellAddress, row, column, data) => ExtendedAscii.numberToAsciiCharacter(cellAddress));
+        
         this.#codePagePopup = document.getElementById(codePagePopupId);
         this.#codePageTitle = document.getElementById(codePageTitleId);
         this.#codePageCharactersData = document.getElementById(codePageCharactersDataId);
-        this.#popupDialog = new PopupDialog();
-        
-        this.#popupTable = new Table(this.#codePageCharactersData, -1, "byte-indexes", "byte-cell")
+        this.#popupCodePageTable = new Table(this.#codePageCharactersData, -1, "byte-indexes", "byte-cell")
             .initCells(null, 1, 1, (cellAddress, row, column, data) => toHexString(cellAddress + 128, 2))
             .cellEvent('click', (cell, e, data) => {
                 let characterCode = parseInt(cell.id.substring(2)) + 128;
                 _this._setDecodedText(_this._addAsciiByte(characterCode));
                 _this.closePopup();
             });
+        
+        this.#popupDialog = new PopupDialog();
         
         this.setText(intialText);
         
@@ -161,6 +183,12 @@ class ExtendedAscii {
     setText(text) {
         this.#textEncode.value = text;
         this._setDecodedText(this._setAsciiBytes(text));
+    }
+    
+    showTextEncodePopup(button) {
+        this.#popupDialog.show(this.#encodeTextPopup,
+            button.parentElement.parentElement.getBoundingClientRect().left + 30,
+            button.getBoundingClientRect().bottom);
     }
     
     showEncodePagePopup(button) {
@@ -289,7 +317,7 @@ class ExtendedAscii {
         }
     }
     
-    _setEncodedText(encodedBytes) {
+    _setTextToEncode(encodedBytes) {
         this.#textEncode.value = this._decode(encodedBytes, this.#encodePage);
         return this.#textEncode.value;
     }
@@ -334,6 +362,10 @@ class ExtendedAscii {
         return this._getEncodedBytes();
     }
     
+    _addCharacterToEncode(character) {
+        return this.#textEncode.value + character;
+    }
+    
     _setDecodedText(encodedBytes) {
         this.#textDecode.value = this._decode(encodedBytes, this.#decodePage);
         return this.#textDecode.value;
@@ -346,13 +378,35 @@ class ExtendedAscii {
     }
     
     _fillCodePageData(page) {
-        this.#popupTable.setRows(8, (cellAddress, row, column, data) => String.fromCodePoint(page[cellAddress]));
+        this.#popupCodePageTable.setRows(8, (cellAddress, row, column, data) => String.fromCodePoint(page[cellAddress]));
+    }
+    
+    static numberToAsciiCharacter(number) {
+        if (number == 127) {
+            return ExtendedAscii.#asciiDelSymbol;
+        }
+      
+        return String.fromCharCode(number < 33 ? number + ExtendedAscii.#asciiControlToSymbol : number);
+    }
+    
+    static visualToActualAsciiCharacter(character) {
+        if (character == ExtendedAscii.#asciiDelSymbol) {
+            return String.fromCharCode(127);
+        }
+        
+        let code = character.charCodeAt(0);
+        if (code >= ExtendedAscii.#asciiControlToSymbol) {
+            return String.fromCharCode(code - ExtendedAscii.#asciiControlToSymbol);
+        }
+        
+        return character;
     }
 }
 
 window.onload = function() {
     popupText = new PopupText("popupText");
     ascii = new ExtendedAscii("comboDefaultText", "textEncode", "comboEncodePage",
+        "popupEncodeText", "asciiCharactersData",
         "popupCodePage", "codePageTitle", "comboCodePage", "codePageCharactersData",
         "asciiBytes", "comboDecodePage", "textDecode");
 }

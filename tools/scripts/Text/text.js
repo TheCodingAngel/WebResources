@@ -9,6 +9,10 @@ class TextApi {
     
     #codePointTree;
     
+    #stringsPopup;
+    #codePointsPopup;
+    #popupDialog;
+    
     #graphemeSplitter;
     #currentEncodingIdx;
     #utf8Encode;
@@ -43,7 +47,8 @@ class TextApi {
         {language: "Zalgo", text: "Z͑ͫ̓ͪ̂ͫ̽͏̴̙̤̞͉͚̯̞̠͍A̴̵̜̰͔ͫ͗͢L̠ͨͧͩ͘G̴̻͈͍͔̹̑͗̎̅͛́Ǫ̵̹̻̝̳͂̌̌͘!͖̬̰̙̗̿̋ͥͥ̂ͣ̐́́͜͞"},
     ];
     
-    constructor(elementStringsId, glyphsId, modifiersId, textFieldId, codePointTreeId, radioButtonIds) {
+    constructor(elementStringsId, glyphsId, modifiersId, textFieldId, codePointTreeId, radioButtonIds,
+                stringsPopupId, codePointsPopupId) {
         this.#elementStrings = document.getElementById(elementStringsId);
         this.#elementGlyphs = document.getElementById(glyphsId);
         this.#elementModifiers = document.getElementById(modifiersId);
@@ -51,6 +56,10 @@ class TextApi {
         this.#radioButtons = radioButtonIds.map(rbId => document.getElementById(rbId));
         
         this.#codePointTree = document.getElementById(codePointTreeId);
+        
+        this.#stringsPopup = document.getElementById(stringsPopupId);
+        this.#codePointsPopup = document.getElementById(codePointsPopupId);
+        this.#popupDialog = new PopupDialog();
         
         this.#elementStrings.size = this.#strings.length;
         for (let str of this.#strings) {
@@ -107,6 +116,22 @@ class TextApi {
         // https://encoding.spec.whatwg.org/#interface-textdecoder
         // https://developer.mozilla.org/en-US/docs/Web/API/Encoding_API/Encodings
         this.#utf8Encode = new TextEncoder();
+    }
+    
+    showStringsPopup(button) {
+        this.#popupDialog.show(this.#stringsPopup,
+            button.parentElement.parentElement.getBoundingClientRect().left + 30,
+            button.getBoundingClientRect().bottom);
+    }
+    
+    showCodePointsPopup(button) {
+        this.#popupDialog.show(this.#codePointsPopup,
+            button.parentElement.parentElement.getBoundingClientRect().left - 450,
+            button.getBoundingClientRect().bottom);
+    }
+    
+    closePopup() {
+        this.#popupDialog.hide();
     }
     
     addGlyphs() {

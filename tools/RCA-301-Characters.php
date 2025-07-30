@@ -7,7 +7,7 @@ require '../common/php/utils.php';
 
 <head>
   <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-  <title>RCA-301 - Word and Characters</title>
+  <title>RCA-301 - Numbers and Characters</title>
 
   <link type="text/css" rel="stylesheet" href="scripts/_Common/base.css">
   <link type="text/css" rel="stylesheet" href="scripts/Rca301_Characters/counters.css">
@@ -41,7 +41,7 @@ require '../common/php/utils.php';
     <li>»</li>
     <li><a href="">Tools</a></li>
     <li>»</li>
-    <li><h1>RCA-301 - Word and Characters</h1></li>
+    <li><h1>RCA-301 - Numbers and Characters</h1></li>
   </ul>
   <div class="flex-stretch-center-children">
   </div>

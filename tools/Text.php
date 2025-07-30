@@ -59,6 +59,58 @@ require '../common/php/utils.php';
 
 
 
+<div id="popupStrings" class="popup section-codepoint flex-column">
+  <div id="stringsHeader" class="flex-row flex-stretch-ortogonal">
+    <h3 id="stringsTitle" class="section-header flex-stretch-center-children">Unicode Strings</h3>
+    <button class="button flex-space-left" title="Close" onclick="textApi.closePopup()">ˣ</button>
+  </div>
+  <div id="stringsPanel" class="codepoint-panel flex-shrink">
+    <p>Note that "glyph" and "character" have one meaning for Unicode and another for writing systems.
+    </p>
+    <p>Text can have <a href="https://www.omniglot.com/writing/direction.htm">different orientation and directions</a>.
+    </p>
+    <p>Diacritics and other modifying or combining marks can be piled to form invalid
+       <a href="https://en.wikipedia.org/wiki/Zalgo_text">Zalgo</a> text.
+    </p>
+    <p>In a similar way glyphs can form grapheme clusters.
+       There are "joiner" and "non-joiner" modifiers used for forming and for breaking clusters.
+    </p>
+  </div>
+</div>
+
+
+
+<div id="popupCodePointTree" class="popup section-codepoint flex-column">
+  <div id="codePointTreeHeader" class="flex-row flex-stretch-ortogonal">
+    <h3 id="codePointTreeTitle" class="section-header flex-stretch-center-children">Code Points</h3>
+    <button class="button flex-space-left" title="Close" onclick="textApi.closePopup()">ˣ</button>
+  </div>
+  <div id="codePointTreePanel" class="codepoint-panel flex-shrink">
+    <p>A text could be just a list of characters and corresponding <a href="CodePoints.php">Code Points</a>.
+       However, diacritics and other modifiers could form clusters with their base letters.
+    </p>
+    <p>Each Code Point is encoded separately, which is why clusters have sub-elements -
+       one for each code point in the cluster.
+    </p>
+    <p>Encoding schemes with Code Units bigger than one byte (such as UTF-16 and UTF-32) have to use
+       <a href="https://www.unicode.org/versions/Unicode16.0.0/core-spec/chapter-2/#G27981">Byte Order Mark (BOM)</a>
+       to distinguish Little from Big Endian.
+       Note how the BOM values are treated as special
+       <a href="https://www.unicode.org/versions/Unicode16.0.0/core-spec/chapter-23/#G19635">"non-character"</a>
+       Code Points.
+    </p>
+    <p>UTF-8 also has a BOM but it's use is
+       <a href="https://www.unicode.org/L2/L2021/21038-bom-guidance.pdf">subject of debates</a>.
+       For HTML it is recommended to
+       <a href="https://www.w3.org/International/questions/qa-byte-order-mark">not use BOM for UTF-8</a>.
+    </p>
+    <p>Note - valid Extended ASCII characters <a href="ExtendedASCII.php">may clash</a> with UTF-8 BOM
+       (select the last "Default text" from the first combo box).
+    </p>
+  </div>
+</div>
+
+
 
 <div class="flex-row">
 
@@ -71,7 +123,7 @@ require '../common/php/utils.php';
 <div id="combiningSection" class="section-codepoint flex-column">
   <div id="combiningHeader" class="flex-row flex-stretch-ortogonal">
     <h3 class="section-header flex-stretch-center-children">Code Point Strings</h3>
-    <button class="button flex-space-left" onclick="codePointData.showPlanePopup(this)">?</button>
+    <button class="button flex-space-left" onclick="textApi.showStringsPopup(this)">?</button>
   </div>
 
 <label class="vertical-margins"><strong>Text:</strong></label>
@@ -169,7 +221,7 @@ require '../common/php/utils.php';
         </div>
       </div>
     </div>
-    <button class="button flex-space-left" title="Encoding Details" onclick="codePointData.showPlanePopup(this)">?</button>
+    <button class="button flex-space-left" title="Encoding Details" onclick="textApi.showCodePointsPopup(this)">?</button>
   </div>
   
   <div id="codePointPanel" class="codepoint-panel-tree flex-column flex-stretch">

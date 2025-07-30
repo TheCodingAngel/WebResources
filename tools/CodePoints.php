@@ -105,7 +105,7 @@ require '../common/php/utils.php';
       onmousedown="codePointData.viewPrevBlockStart(event)" onmouseup="codePointData.viewPrevBlockStop(event)"
       ontouchstart="codePointData.viewPrevBlockStart(event)" ontouchend="codePointData.viewPrevBlockStop(event)">Prev Block</button>
     
-    <h3 id="blockTitle" class="section-header flex-stretch-center-children flex-pos-ortogonal-center">Block</h3>
+    <h3 id="blockTitle" class="section-header flex-stretch-center-children">Block</h3>
     
     <button class="button flex-pos-ortogonal-end flex-space-left"
       onmousedown="codePointData.viewNextBlockStart(event)" onmouseup="codePointData.viewNextBlockStop(event)"
@@ -143,7 +143,7 @@ require '../common/php/utils.php';
 
 <div id="popupCodePoints" class="popup section-codepoint flex-column">
   <div id="codePointsHeader" class="flex-row flex-stretch-ortogonal">
-    <h3 id="codePointsTitle" class="section-header flex-stretch-center-children flex-pos-ortogonal-center">Code Points</h3>
+    <h3 id="codePointsTitle" class="section-header flex-stretch-center-children">Code Points</h3>
     <button class="button flex-space-left" title="Close" onclick="codePointData.closePopup()">ˣ</button>
   </div>
   <div id="codePointsPanel" class="codepoint-panel flex-shrink">
@@ -179,7 +179,7 @@ require '../common/php/utils.php';
 
 <div id="popupCharacterInfo" class="popup section-codepoint flex-column">
   <div id="characterInfoHeader" class="flex-row flex-stretch-ortogonal">
-    <h3 id="characterInfoTitle" class="section-header flex-stretch-center-children flex-pos-ortogonal-center">Encoding Code Points into Code Units</h3>
+    <h3 id="characterInfoTitle" class="section-header flex-stretch-center-children">Encoding Code Points into Code Units</h3>
     <button class="button flex-space-left" title="Close" onclick="characters.closePopup()">ˣ</button>
   </div>
   <div id="characterInfoPanel" class="codepoint-panel flex-shrink">
@@ -188,8 +188,8 @@ require '../common/php/utils.php';
       <button class="button"
         onmousedown="codeUnits.prevCharacterStart(event)" onmouseup="codeUnits.prevCharacterStop(event)"
         ontouchstart="codeUnits.prevCharacterStart(event)" ontouchend="codeUnits.prevCharacterStop(event)">❰ Prev</button>
-      <a id="characterInfoPreview" class="info-inactive">𲎯</a>
-      <a id="characterInfoCode" class="info-inactive">U+323AF</a>
+      <a id="characterInfoPreview" class="info-inactive"></a>
+      <a id="characterInfoCode" class="info-inactive"></a>
       <button class="button"
         onmousedown="codeUnits.nextCharacterStart(event)" onmouseup="codeUnits.nextCharacterStop(event)"
         ontouchstart="codeUnits.nextCharacterStart(event)" ontouchend="codeUnits.nextCharacterStop(event)">Next ❱</button>
@@ -243,7 +243,7 @@ require '../common/php/utils.php';
 
 <div id="popupCategories" class="popup section-codepoint flex-column">
   <div id="categoriesHeader" class="flex-row flex-stretch-ortogonal">
-    <h3 id="categoriesTitle" class="section-header flex-stretch-center-children flex-pos-ortogonal-center">Character categories</h3>
+    <h3 id="categoriesTitle" class="section-header flex-stretch-center-children">Character categories</h3>
     <button class="button flex-space-left" title="Close" onclick="characters.closePopup()">ˣ</button>
   </div>
   <div id="categoriesPanel" class="codepoint-panel flex-shrink">

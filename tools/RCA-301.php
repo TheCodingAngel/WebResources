@@ -14,7 +14,7 @@ require '../common/php/utils.php';
 
   <script type="text/javascript" defer src="scripts/_Common/utils_base.js"></script>
   <script type="text/javascript" defer src="scripts/_Common/wizard_base.js"></script>
-  <script type="text/javascript" defer src="scripts/Rca301/wizard_demo.js"></script>
+  <script type="text/javascript" defer src="scripts/Rca301/wizard.js"></script>
   
   <script type="text/javascript" defer src="scripts/Rca301/utils.js"></script>
   <script type="text/javascript" defer src="scripts/Rca301/memory.js"></script>

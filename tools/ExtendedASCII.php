@@ -63,6 +63,51 @@ require '../common/php/utils.php';
 
 
 
+<div id="popupEncodeText" class="popup section-codepoint flex-column">
+  <div id="encodeTextHeader" class="flex-row flex-stretch-ortogonal">
+    <h3 id="encodeTextTitle" class="section-header flex-stretch-center-children">Extended ASCII has Code Pages</h3>
+    <button class="button flex-space-left" title="Close" onclick="ascii.closePopup()">ˣ</button>
+  </div>
+  <div id="encodeTextPanel" class="codepoint-panel flex-shrink">
+    <p>Each of the 128 numbers between 80<sub><b>16</b></sub> and FF<sub><b>16</b></sub> is matched
+       to <strong>different characters</strong> depending on the <strong>code page</strong> -
+       check out the <strong>following sections</strong>.
+    </p>
+    <p>If a character is not in a code page, it cannot be encoded
+       (so its encoded value is <mark>??</mark> and the corresponding decoded character is <mark>☐</mark>).
+    </p>
+    <p>Each of the 128 numbers between 00<sub><b>16</b></sub> and 7F<sub><b>16</b></sub> is matched
+       to <strong>one character</strong> in the original ASCII, so it is always the same after encoding and decoding:
+    </p>
+    <table id="asciiCharactersTable" class="characters clear-table">
+      <thead>
+        <tr>
+          <th class="table-header" role="columnheader" scope="column">Hex</th>
+          <th class="table-header" role="columnheader" scope="column">0</th>
+          <th class="table-header" role="columnheader" scope="column">1</th>
+          <th class="table-header" role="columnheader" scope="column">2</th>
+          <th class="table-header" role="columnheader" scope="column">3</th>
+          <th class="table-header" role="columnheader" scope="column">4</th>
+          <th class="table-header" role="columnheader" scope="column">5</th>
+          <th class="table-header" role="columnheader" scope="column">6</th>
+          <th class="table-header" role="columnheader" scope="column">7</th>
+          <th class="table-header" role="columnheader" scope="column">8</th>
+          <th class="table-header" role="columnheader" scope="column">9</th>
+          <th class="table-header" role="columnheader" scope="column">A</th>
+          <th class="table-header" role="columnheader" scope="column">B</th>
+          <th class="table-header" role="columnheader" scope="column">C</th>
+          <th class="table-header" role="columnheader" scope="column">D</th>
+          <th class="table-header" role="columnheader" scope="column">E</th>
+          <th class="table-header" role="columnheader" scope="column">F</th>
+        </tr>
+      </thead>
+      <tbody id="asciiCharactersData">
+      </tbody>
+    </table>
+  </div>
+</div>
+
+
 <div id="popupCodePage" class="popup section-codepoint flex-column">
   <div id="codePageHeader" class="flex-row flex-stretch-ortogonal">
     <h3 id="codePageTitle" class="section-header flex-pos-ortogonal-center">Characters for page...</h3>
@@ -71,6 +116,9 @@ require '../common/php/utils.php';
     <button class="button flex-space-left" title="Close" onclick="ascii.closePopup()">ˣ</button>
   </div>
   <div id="codePagePanel" class="codepoint-panel flex-shrink">
+    <p>If a character is not in a code page, it cannot be encoded
+       (so its encoded value is <mark>??</mark> and the corresponding decoded character is <mark>☐</mark>).
+    </p>
     <table id="codePageCharacters" class="data clear-table">
       <thead>
         <tr>
@@ -112,7 +160,7 @@ require '../common/php/utils.php';
     <label class="flex-pos-ortogonal-center flex-space-left">Default Text for:</label>
     <select id="comboDefaultText" class="data flex-pos-ortogonal-center">
     </select>
-    <button class="button" onclick="codePointData.showPlanePopup(this)">?</button>
+    <button class="button" onclick="ascii.showTextEncodePopup(this)">?</button>
   </div>
   <div id="textEncodePanel" class="flex-column flex-stretch-ortogonal disable-dbl-tap-zoom">
     <textarea id="textEncode" class="data-big flex-stretch-ortogonal" rows="3" cols="40"></textarea>
@@ -129,7 +177,7 @@ require '../common/php/utils.php';
 
 <div id="asciiCodesSection" class="section-codepoint flex-column">
   <div id="asciiCodesHeader" class="flex-row flex-stretch-ortogonal">
-    <h3 class="section-header flex-pos-ortogonal-center">Encoded Bytes (Hexadecimal):</h3>
+    <h3 class="section-header flex-pos-ortogonal-center">Encoded Bytes (Hexadecimal values):</h3>
     <select id="comboEncodePage" class="data flex-pos-ortogonal-center flex-space-left">
     </select>
     <button class="button" onclick="ascii.showEncodePagePopup(this)">Show Code Page</button>
