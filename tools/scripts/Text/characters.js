@@ -4,6 +4,7 @@ class Characters {
     static #CATEGORY_SEPARATOR = "\\";
     static #DEFAULT_DESCRIPTION = "Code Point";
     static #DEFAULT_ENCODED_TEXT = "-";
+    static #DEFAULT_CATEGORY = "Any";
     
     #characterInfoPopup;
     #categoriesPopup;
@@ -32,8 +33,6 @@ class Characters {
     constructor(charDescriptionId, charNameId, textSearchId, characterListId,
                 categoriesPopupId, characterInfoPopupId, encodedDataId, characterPreviewId, linkPreviewId,
                 categoryPreviewPrefix, applyCategoriesId, categoryIds) {
-        let _this = this;
-        
         this.#charDescription = document.getElementById(charDescriptionId);
         this.#charName = document.getElementById(charNameId);
         
@@ -69,26 +68,29 @@ class Characters {
         
         this.onCodePointChanged(0);
         
-        for (const c of UnicodeCategories) {
-            this._addOption(this.#categorySelect[0],
-                c.Name, c.Name, c.Name);
-        }
+        let _this = this;
+        
+        this.#textSearch.addEventListener("keyup", function(e) {
+            if (Keys.isEnter(e.key)) {
+                _this.searchCharacter();
+            }
+        });
         
         disableAutomaticResizing(this.#characterList);
         this.#characterList.style.width = "45rem";
         this._fillCategories(UnicodeCategories, this.#categories);
         
-        this.#categorySelect[0].addEventListener("change", function() {
-            _this._setupNextCategoryElements(0, this.value);
-        });
+        this._setupCategoryElements(this.#categorySelect[0], this.#categories);
+        for (let i = 1; i < this.#categorySelect.length; i++) {
+            this._addDefaultCategory(this.#categorySelect[i]);
+        }
         
-        this.#categorySelect[1].addEventListener("change", function() {
-            _this._setupNextCategoryElements(1, this.value);
-        });
-        
-        this.#categorySelect[2].addEventListener("change", function() {
-            _this._setupNextCategoryElements(2, this.value);
-        });
+        // Note - the last combo doesn't need to dynamicaly change following combos
+        for (let i = 0; i < this.#categorySelect.length - 1; i++) {
+            this.#categorySelect[i].addEventListener("change", function() {
+                _this._setupNextCategoryElements(i, this.value);
+            });
+        }
         
         this.#characterList.addEventListener("change", function() {
             _this.onSelectedCharacterChanged(_this.#characterList.options[_this.#characterList.selectedIndex]);
@@ -107,7 +109,7 @@ class Characters {
     
     showCategoriesPopup(button) {
         this.#popupDialog.show(this.#categoriesPopup,
-            button.parentElement.getBoundingClientRect().left + 30, button.getBoundingClientRect().bottom);
+            button.parentElement.getBoundingClientRect().left + 30, button.getBoundingClientRect().bottom - 350);
     }
     
     closePopup() {
@@ -169,13 +171,30 @@ class Characters {
             name.substring(0, name.length - 1), description, categories);
     }
     
-    // Supports range search: U+0080-0FFF
+    // Supports range search: U+0080-0FDA
     searchCharacter() {
         let foundCharacters = this._findCharacters(this.#textSearch.value,
-            /*ComparerConfig.isCaseSensitive |*/ ComparerConfig.isSubstring,
-            ComparerConfig.forceNotEqual /*| ComparerConfig.isSubstring*/);
+            ComparerConfig.isSubstring, ComparerConfig.forceNotEqual);
         
         this._setCharacters(foundCharacters);
+    }
+    
+    applyCategories() {
+        for (let i = 0; i < this.#categorySelect.length; i++) {
+            let category = Characters.#DEFAULT_CATEGORY;
+            
+            if (i < this.#categoriesPreview.length) {
+                let preview = this.#categoriesPreview[i];
+                if (preview && preview.textContent) {
+                    category = preview.textContent;
+                }
+            }
+            
+            if (i < this.#categorySelect.length - 1) {
+                this._setupCategoryElements(this.#categorySelect[i + 1], this._getSubCategories(i, category));
+            }
+            this.#categorySelect[i].value = category;
+        }
     }
     
     getCharactersByCategory() {
@@ -183,13 +202,30 @@ class Characters {
         
         let categoryComparer = new Comparer(ComparerConfig.isCaseSensitive);
         
+        let _this = this;
+        
         for (const character of CodePoints) {
-            if (categoryComparer.arrayContains(character.Categories, this.#categorySelect[0].value)) {
+            let isMatch = categoryComparer.arrayMatches(character.Categories, (index) => {
+                let category = index < _this.#categorySelect.length ?
+                    _this.#categorySelect[index].value : Characters.#DEFAULT_CATEGORY;
+                return category != Characters.#DEFAULT_CATEGORY ? category : null;
+            });
+            
+            if (isMatch && !this._areMoreCategoryFilters(character.Categories)) {
                 foundCharacters.push(character);
             }
         }
         
         this._setCharacters(foundCharacters);
+    }
+    
+    _areMoreCategoryFilters(categories) {
+        for (let i = categories.length; i < this.#categorySelect.length; i++) {
+            if (this.#categorySelect[i].value != Characters.#DEFAULT_CATEGORY) {
+                return true;
+            }
+        }
+        return false;
     }
     
     _fillCategories(arr, map) {
@@ -203,12 +239,21 @@ class Characters {
     }
     
     _setupNextCategoryElements(depth, categoryName) {
-        this._setupCategoryElements(this.#categorySelect[depth + 1], this._getSubCategories(depth, categoryName));
+        for (let i = depth; i < this.#categorySelect.length - 1; i++) {
+            this._setupCategoryElements(this.#categorySelect[i + 1], this._getSubCategories(i, categoryName));
+        }
     }
     
     _setupCategoryElements(element, map) {
         clearSelect(element);
-        for (const categoryName of map.keys()) {
+        this._addDefaultCategory(element);
+        
+        if (!isValid(map)) {
+            return;
+        }
+        
+        let sortedCategories = map.keys().toArray().sort();
+        for (const categoryName of sortedCategories) {
             this._addOption(element, categoryName, categoryName, categoryName);
         }
     }
@@ -217,8 +262,15 @@ class Characters {
         let parentMap = this.#categories;
         for (let i = 0; i < depth; i++) {
             parentMap = parentMap.get(this.#categorySelect[i].value);
+            if (!isValid(parentMap)) {
+                return parentMap;
+            }
         }
         return parentMap.get(categoryName);
+    }
+    
+    _addDefaultCategory(element) {
+        this._addOption(element, "anyCategory", Characters.#DEFAULT_CATEGORY, "[Any]");
     }
     
     _getDescription(generalCategory) {
@@ -274,7 +326,8 @@ class Characters {
         const utf8 = this.#utf8Encode.encode(character);
         for (let i = 1; i < utf8Row.cells.length; i++) {
             const dataIndex = i - 1;
-            utf8Row.cells[i].textContent = dataIndex < utf8.length ? toHexString(utf8[dataIndex], 2) : Characters.#DEFAULT_ENCODED_TEXT;
+            utf8Row.cells[i].textContent = dataIndex < utf8.length ?
+                toHexString(utf8[dataIndex], 2) : Characters.#DEFAULT_ENCODED_TEXT;
         }
         
         const utf16 = TextCode.stringToUtf16(character);

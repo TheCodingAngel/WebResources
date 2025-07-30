@@ -78,6 +78,21 @@ class Comparer {
         
         return false;
     }
+    
+    arrayMatches(array, callback) {
+        if (this.#config & ComparerConfig.forceNotEqual) {
+            return false;
+        }
+        
+        for (let i = 0; i < array.length; i++) {
+            const str = callback(i);
+            if (str !== null && !this.stringsEqual(array[i], str)) {
+                return false;
+            }
+        }
+        
+        return true;
+    }
 }
 
 function checkWord(str, word, isCaseSensitive = true) {

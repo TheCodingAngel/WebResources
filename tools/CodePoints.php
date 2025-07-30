@@ -259,6 +259,10 @@ require '../common/php/utils.php';
       <br>
       <button class="button" onclick="characters.saveCategories()">Convert to JavaScript a "categories.txt" file from your computer</button>
     </p>
+    <p>Searching supports both characters (π) and Code Points (U+03C0).<br>
+       Code Point ranges are also supported - example: U+009C-03CE.<br>
+       Searching for empty string gives all characters in the database.
+    </p>
   </div>
 </div>
 
@@ -485,7 +489,7 @@ require '../common/php/utils.php';
           </ul>
         </ul>
     </ul>
-    <button id="applyCategories" class="button flex-space-top" onclick="codePointData.showPlanePopup(this)">Apply Categories</button>
+    <button id="applyCategories" class="button flex-space-top" onclick="characters.applyCategories()">Apply Categories</button>
   </div>
   </div>
 </div>
