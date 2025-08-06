@@ -54,10 +54,12 @@ class Instructions {
         ['P', 0],                // for a Pointer (an address given as value)
     ]);
 
-    static ForcedCharCount = {
+    static ForceCharCount = {
         None: 0,
-        NoLeftValue: 1,
-        Full: 2,
+        OnlyLeftRegister: 1,
+        OnlyRight: 2,
+        ExcludeLeftValue: 3,
+        LeftAndRight: 4,
     }
 
     #twoValueSufixes = new Map([
@@ -157,7 +159,7 @@ class Instructions {
 
     _compare(opcode, suffix, a, b) {
         let valueTypePair = this._getValueTypePair("compare", opcode, suffix, ['R', 'V']);
-        let valuesInfo = this._getValuesInfo(valueTypePair[0], valueTypePair[1], a, b, Instructions.ForcedCharCount.Full);
+        let valuesInfo = this._getValuesInfo(valueTypePair[0], valueTypePair[1], a, b, Instructions.ForceCharCount.LeftAndRight);
 
         let valueA = valuesInfo.getValue(valueTypePair[0], a, ValuesInfo.IndirectionType.None);
         let valueANum = parseIntOrNull(valueA);
@@ -181,7 +183,7 @@ class Instructions {
 
     _compareString(opcode, suffix, a, b) {
         let valueTypePair = this._getValueTypePair("compare", opcode, suffix, ['P', 'P']);
-        let valuesInfo = this._getValuesInfo(valueTypePair[0], valueTypePair[1], a, b, Instructions.ForcedCharCount.None);
+        let valuesInfo = this._getValuesInfo(valueTypePair[0], valueTypePair[1], a, b, Instructions.ForceCharCount.None);
 
         let valueA = valuesInfo.getValue(valueTypePair[0], a, ValuesInfo.IndirectionType.MemoryAndRegisters);
         let valueB = valuesInfo.getValue(valueTypePair[1], b, ValuesInfo.IndirectionType.MemoryAndRegisters);
@@ -207,7 +209,7 @@ class Instructions {
 
     _find(opcode, suffix, a, b) {
         let valueType = this._getValueType("find", opcode, suffix, 'R');
-        let valuesInfo = this._getValuesInfo(valueType, null, a, b, Instructions.ForcedCharCount.None);
+        let valuesInfo = this._getValuesInfo(valueType, null, a, b, Instructions.ForceCharCount.None);
 
         let count = parseInt(b[0]);
         let chars = []
@@ -361,16 +363,20 @@ class Instructions {
     }
 
     _in(opcode, suffix, a, b) {
-        let valueType = this._getValueType("input", opcode, suffix, 'V');
-        this._verifyInstructionPointer("input", opcode, "change", valueType, a);
+        let valueTypePair = this._getValueTypePair("input", opcode, suffix, ['V', 'V']);
+        this._verifyInstructionPointer("input", opcode, "change", valueTypePair[0], a);
+        this._verifyInstructionPointer("input", opcode, "use as a port number", valueTypePair[1], b);
         
-        let port = parseIntOrNull(b);
+        let valuesInfo = this._getValuesInfo(valueTypePair[0], valueTypePair[1], a, b, Instructions.ForceCharCount.OnlyLeftRegister);
+        
+        // The false flag for limiting char count is because we don't want limitations for port value
+        // to affect the actual value
+        let portValue = valuesInfo.getValue(valueTypePair[1], b, ValuesInfo.IndirectionType.None, false);
+        let port = parseIntOrNull(portValue);
         if (port == null) {
-            throw new InstructionError("Invalid port value (must be a number): " + b);
+            throw new InstructionError("Invalid port value (must be a number): " + portValue);
         }
 
-        let valuesInfo = this._getValuesInfo(valueType, null, a, b);
-        
         let characterCount = valuesInfo.getCharacterCount();
         let newValue = this.#io.readFromPort(port, characterCount);
         
@@ -380,22 +386,26 @@ class Instructions {
             throw new InstructionError("Input not supported for the device on port " + port);
         }
 
-        valuesInfo.setValue(valueType, a, newValue, true);
+        valuesInfo.setValue(valueTypePair[0], a, newValue, true);
         this.#cpu.setCustomCounter(characterCount - newValue.length);
         this.#cpu.setFlags(null, null, !valuesInfo.isUsingCustomCounter());
     }
 
     _out(opcode, suffix, a, b) {
-        let valueType = this._getValueType("output", opcode, suffix, 'P');
+        let valueTypePair = this._getValueTypePair("output", opcode, suffix, ['V', 'P']);
+        this._verifyInstructionPointer("output", opcode, "use as a port number", valueTypePair[0], a);
         
-        let port = parseIntOrNull(a);
+        let valuesInfo = this._getValuesInfo(valueTypePair[0], valueTypePair[1], a, b, Instructions.ForceCharCount.OnlyRight);
+        
+        // The false flag for limiting char count is because we don't want limitations for port value
+        // to affect the actual value
+        let portValue = valuesInfo.getValue(valueTypePair[0], a, ValuesInfo.IndirectionType.None, false);
+        let port = parseIntOrNull(portValue);
         if (port == null) {
-            throw new InstructionError("Invalid port value (must be a number): " + a);
+            throw new InstructionError("Invalid port value (must be a number): " + portValue);
         }
 
-        let valuesInfo = this._getValuesInfo(null, valueType, a, b);
-        let value = valuesInfo.getValue(valueType, b, ValuesInfo.IndirectionType.None);
-
+        let value = valuesInfo.getValue(valueTypePair[1], b, ValuesInfo.IndirectionType.None);
         let charsNotWritten = this.#io.writeToPort(port, value, valuesInfo.getCharacterCount());
         if (charsNotWritten == null) {
             throw new InstructionError("Device not found on port " + port);
@@ -404,7 +414,7 @@ class Instructions {
         }
         
         this.#cpu.setCustomCounter(charsNotWritten);
-        this.#cpu.setFlags(null, null, valueType == 'P' || valueType == 'A' ?
+        this.#cpu.setFlags(null, null, valueTypePair[1] == 'P' || valueTypePair[1] == 'A' ?
             !valuesInfo.isUsingCustomCounter() : charsNotWritten > 0);
     }
 
@@ -479,24 +489,32 @@ class Instructions {
     _verifyInstructionPointer(name, opcode, action, valueType, a) {
         if (valueType == 'R' && this.#cpu.isOperandInstructionPointer(a)) {
             throw new InstructionError(`Cannot ${action} with "${opcode}" (${name}) the instruction pointer (EIP or register identifier ${a}).\n` +
-                `Either change the register identifier or use a jump instruction instead.`);
+                `Either change the register identifier or use a jump instruction if you want to change EIP.`);
         }
     }
 
-    _getValuesInfo(valueTypeLeft, valueTypeRight, a, b, forceCharCount = Instructions.ForcedCharCount.NoLeftValue) {
+    _getValuesInfo(valueTypeLeft, valueTypeRight, a, b, forceCharCount = Instructions.ForceCharCount.ExcludeLeftValue) {
         let charCountLeft = 0;
         let charCountRight = 0;
 
         switch (forceCharCount) {
-            case Instructions.ForcedCharCount.Full:
+            case Instructions.ForceCharCount.LeftAndRight:
                 charCountLeft = this.#forcedCharacterCount.get(valueTypeLeft);
                 charCountRight = this.#forcedCharacterCount.get(valueTypeRight);
                 break;
-            case Instructions.ForcedCharCount.NoLeftValue:
+            case Instructions.ForceCharCount.ExcludeLeftValue:
                 if (valueTypeLeft != 'V') {
                     charCountLeft = this.#forcedCharacterCount.get(valueTypeLeft);
                 }
                 charCountRight = this.#forcedCharacterCount.get(valueTypeRight);
+                break;
+            case Instructions.ForceCharCount.OnlyRight:
+                charCountRight = this.#forcedCharacterCount.get(valueTypeRight);
+                break;
+            case Instructions.ForceCharCount.OnlyLeftRegister:
+                if (valueTypeLeft == 'R') {
+                    charCountLeft = this.#forcedCharacterCount.get(valueTypeLeft);
+                }
                 break;
         }
 
@@ -593,10 +611,13 @@ class ValuesInfo {
         return this.#characterCount;
     }
 
-    getValue(valueType, operand, indirection) {
+    // The char count should not limited when the operands contain independent information
+    getValue(valueType, operand, indirection, limitCharCount = true) {
         let value = this._getValueInternal(valueType, operand, indirection);
         // value might be limited by using a subregister or an address near the end of the memory
-        this.#characterCount = Math.min(this.#characterCount, value.length);
+        if (limitCharCount) {
+            this.#characterCount = Math.min(this.#characterCount, value.length);
+        }
         return value;
     }
 
