@@ -244,6 +244,10 @@ function isMaskSet(value, fullMask, specificMask) {
     return (value & specificMask) === specificMask;
 }
 
+function getPropertiesCount(obj) {
+    return Object.keys(obj).length;
+}
+
 function loadJavascript(id, url, callbackLoad, callbackError) {
     if (document.getElementById(id)) {
         return;

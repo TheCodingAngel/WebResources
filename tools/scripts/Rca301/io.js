@@ -13,12 +13,12 @@ class IO {
     static #teleprinterInputCapacity = 80;
     static #teleprinterPrintCapacity = 80;
 
-    // we may want to skip port numbers so use map istead of array
+    // we may have unassigned port numbers so use map istead of array
     #devices = new Map([
-        [0, {read: null,                             write: this._print.bind(this)}],
-        [1, {read: this._readPunch.bind(this),       write: null}],
-        [2, {read: this._readTeleprinter.bind(this), write: this._printTeleprinter.bind(this)}],
-        [3, {read: this._readFile.bind(this),        write: this._writeFile.bind(this)}],
+        [0, {read: null,                             write: this._print.bind(this),            hasData : null}],
+        [1, {read: this._readPunch.bind(this),       write: null,                              hasData : this._isPunchReady.bind(this)}],
+        [2, {read: this._readTeleprinter.bind(this), write: this._printTeleprinter.bind(this), hasData : this._isTeleprinterReady.bind(this)}],
+        [3, {read: this._readFile.bind(this),        write: this._writeFile.bind(this),        hasData : this._isFileReady.bind(this)}],
     ]);
 
     constructor(memory, readerElement, writerElement, teleprinterElement) {
@@ -144,10 +144,25 @@ class IO {
         }
         return maxCharCount > 0 ? device.write(value, maxCharCount) : 0;
     }
+    
+    isMoreDataOnPort(port) {
+        let device = this.#devices.get(port);
+        if (!device) {
+            return null;
+        }
+        if (!device.hasData) {
+            return false;
+        }
+        return device.hasData();
+    }
 
     _readPunch(maxCharCount) {
         this.#punchReader.resetIfChanged(this.#readerElement.value);
         return this.#punchReader.read(maxCharCount);
+    }
+    
+    _isPunchReady() {
+        return this.#punchReader.hasData();
     }
 
     _print(value, maxCharCount) {
@@ -166,6 +181,10 @@ class IO {
         this.#teleprinterElement.value += value.substring(0, max);
         return maxCharCount - max;
     }
+    
+    _isTeleprinterReady() {
+        return this.#teleprinter.hasData();
+    }
 
     _readFile(maxCharCount) {
 
@@ -173,6 +192,10 @@ class IO {
 
     _writeFile(value, maxCharCount) {
         
+    }
+    
+    _isFileReady() {
+        return false;
     }
 
     static _getTeleprinterCharacter(key) {
@@ -231,6 +254,10 @@ class ReaderBuffer {
         this.#position = Math.min(this.#position + maxCharCount, this.#value.length);
         return this.#value.substring(oldPosition, this.#position);
     }
+    
+    hasData() {
+        return this.#position >= 0 && this.#position < this.#value.length;
+    }
 }
 
 class CircularBuffer {
@@ -265,5 +292,9 @@ class CircularBuffer {
     
     getValue() {
         return this.#value;
+    }
+    
+    hasData() {
+        return this.#value.length > 0;
     }
 }

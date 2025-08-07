@@ -14,13 +14,17 @@ class Instructions {
     #cpu;
 
     #haltOpcode = '.';
+    #breakpointOpcode = ',';
+    #iretOpcode = ':';
+    
+    #lastBreakpointAddress = -1;
 
     #all = new Map([
         [' ', this._nop.bind(this)],
 
         ['M', this._move.bind(this)],
-        ['T', this._moveString.bind(this)],
-        ['S', this._storeString.bind(this)],
+        ['S', this._moveString.bind(this)],
+        ['"', this._storeString.bind(this)],
 
         ['?', this._compare.bind(this)],
         ['C', this._compareString.bind(this)],
@@ -35,6 +39,15 @@ class Instructions {
         ['G', this._jumpIfGreaterOrEqual.bind(this)],
         ['$', this._jumpIfOverflow.bind(this)],
 
+        [this.#haltOpcode, this._halt.bind(this)],
+        ['T', this._int.bind(this)],  // inTerrupt = Trap
+        [this.#breakpointOpcode, this._int3.bind(this)],
+        [this.#iretOpcode, this._iret.bind(this)],
+        ['@', this._call.bind(this)],
+        [';', this._ret.bind(this)],
+        ['(', this._push.bind(this)],
+        [')', this._pop.bind(this)],
+        
         ['+', this._add.bind(this)],
         ['-', this._subtract.bind(this)],
         ['*', this._multiply.bind(this)],
@@ -75,7 +88,7 @@ class Instructions {
 
         ['M', ['V', 'R']],
         ['N', ['V', 'A']],
-        ['O', ['V', 'V']],
+        ['U', ['V', 'V']],
         ['Q', ['V', 'P']],
 
         ['W', ['P', 'R']],
@@ -99,11 +112,23 @@ class Instructions {
         }
 
         let opcode = characters[0];
-        if (opcode == this.#haltOpcode) {
-            alert("Reached the end of execution:\nSystem halted");
-            return false;
+        switch (opcode) {
+            case this.#haltOpcode:
+                alert("Reached the end of execution:\nSystem halted");
+                return false;
+            case this.#breakpointOpcode:
+                let currentAddr = this.#cpu.getInstructionPointer();
+                let shouldContinue = this.#lastBreakpointAddress == currentAddr;
+                if (shouldContinue) {
+                    this.#lastBreakpointAddress = -1;
+                    this.#cpu.incrementInstructionPointer();
+                } else {
+                    this.#lastBreakpointAddress = currentAddr;
+                    alert("Reached a breakpoint");
+                }
+                return shouldContinue;
         }
-
+        
         let instruction = this.#all.get(opcode);
         if (!instruction) {
             throw new InstructionError("Unknown opcode: " + opcode);
@@ -320,6 +345,102 @@ class Instructions {
         return newAddress;
     }
 
+    _halt(opcode, suffix, a, b) {
+    }
+    
+    _int(opcode, suffix, a, b) {
+        if (suffix != ' ') {
+            throw new InstructionError(`Incorrect suffix "${suffix}" for instruction "${opcode}" (int); only the default suffix of empty space is allowed as a suffix.`);
+        }
+        let interruptNumber = parseIntOrNull(a);
+        if (interruptNumber != null) {
+            this._executeInterrupt(interruptNumber);
+        }
+    }
+    
+    _int3(opcode, suffix, a, b) {
+        this._executeInterrupt(3);
+    }
+    
+    _executeInterrupt(interruptNumber) {
+        let memoryCapacity = this.#memory.getCapacity();
+        let registers = this.#cpu.getAllRegisters();
+        
+        let stackPointer = this.#cpu.getStackPointer();
+        if (stackPointer < registers.length) {
+            throw new InstructionError(`Incorrect Stack Pointer value for interrupts: "${stackPointer}" (must be between ${registers.length} and ${memoryCapacity}).`);
+        }
+        
+        let idt = this.#cpu.getIDT();
+        let maxIdtValue = memoryCapacity - this.#cpu.getIDTSize();
+        if (idt < 0 || idt > maxIdtValue) {
+            throw new InstructionError(`Incorrect Interrupt Description Table value for interrupts: "${idt}" (must be between 0 and ${maxIdtValue}).`);
+        }
+        
+        let handlerAddress = parseIntOrNull(this.#memory.getTextAtAddress(idt + interruptNumber * CPU.registerSize, CPU.registerSize));
+        
+        this._pushValue(registers);
+        
+        this.#cpu.setInstructionPointer(handlerAddress);
+        let nextInstructionStr = this.#cpu.getNextInstruction();
+        while(nextInstructionStr[0] != ':') { // the opcode of iret
+            if (!this.executeInstruction(nextInstructionStr)) {
+                return; // special cases that break running loop (for example "halt" and "breakpoint")
+            }
+            nextInstructionStr = this.#cpu.getNextInstruction();
+        }
+        
+        // The "iret" instruction will pop all registers
+        this.executeInstruction(nextInstructionStr);
+    }
+    
+    _iret(opcode, suffix, a, b) {
+        let numCharacters = this.#cpu.getAllRegistersSize();
+        let registers = this._popValue(numCharacters);
+        this.#cpu.setAllRegisters(registers);
+        
+        return this.#cpu.getInstructionPointer();
+    }
+    
+    _call(opcode, suffix, a, b) {
+    }
+    
+    _ret(opcode, suffix, a, b) {
+    }
+    
+    _push(opcode, suffix, a, b) {
+        let valueType = this._getValueType(name, opcode, suffix, 'R');
+        let valuesInfo = this._getValuesInfo(valueType, null, a, null);
+        
+        let value = valuesInfo.getValue(valueType, a, ValuesInfo.IndirectionType.None);
+        this._pushValue(value);
+    }
+    
+    _pop(opcode, suffix, a, b) {
+        let valueType = this._getValueType(name, opcode, suffix, 'R');
+        this._verifyInstructionPointer("pop", opcode, "change", valueType, a);
+        
+        let valuesInfo = this._getValuesInfo(valueType, null, a, null);
+        
+        let numCharacters = valuesInfo.getCharacterCount();
+        let newValue = this._popValue(numCharacters);
+        valuesInfo.setValue(valueType, a, newValue);
+    }
+    
+    _pushValue(value) {
+        let stackAddress = this.#cpu.pushStackPointer(value.length);
+        if (stackAddress < 0) {
+            return;
+        }
+        
+        this.#memory.setTextAtAddress(stackAddress, value);
+    }
+    
+    _popValue(numCharacters) {
+        let stackAddress = this.#cpu.popStackPointer(numCharacters);
+        return this.#memory.getTextAtAddress(stackAddress, numCharacters);
+    }
+
     _add(opcode, suffix, a, b) {
         this._arithmetic_2("add", opcode, suffix, a, b, (valueA, valueB) => {
             return valueA + valueB;
@@ -388,7 +509,7 @@ class Instructions {
 
         valuesInfo.setValue(valueTypePair[0], a, newValue, true);
         this.#cpu.setCustomCounter(characterCount - newValue.length);
-        this.#cpu.setFlags(null, null, !valuesInfo.isUsingCustomCounter());
+        this.#cpu.setFlags(null, null, this.#io.isMoreDataOnPort(port));
     }
 
     _out(opcode, suffix, a, b) {
@@ -414,8 +535,7 @@ class Instructions {
         }
         
         this.#cpu.setCustomCounter(charsNotWritten);
-        this.#cpu.setFlags(null, null, valueTypePair[1] == 'P' || valueTypePair[1] == 'A' ?
-            !valuesInfo.isUsingCustomCounter() : charsNotWritten > 0);
+        this.#cpu.setFlags(null, null, charsNotWritten > 0);
     }
 
     _arithmetic_2(name, opcode, suffix, a, b, operation) {

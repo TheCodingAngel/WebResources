@@ -86,7 +86,7 @@ class Memory {
                 
                 let endAddress = memory.#selectedAddressEnd >= 0 ?
                     memory.#selectedAddressEnd :
-                    memory.#columnCount * memory.#rowCount - 1;
+                    memory.getCapacity() - 1;
                 memory.scrollAddressesIntoView(startAddress, endAddress);
             };
             //alert(fileList[0].name);
@@ -175,6 +175,10 @@ class Memory {
         this.#addressStartInput.value = this.#selectedAddressStart;
         this.#addressEndInput.value = this.#selectedAddressEnd;
     }
+    
+    getCapacity() {
+        return this.#rowCount * this.#columnCount;
+    }
 
     scrollToAddress(addressElement) {
         let address = addressElement.value ? addressElement.value : 0;
@@ -205,7 +209,7 @@ class Memory {
 
     saveToFile() {
         let text = this.#selectedAddressEnd < 0
-            ? this.getTextAtAddress(0, this.#rowCount * this.#columnCount)
+            ? this.getTextAtAddress(0, this.getCapacity())
             : this.onGetTextAtSelectedAddresses();
         saveTextToFile("MagneticTape.txt", text);
     }
@@ -250,7 +254,7 @@ class Memory {
         if (startCell) {
             let endAddress = this.#selectedAddressEnd >= 0 ?
                 this.#selectedAddressEnd :
-                this.#columnCount * this.#rowCount - 1;
+                this.getCapacity() - 1;
             this._zeroCells(startCell, endAddress - startAddress + 1);
             
             if (this.#selectedAddressStart >= 0) {
@@ -267,7 +271,7 @@ class Memory {
             
             let endAddress = this.#selectedAddressEnd >= 0 ?
                 this.#selectedAddressEnd :
-                this.#columnCount * this.#rowCount - 1;
+                this.getCapacity() - 1;
             this.scrollAddressesIntoView(startAddress, endAddress);
         }
     }
@@ -308,7 +312,7 @@ class Memory {
             startAddress = -1;
             endAddress = -1;
         } else {
-            let maxAddress = this.#rowCount * this.#columnCount - 1;
+            let maxAddress = this.getCapacity() - 1;
             startAddress = Math.min(startAddress, maxAddress);
             endAddress = Math.min(endAddress, maxAddress);
             if (startAddress < 0) {

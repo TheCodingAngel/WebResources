@@ -39,6 +39,15 @@ class CPU {
         StepByStep: 0x02,
         All: 0x03
     }
+    
+    // Multiply by 4 to get the address offset
+    static Interrupts = {
+        DivideByZero: 0,
+        InvalidOpcode: 1,
+        Halt: 2,
+        Breakpoint: 3,
+        Teleprinter: 4,
+    }
 
     #registers = new Map([
         [CPU.#instructionPointerId, {value: CPU.#defaultPointerValue}],
@@ -122,6 +131,10 @@ class CPU {
     getNextInstruction() {
         return this.#memory.getTextAtAddress(this.#registers.get(CPU.#instructionPointerId).value, CPU.instructionSize);
     }
+    
+    getInstructionPointer() {
+        return this.getRegisterValueById(CPU.#instructionPointerId);
+    }
 
     incrementInstructionPointer() {
         this.setInstructionPointer(this.#registers.get(CPU.#instructionPointerId).value + CPU.instructionSize);
@@ -136,6 +149,44 @@ class CPU {
         if (autoScroll) {
             this._scrollInstructionIntoView();
         }
+    }
+    
+    getAllRegistersSize() {
+        // controls and flags are converted to 2-character values, so together they take 1 register size
+        return (this.#registers.size + 1) * CPU.registerSize;
+    }
+    
+    // as a string value
+    getAllRegisters() {
+        let res = "";
+        for (let i = 0; i < this.#registersInfo.size(); i++) {
+            let id = this.#registersInfo.get(i).registerId;
+            let value = this.getRegisterValueById(id);
+            res += value;
+        }
+        
+        res += padOrCutNumber(this.#flags, 2);
+        res += padOrCutNumber(this.#control, 2);
+        return res;
+    }
+    
+    setAllRegisters(strValues) {
+        let items = Math.floor(strValues.length / CPU.registerSize);
+        for (let i = 0; i < items - 2; i++) {
+            let charIndex = i * CPU.registerSize;
+            let value = strValues.substring(charIndex, charIndex + CPU.registerSize);
+            let id = this.#registersInfo.get(i).registerId;
+            this.setRegisterValueById(id, value);
+        }
+        
+        let flags = parseIntOrZero(strValues.slice(-4, -2));
+        setFlags(this.isMaskSet(flags, CPU.FlagsMask.All, CPU.FlagsMask.Positive),
+                 this.isMaskSet(flags, CPU.FlagsMask.All, CPU.FlagsMask.Negative),
+                 this.isMaskSet(flags, CPU.FlagsMask.All, CPU.FlagsMask.Overflown));
+        
+        let control = parseIntOrZero(strValues.slice(-2));
+        setControl(this.isMaskSet(control, CPU.ControlMask.All, CPU.ControlMask.NegativeDirection),
+                   this.isMaskSet(control, CPU.ControlMask.All, CPU.ControlMask.StepByStep));
     }
 
     setFlags(isPositive, isNegative, isOverflown) {
@@ -170,6 +221,43 @@ class CPU {
         }
 
         this.setRegisterValueById("ecx", value);
+    }
+    
+    getCodeSegment() {
+        return parseIntOrNull(this.getRegisterValueById("cs"));
+    }
+    
+    getStackPointer() {
+        return parseIntOrNull(this.getRegisterValueById("esp"));
+    }
+    
+    pushStackPointer(numCharacters) {
+        let value = this.getStackPointer();
+        if (value < numCharacters) {
+            return -1;
+        }
+        
+        value -= numCharacters;
+        this.setRegisterValueById("esp", value);
+        return value;
+    }
+    
+    popStackPointer(numCharacters) {
+        let value = this.getStackPointer();
+        if (value >= this.#memory.getCapacity() - numCharacters) {
+            return -1;
+        }
+        
+        this.setRegisterValueById("esp", value + numCharacters);
+        return value;
+    }
+    
+    getIDT() {
+        return parseIntOrNull(this.getRegisterValueById("idt"));
+    }
+    
+    getIDTSize() {
+        return getPropertiesCount(CPU.Interrupts) * CPU.registerSize;
     }
 
     getRegisterValueById(registerId) {
