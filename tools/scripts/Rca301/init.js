@@ -3,7 +3,7 @@ function init() {
     videoManager = new VideoManager();
     */
 
-    popups = new Popups("popupText", "popupNumeric");
+    PopupCenter.init("popupText", "popupNumeric");
 
     let addressStartElement = document.getElementById("addressStart");
     let addressEndElement = document.getElementById("addressEnd");

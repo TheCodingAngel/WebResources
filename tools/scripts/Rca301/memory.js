@@ -97,7 +97,7 @@ class Memory {
 
 
         this.#elementContainer.addEventListener('scroll', function (e) {
-            Popups.hideTextPopup();
+            PopupCenter.hideTextPopup();
         });
 
         this.#elementData.addEventListener('dblclick', function (e) {
@@ -441,7 +441,7 @@ class Memory {
         let endCellRect = rowElement.cells[this.#columnCount].getBoundingClientRect();
         let width = endCellRect.right - startCellRect.left;
 
-        Popups.showTextPopup(value, this.#columnCount, startCellRect.left, startCellRect.top + 3, width, newValue => {
+        PopupCenter.showTextPopup(value, this.#columnCount, startCellRect.left, startCellRect.top + 3, width, newValue => {
             let fixedValue = padWithHaltOrCut(newValue, memory.#columnCount);
             memory.setTextAtAddress(startAddress, fixedValue);
         });
@@ -454,7 +454,7 @@ class Memory {
 
         let cellRect = cellElement.getBoundingClientRect();
         
-        Popups.showTextPopup(value, charCount, cellRect.left, cellRect.top + 3, cellRect.width, newValue => {
+        PopupCenter.showTextPopup(value, charCount, cellRect.left, cellRect.top + 3, cellRect.width, newValue => {
             let fixedValue = padWithHaltOrCut(newValue, charCount);
             memory.setTextAtAddress(address, fixedValue);
         });

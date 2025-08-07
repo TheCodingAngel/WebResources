@@ -442,7 +442,7 @@ class CPU {
         let cellRect = cell.getBoundingClientRect();
         let value = cell.childNodes[0].nodeValue;
         
-        Popups.showNumericPopup(value, 1, 0, 1, cellRect.left, cellRect.top + 3, cellRect.width, newValue => {
+        PopupCenter.showNumericPopup(value, 1, 0, 1, cellRect.left, cellRect.top + 3, cellRect.width, newValue => {
             let isSet = parseIntOrZero(newValue) != 0;
             switch (popupType) {
                 case CPU.#PopupType.Control:
@@ -488,12 +488,12 @@ class CPU {
         let width = endCellRect.right - startCellRect.left;
 
         if (isGeneralPurpose) {
-            Popups.showTextPopup(value, CPU.registerSize,
+            PopupCenter.showTextPopup(value, CPU.registerSize,
                 startCellRect.left, startCellRect.top + 3, width, newValue => {
                     cpu.setRegisterValueById(rowElement.cells[0].id, padWithHaltOrCut(newValue, CPU.registerSize));
                 });
         } else {
-            Popups.showNumericPopup(value, CPU.registerSize, CPU.#invalidPointerValue, CPU.#registerMaxIntValue,
+            PopupCenter.showNumericPopup(value, CPU.registerSize, CPU.#invalidPointerValue, CPU.#registerMaxIntValue,
                 startCellRect.left, startCellRect.top + 3, width, newValue => {
                     cpu.setRegisterValueById(rowElement.cells[0].id, parseIntOrZero(newValue, 10));
                 });

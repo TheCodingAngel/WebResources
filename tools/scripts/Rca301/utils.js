@@ -1,78 +1,30 @@
-var popups;
-
-class Popups {
+class PopupCenter {
     static #popupText;
     static #popupNumeric;
 
-    static #allPopups = new Map();
-
-    constructor(popupTextId, popupNumericId) {
-        Popups.#popupText = document.getElementById(popupTextId);
-        Popups.#allPopups.set(popupTextId, {element: Popups.#popupText, callback: null});
-
-        Popups.#popupNumeric = document.getElementById(popupNumericId);
-        Popups.#allPopups.set(popupNumericId, {element: Popups.#popupNumeric, callback: null});
-
-        Popups.#allPopups.forEach(value => {
-            value.element.addEventListener("keyup", this._onKeyUp);
-            value.element.addEventListener("focusout", this._onLostFocus);
-        })
+    static init(popupTextId, popupNumericId) {
+        this.#popupText = new PopupText(popupTextId);
+        this.#popupNumeric = new PopupText(popupNumericId);
     }
 
     static showTextPopup(value, charCount, left, top, width, onEditDone) {
-        Popups._showPopup(popupText, value, charCount, null, null, left, top, width, onEditDone);
+        this.#popupText.showTextPopup(value, charCount, left, top, width, onEditDone);
     }
 
     static hideTextPopup() {
-        popupText.style.display = "none";
+        this.#popupText.hideTextPopup();
     }
 
     static showNumericPopup(value, charCount, min, max, left, top, width, onEditDone) {
-        Popups._showPopup(popupNumeric, value, charCount, min, max, left, top, width, onEditDone);
+        let popupElement = this.#popupNumeric.getPopupElement();
+        popupElement.setAttribute("min", min);
+        popupElement.setAttribute("max", max);
+        
+        this.#popupNumeric.showTextPopup(value, charCount, left, top, width, onEditDone);
     }
 
     static hideNumericPopup() {
-        popupNumeric.style.display = "none";
-    }
-
-    static _showPopup(popupElement, value, charCount, min, max, left, top, width, onEditDone) {
-        Popups.#allPopups.get(popupElement.id).callback = onEditDone;
-
-        popupElement.setAttribute("maxlength", charCount);
-        if (min != null) {
-            popupElement.setAttribute("min", min);
-        }
-        if (max != null) {
-            popupElement.setAttribute("max", max);
-        }
-        popupElement.value = value;
-
-        // Some browsers use "documentElement" while others - "body" for scrolling
-        let scrollLeft = document.documentElement.scrollLeft || document.body.scrollLeft;
-        let scrollTop = document.documentElement.scrollTop || document.body.scrollTop;
-        
-        popupElement.style.left = `${ left + scrollLeft }px`;
-        popupElement.style.top = `${ top + scrollTop }px`;
-        popupElement.style.width = `${ width }px`;
-    
-        popupElement.style.zIndex = 1;
-        popupElement.select();
-        popupElement.style.display = "block";
-        popupElement.focus();
-    }
-
-    _onKeyUp(event) {
-        let popup = Popups.#allPopups.get(this.id); // "this" is the element dispatching the event
-        if (event.key === "Enter") {
-            popup.callback(popup.element.value);
-        }
-        if (event.key === "Enter" || event.key === "Escape") {
-            popup.element.style.display = "none";
-        }
-    }
-
-    _onLostFocus() {
-        Popups.#allPopups.get(this.id).element.style.display = "none";
+        this.#popupNumeric.hideTextPopup();
     }
 }
 

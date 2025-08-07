@@ -13,6 +13,7 @@ require '../common/php/utils.php';
   <link type="text/css" rel="stylesheet" href="scripts/Rca301/RCA-301.css">
 
   <script type="text/javascript" defer src="scripts/_Common/utils_base.js"></script>
+  <script type="text/javascript" defer src="scripts/_Common/popups.js"></script>
   <script type="text/javascript" defer src="scripts/_Common/wizard_base.js"></script>
   <script type="text/javascript" defer src="scripts/Rca301/wizard.js"></script>
   

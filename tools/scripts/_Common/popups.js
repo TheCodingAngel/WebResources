@@ -103,43 +103,47 @@ class PopupDialog extends PopupBase {
 }
 
 class PopupText extends PopupBase {
-    #popupText;
+    #textElement;
     #callback;
     
-    constructor(popupTextId) {
+    constructor(textElementId) {
         super();
         
-        this.#popupText = document.getElementById(popupTextId);
+        this.#textElement = document.getElementById(textElementId);
         
         let _this = this;
         
-        this.#popupText.addEventListener("keyup", function(event) {
+        this.#textElement.addEventListener("keyup", function(event) {
             if (event.key === "Enter") {
-                _this.#callback(_this.#popupText.value);
+                _this.#callback(_this.#textElement.value);
             }
             if (event.key === "Enter" || event.key === "Escape") {
                 _this.hideTextPopup();
             }
         });
         
-        this.#popupText.addEventListener("focusout", function(event) {
+        this.#textElement.addEventListener("focusout", function(event) {
             _this.hideTextPopup();
         });
     }
     
     showTextPopup(value, charCount, left, top, width, onEditDone) {
         this.#callback = onEditDone;
-        this.#popupText.setAttribute("maxlength", charCount);
-        this.#popupText.value = value;
-        super._showPopup(this.#popupText, 1, left, top, width);
+        this.#textElement.setAttribute("maxlength", charCount);
+        this.#textElement.value = value;
+        super._showPopup(this.#textElement, 1, left, top, width);
     }
 
     hideTextPopup() {
-        super._hidePopup(this.#popupText);
+        super._hidePopup(this.#textElement);
+    }
+    
+    getPopupElement() {
+        return this.#textElement;
     }
     
     setValidationPattern(regexPattern) {
-        this.#popupText.pattern = regexPattern;
+        this.#textElement.pattern = regexPattern;
     }
 }
 
