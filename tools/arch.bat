@@ -43,6 +43,7 @@ echo %FN_RCA_301%.zip
   "%FN_RCA_301%.html" ^
   "scripts\_Common\base.css" ^
   "scripts\_Common\utils_base.js" ^
+  "scripts\_Common\popups.js" ^
   "scripts\_Common\wizard_base.js" ^
   "scripts\Rca301\*.*"
 
@@ -54,6 +55,7 @@ echo %FN_RCA_301_FULL%.zip
   "%FN_RCA_301_FULL%.html" ^
   "scripts\_Common\base.css" ^
   "scripts\_Common\utils_base.js" ^
+  "scripts\_Common\popups.js" ^
   "scripts\_Common\wizard_base.js" ^
   "scripts\Rca301\*.*"
 
