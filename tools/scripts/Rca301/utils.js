@@ -33,6 +33,11 @@ function padWithHaltOrCut(str, characterCount) {
     return padOrCutString(str, characterCount, '.');
 }
 
+function parseIntOrMinusOne(str, radix = 10) {
+    let res = parseInt(str, radix);
+    return isNaN(res) ? -1 : res;
+}
+
 function fixIfOverflown(number, charCount) {
     let stringValue = number.toString(10);
     if (stringValue.length <= charCount) {

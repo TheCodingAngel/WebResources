@@ -13,11 +13,13 @@ class CPU {
 
     static registerSize = 4;
     static instructionSize = 10;
+    static #interruptOffset = 10;
     static #registerMaxIntValue = 9999;
     static #registerDefaultStrValue = "0000";
     static #defaultPointerValue = 0;
     static #invalidPointerValue = -1;
     static #instructionPointerId = "eip";
+    static #codeSegmentId = "cs";
 
     static #PopupType = {
         Register: 0,
@@ -53,7 +55,7 @@ class CPU {
         [CPU.#instructionPointerId, {value: CPU.#defaultPointerValue}],
         ["esp", {value: CPU.#invalidPointerValue}],
         ["ebp", {value: CPU.#invalidPointerValue}],
-        ["cs", {value: CPU.#invalidPointerValue}],
+        [CPU.#codeSegmentId, {value: CPU.#invalidPointerValue}],
 
         ["eax", {value: CPU.#registerDefaultStrValue}],
         ["ebx", {value: CPU.#registerDefaultStrValue}],
@@ -69,7 +71,7 @@ class CPU {
         ['4', {registerId: "esp", hasSubRegisters: false}],
         ['5', {registerId: "ebp", hasSubRegisters: false}],
         ['6', {registerId: "idt", hasSubRegisters: false}],
-        ['7', {registerId: "cs", hasSubRegisters: false}],
+        ['7', {registerId: CPU.#codeSegmentId, hasSubRegisters: false}],
     ]);
 
     #flags = CPU.FlagsMask.None;
@@ -93,7 +95,8 @@ class CPU {
                     : padOrCutNumber(register.value, CPU.registerSize));
         });
 
-        memory.markAddresses(this.#registers.get(CPU.#instructionPointerId).value, CPU.instructionSize, Memory.markType.NextInstruction, true);
+        let instructionAddress = this.logicalToPhysicalAddress(this.getInstructionPointer());
+        memory.markAddresses(instructionAddress, CPU.instructionSize, Memory.markType.NextInstruction, true);
         CPU._setHtmlRegisterBackground(CPU.#instructionPointerId, Memory.nextInstructionColor);
 
         this.#registersElement.addEventListener('click', function (e) {
@@ -117,6 +120,7 @@ class CPU {
         this.setFlags(false, false, false);
         this.setControl(false, false);
         
+        this.setRegisterValueById(CPU.#codeSegmentId, CPU.#invalidPointerValue);
         this.setInstructionPointer(CPU.#defaultPointerValue);
         
         this.setRegisterValueById("idt", CPU.#invalidPointerValue);
@@ -129,7 +133,8 @@ class CPU {
     }
 
     getNextInstruction() {
-        return this.#memory.getTextAtAddress(this.#registers.get(CPU.#instructionPointerId).value, CPU.instructionSize);
+        let physicalAddress = this.logicalToPhysicalAddress(this.getInstructionPointer());
+        return this.#memory.getTextAtAddress(physicalAddress, CPU.instructionSize);
     }
     
     getInstructionPointer() {
@@ -137,7 +142,7 @@ class CPU {
     }
 
     incrementInstructionPointer() {
-        this.setInstructionPointer(this.#registers.get(CPU.#instructionPointerId).value + CPU.instructionSize);
+        return this.setInstructionPointer(this.getInstructionPointer() + CPU.instructionSize);
     }
 
     setInstructionPointer(newAddress) {
@@ -224,11 +229,56 @@ class CPU {
     }
     
     getCodeSegment() {
-        return parseIntOrNull(this.getRegisterValueById("cs"));
+        return parseIntOrMinusOne(this.getRegisterValueById(CPU.#codeSegmentId));
+    }
+    
+    // the registers should be already saved (this function changes them)
+    enterInterrupt(interrupt) {
+        let prevCodeSegment = this.getCodeSegment();
+        this.setRegisterValueById(CPU.#codeSegmentId, -CPU.#interruptOffset - interrupt);
+        if (prevCodeSegment < 0) {
+            return;
+        }
+        
+        let esp = this.getStackPointer();
+        if (esp >= 0) {
+            this.setRegisterValueById("esp", esp + prevCodeSegment);
+        }
+        
+        let ebp = this.getBasePointer();
+        if (ebp >= 0) {
+            this.setRegisterValueById("ebp", ebp + prevCodeSegment);
+        }
+    }
+    
+    // the registers should be already restored (most probaly through setAllRegisters())
+    exitInterrupt() {
+        // No need to correct pointer registers back to logical addresses.
+        // They have been saved and restored together with the CodeSegment register.
+    }
+    
+    // return negative value if not in interrupt
+    getCurrentInterrupt() {
+        let cs = this.getCodeSegment();
+        return cs <= -CPU.#interruptOffset ? -cs - CPU.#interruptOffset : -1;
+    }
+    
+    logicalToPhysicalAddress(address) {
+        let cs = this.getCodeSegment();
+        return cs < 0 ? address : address + cs;
+    }
+    
+    physicalToLogicalAddress(address) {
+        let cs = this.getCodeSegment();
+        return cs < 0 ? address : Math.max(0, address - cs);
     }
     
     getStackPointer() {
-        return parseIntOrNull(this.getRegisterValueById("esp"));
+        return parseIntOrMinusOne(this.getRegisterValueById("esp"));
+    }
+    
+    getBasePointer() {
+        return parseIntOrMinusOne(this.getRegisterValueById("ebp"));
     }
     
     pushStackPointer(numCharacters) {
@@ -253,7 +303,7 @@ class CPU {
     }
     
     getIDT() {
-        return parseIntOrNull(this.getRegisterValueById("idt"));
+        return parseIntOrMinusOne(this.getRegisterValueById("idt"));
     }
     
     getIDTSize() {
@@ -377,16 +427,25 @@ class CPU {
             CPU._cutNumberToPointer(value);
 
         if (registerId == CPU.#instructionPointerId) {
-            this.#memory.markAddresses(this.#registers.get(CPU.#instructionPointerId).value, CPU.instructionSize, Memory.markType.NextInstruction, false);
-            this.#memory.markAddresses(value, CPU.instructionSize, Memory.markType.NextInstruction, true);
+            let oldAddress = this.#registers.get(CPU.#instructionPointerId).value;
+            this.#memory.markAddresses(this.logicalToPhysicalAddress(oldAddress), CPU.instructionSize, Memory.markType.NextInstruction, false);
+            this.#memory.markAddresses(this.logicalToPhysicalAddress(value), CPU.instructionSize, Memory.markType.NextInstruction, true);
         }
-
-        this.#registers.get(registerId).value = value;
+        
+        if (registerId == CPU.#codeSegmentId) {
+            let address = this.getInstructionPointer();
+            this.#memory.markAddresses(this.logicalToPhysicalAddress(address), CPU.instructionSize, Memory.markType.NextInstruction, false);
+            this.#registers.get(registerId).value = value;
+            this.#memory.markAddresses(this.logicalToPhysicalAddress(address), CPU.instructionSize, Memory.markType.NextInstruction, true);
+        } else {
+            this.#registers.get(registerId).value = value;
+        }
 
         let stringValue = typeof(value) == "string" ? value : padOrCutNumber(value, CPU.registerSize);
         this._updateRegisterView(rowElement, stringValue);
 
-        if (this.#autoScrollToNextInstruction && registerId == CPU.#instructionPointerId) {
+        if (this.#autoScrollToNextInstruction &&
+            (registerId == CPU.#instructionPointerId || registerId == CPU.#codeSegmentId)) {
             this._scrollInstructionIntoView();
         }
     }
@@ -400,9 +459,8 @@ class CPU {
     }
 
     _scrollInstructionIntoView() {
-        this.#memory.scrollAddressesIntoView(
-            this.#registers.get(CPU.#instructionPointerId).value,
-            this.#registers.get(CPU.#instructionPointerId).value + CPU.instructionSize - 1);
+        let physicalAddress = this.logicalToPhysicalAddress(this.getInstructionPointer());
+        this.#memory.scrollAddressesIntoView(physicalAddress, physicalAddress + CPU.instructionSize - 1);
     }
 
     static _setHtmlRegisterBackground(registerId, color) {
@@ -431,7 +489,10 @@ class CPU {
         if (popupType == CPU.#PopupType.Register) {
             let rowElement = cell.parentElement;
             let registerId = rowElement.cells[0].id;
-            this._showEditPopup(rowElement, this.getRegisterValueById(registerId), this._isGeneralPurposeRegister(registerId));
+            let isGeneralPurposeRegister = this._isGeneralPurposeRegister(registerId);
+            let defaultValue = isGeneralPurposeRegister ? CPU.#registerDefaultStrValue :
+                (registerId == CPU.#instructionPointerId ? CPU.#defaultPointerValue : CPU.#invalidPointerValue);
+            this._showEditPopup(rowElement, this.getRegisterValueById(registerId), isGeneralPurposeRegister, defaultValue);
             return;
         }
 
@@ -482,7 +543,7 @@ class CPU {
         return true;
     }
 
-    _showEditPopup(rowElement, value, isGeneralPurpose) {
+    _showEditPopup(rowElement, value, isGeneralPurpose, defaultValue) {
         let startCellRect = rowElement.cells[1].getBoundingClientRect();
         let endCellRect = rowElement.cells[CPU.registerSize].getBoundingClientRect();
         let width = endCellRect.right - startCellRect.left;
@@ -495,7 +556,11 @@ class CPU {
         } else {
             PopupCenter.showNumericPopup(value, CPU.registerSize, CPU.#invalidPointerValue, CPU.#registerMaxIntValue,
                 startCellRect.left, startCellRect.top + 3, width, newValue => {
-                    cpu.setRegisterValueById(rowElement.cells[0].id, parseIntOrZero(newValue, 10));
+                    let value = parseIntOrNull(newValue, 10);
+                    if (value == null) {
+                        value = defaultValue;
+                    }
+                    cpu.setRegisterValueById(rowElement.cells[0].id, value);
                 });
         }
     }

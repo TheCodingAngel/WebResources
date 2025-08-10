@@ -118,6 +118,8 @@ class Instructions {
                 return false;
             case this.#breakpointOpcode:
                 let currentAddr = this.#cpu.getInstructionPointer();
+                currentAddr = this.#cpu.logicalToPhysicalAddress(currentAddr);
+                
                 let shouldContinue = this.#lastBreakpointAddress == currentAddr;
                 if (shouldContinue) {
                     this.#lastBreakpointAddress = -1;
@@ -134,7 +136,7 @@ class Instructions {
             throw new InstructionError("Unknown opcode: " + opcode);
         }
         let nextInstructionAddress = instruction(opcode, characters[1], characters.substring(2, 6), characters.substring(6));
-
+        
         if (typeof(nextInstructionAddress) == "undefined" || nextInstructionAddress == null) {
             this.#cpu.incrementInstructionPointer();
         } else if (typeof(nextInstructionAddress) == "number") {
@@ -377,13 +379,13 @@ class Instructions {
             throw new InstructionError(`Incorrect Interrupt Description Table value for interrupts: "${idt}" (must be between 0 and ${maxIdtValue}).`);
         }
         
-        let handlerAddress = parseIntOrNull(this.#memory.getTextAtAddress(idt + interruptNumber * CPU.registerSize, CPU.registerSize));
-        
         this._pushValue(registers);
+        this.#cpu.enterInterrupt(interruptNumber); // CS becomes negative and all addresses become physical
         
+        let handlerAddress = parseIntOrNull(this.#memory.getTextAtAddress(idt + interruptNumber * CPU.registerSize, CPU.registerSize));
         this.#cpu.setInstructionPointer(handlerAddress);
         let nextInstructionStr = this.#cpu.getNextInstruction();
-        while(nextInstructionStr[0] != ':') { // the opcode of iret
+        while(nextInstructionStr[0] != this.#iretOpcode) {
             if (!this.executeInstruction(nextInstructionStr)) {
                 return; // special cases that break running loop (for example "halt" and "breakpoint")
             }
@@ -398,6 +400,7 @@ class Instructions {
         let numCharacters = this.#cpu.getAllRegistersSize();
         let registers = this._popValue(numCharacters);
         this.#cpu.setAllRegisters(registers);
+        this.#cpu.exitInterrupt();
         
         return this.#cpu.getInstructionPointer();
     }
@@ -433,11 +436,13 @@ class Instructions {
             return;
         }
         
+        stackAddress = this.#cpu.logicalToPhysicalAddress(stackAddress);
         this.#memory.setTextAtAddress(stackAddress, value);
     }
     
     _popValue(numCharacters) {
         let stackAddress = this.#cpu.popStackPointer(numCharacters);
+        stackAddress = this.#cpu.logicalToPhysicalAddress(stackAddress);
         return this.#memory.getTextAtAddress(stackAddress, numCharacters);
     }
 
@@ -803,11 +808,13 @@ class ValuesInfo {
 
     _dereference(address, characterCount) {
         let addressNumber = this._getValidAddress(address);
+        addressNumber = this.#cpu.logicalToPhysicalAddress(addressNumber);
         return this.#memory.getTextAtAddress(addressNumber, characterCount > 0 ? characterCount : CPU.registerSize);
     }
 
     _setInMemory(address, value, characterCount) {
         let addressNumber = this._getValidAddress(address);
+        addressNumber = this.#cpu.logicalToPhysicalAddress(addressNumber);
         this.#memory.setTextAtAddress(addressNumber, typeof(value) == "string" ?
             padWithHaltOrCut(value, characterCount) :
             padOrCutNumber(value, characterCount));
