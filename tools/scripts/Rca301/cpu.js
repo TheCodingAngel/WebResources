@@ -63,8 +63,6 @@ class CPU {
         ["idt", {value: CPU.#invalidPointerValue}],
     ]);
     
-    #strRegisters = ["eax", "ebx", "ecx"];
-
     #registersInfo = new Map([
         ['0', {registerId: CPU.#instructionPointerId, hasSubRegisters: false}],
         ['1', {registerId: "eax", hasSubRegisters: true}],
@@ -163,14 +161,14 @@ class CPU {
         return (this.#registers.size + 1) * CPU.registerSize;
     }
     
-    // as a string value
+    // returns a string value of all registers
     getAllRegisters() {
         let res = "";
         
         for (let i = 0; i < this.#registersInfo.size; i++) {
             let id = this.#registersInfo.get(i.toString()).registerId;
             let value = this.getRegisterValueById(id);
-            if (this.#strRegisters.includes(id)) {
+            if (this._isGeneralPurposeRegister(id)) {
                 res += padWithHaltOrCut(value, CPU.registerSize);
             } else {
                 res += padOrCutNumber(value, CPU.registerSize);
@@ -183,13 +181,13 @@ class CPU {
     }
     
     setAllRegisters(strValues) {
-        let flagsChars = 4; // the characters used for this.#flags and this.#control
+        const flagsChars = 4; // the characters used for this.#flags and this.#control
         let registerItems = Math.floor((strValues.length - flagsChars) / CPU.registerSize);
         for (let i = 0; i < registerItems; i++) {
             let charIndex = i * CPU.registerSize;
             let value = strValues.substring(charIndex, charIndex + CPU.registerSize);
             let id = this.#registersInfo.get(i.toString()).registerId;
-            if (!this.#strRegisters.includes(id)) {
+            if (!this._isGeneralPurposeRegister(id)) {
                 value = parseIntOrZero(value);
             }
             this.setRegisterValueById(id, value);
