@@ -320,22 +320,27 @@ class CPU {
     }
     
     setInterruptData(eax, ebx, ecx) {
-        if (isValid(eax)) {
-            this.setRegisterValueById("eax", eax);
-        }
-        if (isValid(ebx)) {
-            this.setRegisterValueById("ebx", ebx);
-        }
-        if (isValid(ecx)) {
-            this.setRegisterValueById("ecx", ecx);
-        }
+        this.setGeneralRegisterValueSafe("eax", eax);
+        this.setGeneralRegisterValueSafe("ebx", ebx);
+        this.setGeneralRegisterValueSafe("ecx", ecx);
     }
-
+    
     getRegisterValueById(registerId) {
         if (registerId) {
             return this.#registers.get(registerId).value;
         }
         return null;
+    }
+    
+    setGeneralRegisterValueSafe(registerId, value) {
+        if (typeof(value) == "number") {
+            value = padOrCutNumber(value, CPU.registerSize);
+        } else if (typeof(value) == "string") {
+            value = padWithHaltOrCut(value, CPU.registerSize)
+        } else {
+            return;
+        }
+        this.setRegisterValueById(registerId, value);
     }
 
     setRegisterValueById(registerId, value) {

@@ -188,7 +188,11 @@ class Emulator {
         }
         
         for (let [interrupt, portData] of this.#hardwareInterrupts) {
-            this._checkHardwareInterrupt(interrupt, portData);
+            let handlerAddress = this._checkHardwareInterrupt(interrupt, portData);
+            if (handlerAddress != null) {
+                this.#cpu.setInstructionPointer(handlerAddress);
+                return;
+            }
         }
         
         let nextInstructionAddress = this.#executeInstructionCallback(characters);
@@ -302,7 +306,8 @@ class Emulator {
         }
         
         this.#returnFromInterruptToNext.push(returnToNext);
-        return this._customInterruptHandler(interruptNumber, handlerAddress, ignoreErrors);
+        this._customInterruptHandler(interruptNumber, ignoreErrors);
+        return handlerAddress;
     }
     
     _isTrap(interruptNumber) {
@@ -312,12 +317,12 @@ class Emulator {
     _checkHardwareInterrupt(interruptNumber, portData) {
         let handlerAddress = this._getValidInterruptHandler(interruptNumber, true);
         if (this._isDefaultInterrupt(handlerAddress, interruptNumber)) {
-            return;
+            return null;
         }
         
         if (this.#io.isMoreDataOnPort(portData.port)) {
             let data = this.#io.readFromPort(portData.port, this.#ioBufferCapacity);
-            for (ch of data) {
+            for (let ch of data) {
                 portData.queue.push(ch);
             }
         }
@@ -325,11 +330,14 @@ class Emulator {
         if (portData.queue.length > 0) {
             let nonHandled = portData.queue.splice(CPU.registerSize, Infinity);
             let characters = portData.queue.join("");
-            this.#cpu.setInterruptData(characters, null, characters.length);
             this.#returnFromInterruptToNext.push(false);
-            this._customInterruptHandler(interruptNumber, handlerAddress, false);
+            this._customInterruptHandler(interruptNumber, false);
+            this.#cpu.setInterruptData(characters, null, characters.length);
             portData.queue = nonHandled;
+            return handlerAddress;
         }
+        
+        return null;
     }
     
     _getValidInterruptHandler(interruptNumber, ignoreErrors) {
@@ -408,7 +416,7 @@ class Emulator {
         }
     }
     
-    _customInterruptHandler(interruptNumber, handlerAddress, ignoreErrors) {
+    _customInterruptHandler(interruptNumber, ignoreErrors) {
         this.#steppedInCount++;
         
         let registers = this.#cpu.getAllRegisters();
@@ -425,7 +433,5 @@ class Emulator {
         
         this.pushValue(registers);
         this.#cpu.enterInterrupt(interruptNumber); // CS becomes negative and all addresses become physical
-        
-        return handlerAddress;
     }
 }
