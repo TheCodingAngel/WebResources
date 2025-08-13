@@ -21,8 +21,8 @@ require '../common/php/utils.php';
   <script type="text/javascript" defer src="scripts/Rca301/memory.js"></script>
   <script type="text/javascript" defer src="scripts/Rca301/io.js"></script>
   <script type="text/javascript" defer src="scripts/Rca301/cpu.js"></script>
-  <script type="text/javascript" defer src="scripts/Rca301/instructions.js"></script>
   <script type="text/javascript" defer src="scripts/Rca301/emulator.js"></script>
+  <script type="text/javascript" defer src="scripts/Rca301/instructions.js"></script>
   <script type="text/javascript" defer src="scripts/Rca301/init.js"></script>
 </head>
 
@@ -175,7 +175,7 @@ require '../common/php/utils.php';
           <label for="executionInterval" class="label flex-pos-ortogonal-center">Delay</label>
           <input type="number" inputmode="numeric" class="numedit flex-pos-ortogonal-center" id="executionInterval" min="0" max="5000" maxlength="4" size="4">
           <label for="executionInterval" class="label flex-pos-ortogonal-center">ms</label>
-          <button class="button flex-space-left" onclick="emulator.stepOver();">Step (Alt+P)</button>
+          <button class="button flex-space-left" onclick="emulator.step();">Step (Alt+P)</button>
         </div>
 
         <section>

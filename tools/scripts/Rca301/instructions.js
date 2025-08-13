@@ -12,13 +12,8 @@ class Instructions {
     #memory;
     #io;
     #cpu;
-
-    #haltOpcode = '.';
-    #breakpointOpcode = ',';
-    #iretOpcode = ':';
+    #emulator;
     
-    #lastBreakpointAddress = -1;
-
     #all = new Map([
         [' ', this._nop.bind(this)],
 
@@ -39,10 +34,11 @@ class Instructions {
         ['G', this._jumpIfGreaterOrEqual.bind(this)],
         ['$', this._jumpIfOverflow.bind(this)],
 
-        [this.#haltOpcode, this._halt.bind(this)],
         ['T', this._int.bind(this)],  // inTerrupt = Trap
-        [this.#breakpointOpcode, this._int3.bind(this)],
-        [this.#iretOpcode, this._iret.bind(this)],
+        ['.', this._halt.bind(this)],
+        [',', this._breakpoint.bind(this)],
+        [':', this._iret.bind(this)],
+        ["'", this._clgi.bind(this)],
         ['@', this._call.bind(this)],
         [';', this._ret.bind(this)],
         ['(', this._push.bind(this)],
@@ -97,57 +93,94 @@ class Instructions {
         ['Z', ['P', 'P']],
     ]);
 
-    constructor(memory, io, cpu) {
+    constructor(memory, io, cpu, emulator) {
         this.#memory = memory;
         this.#io = io;
         this.#cpu = cpu;
+        this.#emulator = emulator;
     }
 
     executeInstruction(characters) {
-        if (typeof(characters) != "string") {
-            throw new InstructionError("Invalid instruction data");
-        }
-        if (characters.length != CPU.instructionSize) {
-            throw new InstructionError(`Instructions must have ${CPU.instructionSize} characters but the next one is with ${characters.length}. Maybe EIP has incorrect value?`);
-        }
-
         let opcode = characters[0];
-        switch (opcode) {
-            case this.#haltOpcode:
-                alert("Reached the end of execution:\nSystem halted");
-                return false;
-            case this.#breakpointOpcode:
-                let currentAddr = this.#cpu.getInstructionPointer();
-                currentAddr = this.#cpu.logicalToPhysicalAddress(currentAddr);
-                
-                let shouldContinue = this.#lastBreakpointAddress == currentAddr;
-                if (shouldContinue) {
-                    this.#lastBreakpointAddress = -1;
-                    this.#cpu.incrementInstructionPointer();
-                } else {
-                    this.#lastBreakpointAddress = currentAddr;
-                    alert("Reached a breakpoint");
-                }
-                return shouldContinue;
-        }
-        
         let instruction = this.#all.get(opcode);
         if (!instruction) {
             throw new InstructionError("Unknown opcode: " + opcode);
         }
-        let nextInstructionAddress = instruction(opcode, characters[1], characters.substring(2, 6), characters.substring(6));
-        
-        if (typeof(nextInstructionAddress) == "undefined" || nextInstructionAddress == null) {
-            this.#cpu.incrementInstructionPointer();
-        } else if (typeof(nextInstructionAddress) == "number") {
-            this.#cpu.setInstructionPointer(nextInstructionAddress);
-        } else {
-            throw new InstructionError("Incorrect result for instruction with opcode " + opcode);
-        }
-        
-        return true;
+        return instruction(opcode, characters[1], characters.substring(2, 6), characters.substring(6));
     }
-
+    
+    _halt(opcode, suffix, a, b) {
+        return this.#emulator.executeInterrupt(CPU.Interrupts.Halt);
+    }
+    
+    _breakpoint(opcode, suffix, a, b) {
+        return this.#emulator.executeInterrupt(CPU.Interrupts.Breakpoint);
+    }
+    
+    _int(opcode, suffix, a, b) {
+        if (suffix != ' ') {
+            throw new InstructionError(`Incorrect suffix "${suffix}" for instruction "${opcode}" (int); only the default suffix of empty space is allowed as a suffix.`);
+        }
+        let interruptNumber = parseIntOrNull(a);
+        if (interruptNumber == null) {
+            throw new InstructionError(`Incorrect interrupt number: "${a}" for instruction "${opcode}" (int).`);
+        }
+        return this.#emulator.executeInterrupt(interruptNumber);
+    }
+    
+    _iret(opcode, suffix, a, b) {
+        return this.#emulator.returnFromInterrupt();
+    }
+    
+    _clgi(opcode, suffix, a, b) {
+        return this.#emulator.clearGlobalInterrupt();
+    }
+    
+    _call(opcode, suffix, a, b) {
+        this.#emulator.enterCall();
+        
+        let valueType = this._getValueType("call", opcode, suffix, 'V');
+        let valuesInfo = new ValuesInfo(this.#cpu, this.#memory, CPU.registerSize, false);
+        let newAddressStr = valuesInfo.getValue(valueType, a, ValuesInfo.IndirectionType.None);
+        let newAddress = parseIntOrNull(newAddressStr);
+        if (newAddress == null) {
+            switch (valueType) {
+                case 'R':
+                    throw new InstructionError(`"call" expects address while register ${a} does not contain a number: ${newAddressStr}.`);
+                case 'A':
+                    throw new InstructionError(`"call" expects address while register ${a} does not point to a number: ${newAddressStr}.`);
+                case 'P':
+                    throw new InstructionError(`"call" expects address while at address ${a} there is no number: ${newAddressStr}.`);
+                default:
+                    throw new InstructionError(`"call" expects address while the first operand is not a number: ${newAddressStr}.`);
+            }
+        }
+        return newAddress;
+    }
+    
+    _ret(opcode, suffix, a, b) {
+        return this.#emulator.exitCall();
+    }
+    
+    _push(opcode, suffix, a, b) {
+        let valueType = this._getValueType("push", opcode, suffix, 'R');
+        let valuesInfo = this._getValuesInfo(valueType, null, a, null);
+        
+        let value = valuesInfo.getValue(valueType, a, ValuesInfo.IndirectionType.None);
+        this.#emulator.pushValue(value);
+    }
+    
+    _pop(opcode, suffix, a, b) {
+        let valueType = this._getValueType("pop", opcode, suffix, 'R');
+        this._verifyInstructionPointer("pop", opcode, "change", valueType, a);
+        
+        let valuesInfo = this._getValuesInfo(valueType, null, a, null);
+        
+        let numCharacters = valuesInfo.getCharacterCount();
+        let newValue = this.#emulator.popValue(numCharacters);
+        valuesInfo.setValue(valueType, a, newValue);
+    }
+    
     _nop(opcode, suffix, a, b) {
         if (suffix != ' ') {
             throw new InstructionError(`Incorrect suffix "${suffix}" for instruction " " (nop); only the default suffix of empty space is allowed as a suffix.`);
@@ -345,105 +378,6 @@ class Instructions {
             }
         }
         return newAddress;
-    }
-
-    _halt(opcode, suffix, a, b) {
-    }
-    
-    _int(opcode, suffix, a, b) {
-        if (suffix != ' ') {
-            throw new InstructionError(`Incorrect suffix "${suffix}" for instruction "${opcode}" (int); only the default suffix of empty space is allowed as a suffix.`);
-        }
-        let interruptNumber = parseIntOrNull(a);
-        if (interruptNumber != null) {
-            this._executeInterrupt(interruptNumber);
-        }
-    }
-    
-    _int3(opcode, suffix, a, b) {
-        this._executeInterrupt(3);
-    }
-    
-    _executeInterrupt(interruptNumber) {
-        let memoryCapacity = this.#memory.getCapacity();
-        let registers = this.#cpu.getAllRegisters();
-        
-        let stackPointer = this.#cpu.getStackPointer();
-        if (stackPointer < registers.length) {
-            throw new InstructionError(`Incorrect Stack Pointer value for interrupts: "${stackPointer}" (must be between ${registers.length} and ${memoryCapacity}).`);
-        }
-        
-        let idt = this.#cpu.getIDT();
-        let maxIdtValue = memoryCapacity - this.#cpu.getIDTSize();
-        if (idt < 0 || idt > maxIdtValue) {
-            throw new InstructionError(`Incorrect Interrupt Description Table value for interrupts: "${idt}" (must be between 0 and ${maxIdtValue}).`);
-        }
-        
-        this._pushValue(registers);
-        this.#cpu.enterInterrupt(interruptNumber); // CS becomes negative and all addresses become physical
-        
-        let handlerAddress = parseIntOrNull(this.#memory.getTextAtAddress(idt + interruptNumber * CPU.registerSize, CPU.registerSize));
-        this.#cpu.setInstructionPointer(handlerAddress);
-        let nextInstructionStr = this.#cpu.getNextInstruction();
-        while(nextInstructionStr[0] != this.#iretOpcode) {
-            if (!this.executeInstruction(nextInstructionStr)) {
-                return; // special cases that break running loop (for example "halt" and "breakpoint")
-            }
-            nextInstructionStr = this.#cpu.getNextInstruction();
-        }
-        
-        // The "iret" instruction will pop all registers
-        this.executeInstruction(nextInstructionStr);
-    }
-    
-    _iret(opcode, suffix, a, b) {
-        let numCharacters = this.#cpu.getAllRegistersSize();
-        let registers = this._popValue(numCharacters);
-        this.#cpu.setAllRegisters(registers);
-        this.#cpu.exitInterrupt();
-        
-        return this.#cpu.getInstructionPointer();
-    }
-    
-    _call(opcode, suffix, a, b) {
-    }
-    
-    _ret(opcode, suffix, a, b) {
-    }
-    
-    _push(opcode, suffix, a, b) {
-        let valueType = this._getValueType(name, opcode, suffix, 'R');
-        let valuesInfo = this._getValuesInfo(valueType, null, a, null);
-        
-        let value = valuesInfo.getValue(valueType, a, ValuesInfo.IndirectionType.None);
-        this._pushValue(value);
-    }
-    
-    _pop(opcode, suffix, a, b) {
-        let valueType = this._getValueType(name, opcode, suffix, 'R');
-        this._verifyInstructionPointer("pop", opcode, "change", valueType, a);
-        
-        let valuesInfo = this._getValuesInfo(valueType, null, a, null);
-        
-        let numCharacters = valuesInfo.getCharacterCount();
-        let newValue = this._popValue(numCharacters);
-        valuesInfo.setValue(valueType, a, newValue);
-    }
-    
-    _pushValue(value) {
-        let stackAddress = this.#cpu.pushStackPointer(value.length);
-        if (stackAddress < 0) {
-            return;
-        }
-        
-        stackAddress = this.#cpu.logicalToPhysicalAddress(stackAddress);
-        this.#memory.setTextAtAddress(stackAddress, value);
-    }
-    
-    _popValue(numCharacters) {
-        let stackAddress = this.#cpu.popStackPointer(numCharacters);
-        stackAddress = this.#cpu.logicalToPhysicalAddress(stackAddress);
-        return this.#memory.getTextAtAddress(stackAddress, numCharacters);
     }
 
     _add(opcode, suffix, a, b) {

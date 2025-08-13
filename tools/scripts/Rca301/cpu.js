@@ -62,6 +62,8 @@ class CPU {
         ["ecx", {value: CPU.#registerDefaultStrValue}],
         ["idt", {value: CPU.#invalidPointerValue}],
     ]);
+    
+    #strRegisters = ["eax", "ebx", "ecx"];
 
     #registersInfo = new Map([
         ['0', {registerId: CPU.#instructionPointerId, hasSubRegisters: false}],
@@ -164,10 +166,15 @@ class CPU {
     // as a string value
     getAllRegisters() {
         let res = "";
-        for (let i = 0; i < this.#registersInfo.size(); i++) {
-            let id = this.#registersInfo.get(i).registerId;
+        
+        for (let i = 0; i < this.#registersInfo.size; i++) {
+            let id = this.#registersInfo.get(i.toString()).registerId;
             let value = this.getRegisterValueById(id);
-            res += value;
+            if (this.#strRegisters.includes(id)) {
+                res += padWithHaltOrCut(value, CPU.registerSize);
+            } else {
+                res += padOrCutNumber(value, CPU.registerSize);
+            }
         }
         
         res += padOrCutNumber(this.#flags, 2);
@@ -176,22 +183,26 @@ class CPU {
     }
     
     setAllRegisters(strValues) {
-        let items = Math.floor(strValues.length / CPU.registerSize);
-        for (let i = 0; i < items - 2; i++) {
+        let flagsChars = 4; // the characters used for this.#flags and this.#control
+        let registerItems = Math.floor((strValues.length - flagsChars) / CPU.registerSize);
+        for (let i = 0; i < registerItems; i++) {
             let charIndex = i * CPU.registerSize;
             let value = strValues.substring(charIndex, charIndex + CPU.registerSize);
-            let id = this.#registersInfo.get(i).registerId;
+            let id = this.#registersInfo.get(i.toString()).registerId;
+            if (!this.#strRegisters.includes(id)) {
+                value = parseIntOrZero(value);
+            }
             this.setRegisterValueById(id, value);
         }
         
         let flags = parseIntOrZero(strValues.slice(-4, -2));
-        setFlags(this.isMaskSet(flags, CPU.FlagsMask.All, CPU.FlagsMask.Positive),
-                 this.isMaskSet(flags, CPU.FlagsMask.All, CPU.FlagsMask.Negative),
-                 this.isMaskSet(flags, CPU.FlagsMask.All, CPU.FlagsMask.Overflown));
+        this.setFlags(isMaskSet(flags, CPU.FlagsMask.All, CPU.FlagsMask.Positive),
+                      isMaskSet(flags, CPU.FlagsMask.All, CPU.FlagsMask.Negative),
+                      isMaskSet(flags, CPU.FlagsMask.All, CPU.FlagsMask.Overflown));
         
         let control = parseIntOrZero(strValues.slice(-2));
-        setControl(this.isMaskSet(control, CPU.ControlMask.All, CPU.ControlMask.NegativeDirection),
-                   this.isMaskSet(control, CPU.ControlMask.All, CPU.ControlMask.StepByStep));
+        this.setControl(isMaskSet(control, CPU.ControlMask.All, CPU.ControlMask.NegativeDirection),
+                        isMaskSet(control, CPU.ControlMask.All, CPU.ControlMask.StepByStep));
     }
 
     setFlags(isPositive, isNegative, isOverflown) {
@@ -308,6 +319,18 @@ class CPU {
     
     getIDTSize() {
         return getPropertiesCount(CPU.Interrupts) * CPU.registerSize;
+    }
+    
+    setInterruptData(eax, ebx, ecx) {
+        if (isValid(eax)) {
+            this.setRegisterValueById("eax", eax);
+        }
+        if (isValid(ebx)) {
+            this.setRegisterValueById("ebx", ebx);
+        }
+        if (isValid(ecx)) {
+            this.setRegisterValueById("ecx", ecx);
+        }
     }
 
     getRegisterValueById(registerId) {

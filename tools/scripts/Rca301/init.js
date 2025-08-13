@@ -25,12 +25,13 @@ function init() {
     let autoScrollElement = document.getElementById("autoScrollMemory");
     cpu = new CPU(memory, io, registersElement, registerPointersElement, controlElement, flagsElement, autoScrollElement.checked);
 
-    instructions = new Instructions(memory, io, cpu);
-
     let executionIntervalElement = document.getElementById("executionInterval");
     let runExecutionButon = document.getElementById("runExecution");
     let cancelExecutionButton = document.getElementById("cancelExecution");
-    emulator = new Emulator(cpu, instructions, runExecutionButon, cancelExecutionButton, executionIntervalElement);
+    emulator = new Emulator(memory, io, cpu, runExecutionButon, cancelExecutionButton, executionIntervalElement);
+    
+    instructions = new Instructions(memory, io, cpu, emulator);
+    emulator.setExecuteInstructionCallback(instructions.executeInstruction.bind(instructions));
 
     let addressScroll = document.getElementById("addressScroll");
     addressScroll.onkeyup = function (e) {
