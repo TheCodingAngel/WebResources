@@ -23,6 +23,7 @@ require '../common/php/utils.php';
   <script type="text/javascript" defer src="scripts/Rca301/cpu.js"></script>
   <script type="text/javascript" defer src="scripts/Rca301/emulator.js"></script>
   <script type="text/javascript" defer src="scripts/Rca301/instructions.js"></script>
+  <script type="text/javascript" defer src="scripts/Rca301/assembler.js"></script>
   <script type="text/javascript" defer src="scripts/Rca301/init.js"></script>
 </head>
 

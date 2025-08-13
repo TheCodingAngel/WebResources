@@ -38,7 +38,7 @@ md arch > NUL 2>&1
 set "FN_RCA_301=RCA-301"
 echo %FN_RCA_301%.zip
 %PHP% %FN_RCA_301%.php > %FN_RCA_301%.html
-%ARCH% --exclude-vcs --exclude "wizard_full.js" --exclude "*_demo.*" ^
+%ARCH% --exclude-vcs --exclude "wizard_full.js" --exclude "assembler.js" --exclude "*_demo.*" ^
   -acf "arch\%FN_RCA_301%.zip" ^
   "%FN_RCA_301%.html" ^
   "scripts\_Common\base.css" ^
