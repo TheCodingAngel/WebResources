@@ -89,7 +89,7 @@ require '../common/php/utils.php';
     <div id="inputSection" class="section-input sidebar-vertical flex-column flex-stretch-ortogonal">
       <h3 id="cardReader" class="section-header">Card Reader:</h3>
       <button id="loadAtStartAddress" class="button" onclick="io.onLoadTextAtStartAddress()">Load at Selection Start</button>
-      <button id="assembleAtStartAddress" class="button" onclick="io.onLoadTextAtStartAddress()">Assemble at Selection Start</button>
+      <button id="assembleAtStartAddress" class="button" onclick="Assembler.assembleAtStartAddress()">Assemble at Selection Start</button>
       <div id="punchReaderWrap" class="card-reader-wrap flex-row">
         <input type="checkbox" class="checkbox flex-pos-ortogonal-center" id="punchReaderWrapCheckbox" onchange="io.toggleReaderWrap(this)">
         <label for="punchReaderWrapCheckbox" class="label flex-pos-ortogonal-center">Wrap Text</label>

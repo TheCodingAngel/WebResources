@@ -99,6 +99,10 @@ class IO {
         }
         this.#memory.onLoadTextAtStartAddress(lines.join(""));
     }
+    
+    getPunchReader() {
+        return this.#readerElement;
+    }
 
     toggleReaderWrap(checkBox) {
         if (checkBox.checked) {
