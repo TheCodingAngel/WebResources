@@ -63,7 +63,7 @@ class CPU {
         ["idt", {value: CPU.#invalidPointerValue}],
     ]);
     
-    #registersInfo = new Map([
+    static registersInfo = new Map([
         ['0', {registerId: CPU.#instructionPointerId, hasSubRegisters: false}],
         ['1', {registerId: "eax", hasSubRegisters: true}],
         ['2', {registerId: "ebx", hasSubRegisters: true}],
@@ -165,8 +165,8 @@ class CPU {
     getAllRegisters() {
         let res = "";
         
-        for (let i = 0; i < this.#registersInfo.size; i++) {
-            let id = this.#registersInfo.get(i.toString()).registerId;
+        for (let i = 0; i < CPU.registersInfo.size; i++) {
+            let id = CPU.registersInfo.get(i.toString()).registerId;
             let value = this.getRegisterValueById(id);
             if (this._isGeneralPurposeRegister(id)) {
                 res += padWithHaltOrCut(value, CPU.registerSize);
@@ -186,7 +186,7 @@ class CPU {
         for (let i = 0; i < registerItems; i++) {
             let charIndex = i * CPU.registerSize;
             let value = strValues.substring(charIndex, charIndex + CPU.registerSize);
-            let id = this.#registersInfo.get(i.toString()).registerId;
+            let id = CPU.registersInfo.get(i.toString()).registerId;
             if (!this._isGeneralPurposeRegister(id)) {
                 value = parseIntOrZero(value);
             }
@@ -350,7 +350,7 @@ class CPU {
     }
 
     isOperandInstructionPointer(operand) {
-        let registerInfo = this.#registersInfo.get(operand[2]);
+        let registerInfo = CPU.registersInfo.get(operand[2]);
         if (!registerInfo) {
             return false;
         }
@@ -358,7 +358,7 @@ class CPU {
     }
 
     getRegisterValueByOperand(operand) {
-        let registerInfo = this.#registersInfo.get(operand[2]);
+        let registerInfo = CPU.registersInfo.get(operand[2]);
         if (!registerInfo) {
             return null;
         }
@@ -402,7 +402,7 @@ class CPU {
     }
 
     setRegisterValueByOperand(operand, value) {
-        let registerInfo = this.#registersInfo.get(operand[2]);
+        let registerInfo = CPU.registersInfo.get(operand[2]);
         if (!registerInfo) {
             return false;
         }
@@ -561,7 +561,7 @@ class CPU {
     }
 
     _isGeneralPurposeRegister(registerId) {
-        for (const registerInfo of this.#registersInfo.values()) {
+        for (const registerInfo of CPU.registersInfo.values()) {
             if (registerInfo.registerId == registerId) {
                 return registerInfo.hasSubRegisters;
             }

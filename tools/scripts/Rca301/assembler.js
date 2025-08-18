@@ -9,11 +9,15 @@ class Assembler {
     #origin = 0;
     #variables = [];
     #labels = [];
-    #procedures = [];  // labels; just the body is ending with "ret"
-    #instructions = [];
+    #procedures = [];  // labels (call instead of jump; body ends with "ret")
     
-    static #DEF_CONST = "EQU";  // 0x13, 
+    #instructions = [];
+    #data = [];
+    
+    //static #DEF_SECTION = ["SECTION", "SEGMENT"]; // both are equivalent
+    //static #DEF_EXPORT = "GLOBAL";
     static #DEF_ORIGIN = "ORG";
+    static #DEF_CONST = "EQU";  // Hex: 0x1F, Oct: 0q17
     static #DEF_CURRENT_ADDRESS = "$";
     
     // Each type allows multitude of comma separated values
@@ -63,7 +67,7 @@ class Assembler {
             this._onSecondPass(statement);
         }
         
-        //this.#memory.onLoadTextAtStartAddress(this.#instructions.join(""));
+        //this.#memory.onLoadTextAtStartAddress(this.#instructions.join("") + this.#data.join(""));
     }
     
     _clear() {
@@ -72,7 +76,9 @@ class Assembler {
         this.#variables.splice(0);
         this.#labels.splice(0);
         this.#procedures.splice(0);
+        
         this.#instructions.splice(0);
+        this.#data.splice(0);
     }
     
     _parseSourceStatements() {
