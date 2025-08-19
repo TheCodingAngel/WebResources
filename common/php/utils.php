@@ -5,6 +5,23 @@ class Page
     private static $top;
     private static $bottom;
     
+    public static function isOffline()
+    {
+        if (php_sapi_name() != 'cli')
+        {
+            return false;
+        }
+        $cmdArgs = $argv ?? $_SERVER['argv'];
+        return $cmdArgs[1] == "offline";
+    }
+    
+    public static function printFontsCss()
+    {
+        $pathRelativeToPage = "scripts/_Common/";
+        $fontsFileName = Page::isOffline() ? "fonts_local.css" : "fonts.css";
+        print(Page::getCssLink($pathRelativeToPage . $fontsFileName));
+    }
+    
     public static function printTop()
     {
         if (!isset(Page::$top))
@@ -39,6 +56,11 @@ class Page
     private static function addPathRelativeToThis($pathRelativeToThisFile)
     {
         return dirname(__FILE__).DIRECTORY_SEPARATOR.$pathRelativeToThisFile;
+    }
+    
+    private static function getCssLink($cssFileName)
+    {
+        return "<link type=\"text/css\" rel=\"stylesheet\" href=\"{$cssFileName}\" />";
     }
 }
 
