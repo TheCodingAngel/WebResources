@@ -15,45 +15,45 @@ class Instructions {
     #emulator;
     
     #all = new Map([
-        [' ', this._nop.bind(this)],
+        [' ', {mnemonic: "NOP",  execute: this._nop.bind(this)}],
 
-        ['M', this._move.bind(this)],
-        ['S', this._moveString.bind(this)],
-        ['"', this._storeString.bind(this)],
+        ['M', {mnemonic: "MOV",  execute: this._move.bind(this)}],
+        ['S', {mnemonic: "MOVS", execute: this._moveString.bind(this)}],
+        ['"', {mnemonic: "STOS", execute: this._storeString.bind(this)}],
 
-        ['?', this._compare.bind(this)],
-        ['C', this._compareString.bind(this)],
-        ['F', this._find.bind(this)],
+        ['?', {mnemonic: "CMP",  execute: this._compare.bind(this)}],
+        ['C', {mnemonic: "CMPS", execute: this._compareString.bind(this)}],
+        ['F', {mnemonic: "SCAS", execute: this._find.bind(this)}],
 
-        ['J', this._jump.bind(this)],
-        ['=', this._jumpIfEqual.bind(this)],
-        ['!', this._jumpIfNotEqual.bind(this)],
-        ['<', this._jumpIfLess.bind(this)],
-        ['>', this._jumpIfGreater.bind(this)],
-        ['L', this._jumpIfLessOrEqual.bind(this)],
-        ['G', this._jumpIfGreaterOrEqual.bind(this)],
-        ['$', this._jumpIfOverflow.bind(this)],
+        ['J', {mnemonic: "JMP",  execute: this._jump.bind(this)}],
+        ['=', {mnemonic: "JE",   execute: this._jumpIfEqual.bind(this)}],
+        ['!', {mnemonic: "JNE",  execute: this._jumpIfNotEqual.bind(this)}],
+        ['<', {mnemonic: "JL",   execute: this._jumpIfLess.bind(this)}],
+        ['>', {mnemonic: "JG",   execute: this._jumpIfGreater.bind(this)}],
+        ['L', {mnemonic: "JLE",  execute: this._jumpIfLessOrEqual.bind(this)}],
+        ['G', {mnemonic: "JGE",  execute: this._jumpIfGreaterOrEqual.bind(this)}],
+        ['$', {mnemonic: "JO",   execute: this._jumpIfOverflow.bind(this)}],
 
-        ['T', this._int.bind(this)],  // inTerrupt = Trap
-        ['.', this._halt.bind(this)],
-        [',', this._breakpoint.bind(this)],
-        [':', this._iret.bind(this)],
-        ["'", this._clgi.bind(this)],
-        ['@', this._call.bind(this)],
-        [';', this._ret.bind(this)],
-        ['(', this._push.bind(this)],
-        [')', this._pop.bind(this)],
+        ['T', {mnemonic: "INT",  execute: this._int.bind(this)}],  // inTerrupt = Trap
+        ['.', {mnemonic: "HLT",  execute: this._halt.bind(this)}],
+        [',', {mnemonic: "INT3", execute: this._breakpoint.bind(this)}],
+        [':', {mnemonic: "IRET", execute: this._iret.bind(this)}],
+        ["'", {mnemonic: "CLGI", execute: this._clgi.bind(this)}],
+        ['@', {mnemonic: "CALL", execute: this._call.bind(this)}],
+        [';', {mnemonic: "RET",  execute: this._ret.bind(this)}],
+        ['(', {mnemonic: "PUSH", execute: this._push.bind(this)}],
+        [')', {mnemonic: "POP",  execute: this._pop.bind(this)}],
         
-        ['+', this._add.bind(this)],
-        ['-', this._subtract.bind(this)],
-        ['*', this._multiply.bind(this)],
-        ['/', this._divide.bind(this)],
-        ['%', this._modulus.bind(this)],
-        ['#', this._increment.bind(this)],
-        ['D', this._decrement.bind(this)],
+        ['+', {mnemonic: "ADD",  execute: this._add.bind(this)}],
+        ['-', {mnemonic: "SUB",  execute: this._subtract.bind(this)}],
+        ['*', {mnemonic: "MUL",  execute: this._multiply.bind(this)}],
+        ['/', {mnemonic: "DIV",  execute: this._divide.bind(this)}],
+        ['%', {mnemonic: "MOD",  execute: this._modulus.bind(this)}],
+        ['#', {mnemonic: "INC",  execute: this._increment.bind(this)}],
+        ['D', {mnemonic: "DEC",  execute: this._decrement.bind(this)}],
 
-        ['I', this._in.bind(this)],
-        ['O', this._out.bind(this)],
+        ['I', {mnemonic: "IN",   execute: this._in.bind(this)}],
+        ['O', {mnemonic: "OUT",  execute: this._out.bind(this)}],
     ]);
 
     #forcedCharacterCount = new Map([
@@ -106,7 +106,15 @@ class Instructions {
         if (!instruction) {
             throw new InstructionError("Unknown opcode: " + opcode);
         }
-        return instruction(opcode, characters[1], characters.substring(2, 6), characters.substring(6));
+        return instruction.execute(opcode, characters[1], characters.substring(2, 6), characters.substring(6));
+    }
+    
+    getMnemonics() {
+        let result = new Map();
+        for (let [key, value] of this.#all) {
+            result.set(value.mnemonic, key);
+        }
+        return result;
     }
     
     _halt(opcode, suffix, a, b) {
