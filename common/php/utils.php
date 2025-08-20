@@ -2,6 +2,9 @@
 
 class Page
 {
+    const ONLINE_IMAGE_PATH = "../res/images/";
+    const OFFLINE_IMAGE_PATH = "images/";
+    
     private static $top;
     private static $bottom;
     
@@ -15,31 +18,45 @@ class Page
         return $cmdArgs[1] == "offline";
     }
     
+    public static function printFavIcon($iconFileName)
+    {
+        if (self::isOffline()) {
+            print("<link rel=\"icon\" type=\"image/x-icon\" href=\"images/{$iconFileName}\">");
+        }
+    }
+    
     public static function printFontsCss()
     {
         $pathRelativeToPage = "scripts/_Common/";
-        $fontsFileName = Page::isOffline() ? "fonts_local.css" : "fonts.css";
-        print(Page::getCssLink($pathRelativeToPage . $fontsFileName));
+        $fontsFileName = self::isOffline() ? "fonts_local.css" : "fonts.css";
+        print(self::getCssLink($pathRelativeToPage . $fontsFileName));
+    }
+    
+    public static function printImagePath($imageFileName)
+    {
+        $baseDir = self::isOffline() ? self::OFFLINE_IMAGE_PATH : self::ONLINE_IMAGE_PATH;
+        print($baseDir . $imageFileName);
     }
     
     public static function printTop()
     {
-        if (!isset(Page::$top))
+        if (!isset(self::$top))
         {
-            Page::$top = file_get_contents(Page::addPathRelativeToThis("page-top.htm"));
+            $temp = file_get_contents(self::addPathRelativeToThis("page-top.htm"));
+            self::$top = self::isOffline() ? str_replace(self::ONLINE_IMAGE_PATH, self::OFFLINE_IMAGE_PATH, $temp) : $temp;
         }
         
-        print(Page::$top);
+        print(self::$top);
     }
     
     public static function printBottom()
     {
-        if (!isset(Page::$bottom))
+        if (!isset(self::$bottom))
         {
-            Page::$bottom = file_get_contents(Page::addPathRelativeToThis("page-bottom.htm"));
+            self::$bottom = file_get_contents(self::addPathRelativeToThis("page-bottom.htm"));
         }
         
-        print(Page::$bottom);
+        print(self::$bottom);
     }
     
     public static function getAbsoluteEntryPath($pathRelativeToEntryPage = null)

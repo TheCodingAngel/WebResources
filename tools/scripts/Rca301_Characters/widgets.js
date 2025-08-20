@@ -67,9 +67,7 @@ class CounterWidgetTernary extends CounterWidgetBase {
             super.start();
             return;
         }
-        alert('Automatic counters work with digits!\n' +
-                'When using levels the values can be changed only manually.\n' +
-                'Check "Convert levels to symbols" in order to use automatic counters...');
+        document.querySelector('.character_popup').classList.add('activemp');
     }
     
     setValueSlider(val) {

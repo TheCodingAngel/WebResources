@@ -34,6 +34,12 @@ pushd %~dp0
 md arch > NUL 2>&1
 
 
+md images > NUL 2>&1
+copy /Y ..\res\images\icon.png images > NUL 2>&1
+copy /Y ..\res\images\arrow.png images > NUL 2>&1
+copy /Y ..\res\images\close.png images > NUL 2>&1
+copy /Y ..\favicon.ico images > NUL 2>&1
+
 
 set "FN_RCA_301=RCA-301"
 echo %FN_RCA_301%.zip
@@ -47,7 +53,8 @@ echo %FN_RCA_301%.zip
   "scripts\_Common\popups.js" ^
   "scripts\_Common\wizard_base.js" ^
   "scripts\Rca301\*.*" ^
-  "fonts\*.*"
+  "fonts\*.*" ^
+  "images\*.*"
 
 set "FN_RCA_301_FULL=RCA-301-Full"
 echo %FN_RCA_301_FULL%.zip
@@ -61,7 +68,8 @@ echo %FN_RCA_301_FULL%.zip
   "scripts\_Common\popups.js" ^
   "scripts\_Common\wizard_base.js" ^
   "scripts\Rca301\*.*" ^
-  "fonts\*.*"
+  "fonts\*.*" ^
+  "images\*.*"
 
 set "FN_CHARS=RCA-301-Characters"
 echo %FN_CHARS%.zip
@@ -76,7 +84,8 @@ echo %FN_CHARS%.zip
   "scripts\_Common\table.js" ^
   "scripts\_Common\wizard_base.js" ^
   "scripts\Rca301_Characters\*.*" ^
-  "fonts\*.*"
+  "fonts\*.*" ^
+  "images\*.*"
 
 set "FN_EXTENDED_ASCII=ExtendedASCII"
 echo %FN_EXTENDED_ASCII%.zip
@@ -93,7 +102,8 @@ echo %FN_EXTENDED_ASCII%.zip
   "scripts\Text\text.css" ^
   "scripts\Text\utils.js" ^
   "scripts\Text\ExtendedAscii.js" ^
-  "fonts\*.*"
+  "fonts\*.*" ^
+  "images\*.*"
 
 set "FN_CODEPOINTS=CodePoints"
 echo %FN_CODEPOINTS%.zip
@@ -109,7 +119,8 @@ echo %FN_CODEPOINTS%.zip
   "scripts\Text\*.*" ^
   "data\categories.txt" ^
   "data\ppucd.txt" ^
-  "fonts\*.*"
+  "fonts\*.*" ^
+  "images\*.*"
 
 set "FN_TEXT=Text"
 echo %FN_TEXT%.zip
@@ -125,7 +136,8 @@ echo %FN_TEXT%.zip
   "scripts\Text\GraphemeSplitter.js" ^
   "scripts\Text\text.js" ^
   "scripts\Text\init_text.js" ^
-  "fonts\*.*"
+  "fonts\*.*" ^
+  "images\*.*"
 
 set "FN_TOOLS=Tools"
 echo %FN_TOOLS%.zip
@@ -133,7 +145,7 @@ echo %FN_TOOLS%.zip
   -acf "arch\%FN_TOOLS%.zip" ^
   "%FN_RCA_301%.html" "%FN_RCA_301_FULL%.html" "%FN_CHARS%.html" ^
   "%FN_EXTENDED_ASCII%.html" "%FN_CODEPOINTS%.html" "%FN_TEXT%.html" ^
-  "scripts\*.*" "data\*.*" "fonts\*.*"
+  "scripts\*.*" "data\*.*" "fonts\*.*" "images\*.*"
 
 
 
@@ -141,6 +153,8 @@ for %%a in (%FN_RCA_301% %FN_RCA_301_FULL% %FN_CHARS% ^
             %FN_EXTENDED_ASCII% %FN_CODEPOINTS% %FN_TEXT%) do (
     del %%a.html
 )
+
+rd /S /Q images
 
 popd
 
