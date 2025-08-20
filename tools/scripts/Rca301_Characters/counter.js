@@ -47,6 +47,7 @@ class Counter {
     #digits = [];  // Little Endian order
     
     #overflowSelector;
+    #overflowTooltip;
     #digitsParent;
   
     #scrollingDigits = [];
@@ -59,6 +60,7 @@ class Counter {
         this.#currentValue = config.initial || 0;
     
         this.#overflowSelector = document.getElementById(config.overflowSelectorId);
+        this.#overflowTooltip = this.#overflowSelector.firstElementChild.firstElementChild.textContent;
         this.#digitsParent = document.getElementById(config.parentId);
         
         this._buildCounterElement(config.allPositions, config.positionsForDigit);
@@ -279,12 +281,12 @@ class Counter {
             for (let i = 0; i < this.#digitCount; i++) {
                 let currentText = this._formatDigit(current[current.length - i - 1] || this._numberToString(0)[0]);
                 let nextText = this._formatDigit(next[next.length - i - 1] || this._numberToString(0)[0]);
-          
+
                 this.#digits[i].querySelector(".digit-current").innerHTML = currentText;
                 this.#digits[i].querySelector(".digit-next").innerHTML = nextText;
-          
+
                 this.#digits[i].style.top = "0px";
-        
+
                 if (currentText !== nextText) {
                     this.#scrollingDigits.push(i);
                 }
@@ -304,10 +306,22 @@ class Counter {
         if (fraction < -this.#UPDATE_PRECISION) {
             fraction = fraction + 1;
         }
-        let _scrollAmount = fraction * - this.#DIGIT_HEIGHT;
+        let _scrollAmount = fraction * -this.#DIGIT_HEIGHT;
+        let newTopValue = Math.round(_scrollAmount);
+        let scale = getElementScale(this.#digitsParent.parentElement);
+        if (scale < 1) {
+            scale /= 2; // patch for the rounding of scaling transformations
+        }
+        
         let _digits = this.#digits;
         this.#scrollingDigits.forEach(function(n) {
-            _digits[n].style.top = _scrollAmount.toString() + "px";
+            let digit = _digits[n];
+            let pos = digit.style.top.substring(0, digit.style.top.length - 2);
+            let px = parseIntOrZero(pos);
+            //if (digit.style.top != newTopValue) {
+            if (Math.round(px * scale) != Math.round(newTopValue * scale)) {
+                digit.style.top = newTopValue.toString() + "px";
+            }
         });
     }
     
@@ -463,9 +477,11 @@ class Counter {
   
     _showOverflowSelector() {
         this.#overflowSelector.style.removeProperty("opacity");
+        this.#overflowSelector.firstElementChild.firstElementChild.textContent = this.#overflowTooltip;
     }
   
     _hideOverflowSelector() {
         this.#overflowSelector.style.opacity = "0";
+        this.#overflowSelector.firstElementChild.firstElementChild.textContent = "";
     }
 }

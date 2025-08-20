@@ -12,6 +12,8 @@ function initSeparators(separatorList, positionsConfig, overlayElement) {
     let initialMargin = 0;
     let initialMarkerPos = 0;
     
+    let scale = 1;
+    
     function getIntValue(strValue) {
         if (strValue) {
             return parseInt(strValue.slice(0, -2), 10);
@@ -45,6 +47,8 @@ function initSeparators(separatorList, positionsConfig, overlayElement) {
         initialMargin = getIntValue(draggedElement.style.marginLeft);
         initialMarkerPos = initialMargin + Math.round(draggedElement.clientWidth / 2);
         
+        scale = getElementScale(draggedElement.parentElement.parentElement.parentElement);
+        
         userSelect = document.body.style.userSelect;
         document.body.style.userSelect = "none";
         if (overlayElement) {
@@ -57,7 +61,7 @@ function initSeparators(separatorList, positionsConfig, overlayElement) {
     }
 
     function mouseMoveHandler(e) {
-        let delta = e.clientX - startPos;
+        let delta = (e.clientX - startPos) / scale;
         
         let newValue = initialMargin + delta;
         if (positionsConfig) {
@@ -72,7 +76,7 @@ function initSeparators(separatorList, positionsConfig, overlayElement) {
     }
     
     function mouseUpHandler(e) {
-        let delta = e.clientX - startPos;
+        let delta = (e.clientX - startPos) / scale;
         setSeparatorPosition(initialMarkerPos + delta, draggedElement);
         
         document.body.style.userSelect = userSelect;

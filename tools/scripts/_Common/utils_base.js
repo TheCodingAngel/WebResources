@@ -438,3 +438,9 @@ function clearTableData(tableDataElement) {
         tableDataElement.deleteRow(0);
     }
 }
+
+function getElementScale(element) {
+    let matrix = window.getComputedStyle(element).transform;
+    let matrixData = matrix ? matrix.split("(")[1] : null;
+    return matrixData ? parseFloat(matrixData.split(",")[0]) : 1;
+}
