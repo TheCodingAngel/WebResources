@@ -2,7 +2,10 @@ var counterTernary;
 var counterOctHex;
 
 class CounterWidgetTernary extends CounterWidgetBase {
+    #WIDER_CHARACTERS_CLASS = "wider_character_section";
+    
     #radioDigits = new Map();
+    #digitCount;
     
     #binaryLine;
     #ternaryLine;
@@ -80,7 +83,9 @@ class CounterWidgetTernary extends CounterWidgetBase {
     
     setDigits(digitCount) {
         super.setDigits(digitCount);
+        this.#digitCount = digitCount;
         this._selectRadioButton(digitCount);
+        this._onCountersWidthChange();
     }
     
     showBinary() {
@@ -139,6 +144,16 @@ class CounterWidgetTernary extends CounterWidgetBase {
     setShortSymbols(useShortSymbols) {
         for (let i in this._allCounters) {
             this._allCounters[i].setCharactersForADigit(useShortSymbols ? 1 : 2);
+        }
+        
+        this._onCountersWidthChange();
+    }
+    
+    _onCountersWidthChange() {
+        if (!this.#checkboxShortSymbols.checked && this.#digitCount >= 8) {
+            document.getElementById('characterSection').classList.add(this.#WIDER_CHARACTERS_CLASS);
+        } else {
+            document.getElementById('characterSection').classList.remove(this.#WIDER_CHARACTERS_CLASS);
         }
     }
     

@@ -122,7 +122,7 @@ require '../common/php/utils.php';
 </div>
 
 
-<div class="character_section">
+<div id="characterSection" class="character_section">
 
   <!-- Binary and Ternary counters -->
   <div id="hardwareSection" class="hardwarea_area section">
