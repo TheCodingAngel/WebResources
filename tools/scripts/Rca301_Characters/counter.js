@@ -308,7 +308,7 @@ class Counter {
         }
         let _scrollAmount = fraction * -this.#DIGIT_HEIGHT;
         let newTopValue = Math.round(_scrollAmount);
-        let scale = getElementScale(this.#digitsParent.parentElement);
+        let scale = getElementScale(this.#digitsParent);
         if (scale < 1) {
             scale /= 2; // patch for the rounding of scaling transformations
         }
@@ -316,8 +316,7 @@ class Counter {
         let _digits = this.#digits;
         this.#scrollingDigits.forEach(function(n) {
             let digit = _digits[n];
-            let pos = digit.style.top.substring(0, digit.style.top.length - 2);
-            let px = parseIntOrZero(pos);
+            let px = parseIntOrZero(digit.style.top.slice(0, -2));
             //if (digit.style.top != newTopValue) {
             if (Math.round(px * scale) != Math.round(newTopValue * scale)) {
                 digit.style.top = newTopValue.toString() + "px";

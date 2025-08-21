@@ -1002,7 +1002,7 @@ button.button_style:hover {
   gap: 8px;
 }
 
-.popup {
+.popup-dialog {
   left: 50% !important;
   top: 32% !important;
   transform: translate(-50%, -50%);

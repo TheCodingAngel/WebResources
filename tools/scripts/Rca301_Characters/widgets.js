@@ -244,15 +244,16 @@ class CounterWidgetOctHex extends CounterWidgetBase {
             
             counterParent.addEventListener("click", function (e) {
                 let radix = counter.getRadix();
+                let scale = getElementScale(counterParent);
                 switch(radix) {
                     case 64:
-                        _this._showCharsPopup(radix, counter, separators, e.offsetX, counterParent.getBoundingClientRect());
+                        _this._showCharsPopup(radix, counter, separators, e.offsetX, counterParent.getBoundingClientRect(), scale);
                         break;
                     case 128:
-                        _this._showCharsPopup(radix, counter, separators, e.offsetX, counterParent.getBoundingClientRect());
+                        _this._showCharsPopup(radix, counter, separators, e.offsetX, counterParent.getBoundingClientRect(), scale);
                         break;
                     default:
-                        _this._showPopup(radix, counter, separators, e.offsetX, counterParent.getBoundingClientRect());
+                        _this._showPopup(radix, counter, separators, e.offsetX, counterParent.getBoundingClientRect(), scale);
                         break;
                 }
             });
@@ -355,8 +356,8 @@ class CounterWidgetOctHex extends CounterWidgetBase {
         counterLine.overflow.style.display = "none";
     }
     
-    _showCharsPopup(radix, counter, separators, clickHorizontalPosition, boundingRect) {
-        let clickedSegment = this._getClosestSegment(separators, clickHorizontalPosition, 0, boundingRect.width);
+    _showCharsPopup(radix, counter, separators, clickHorizontalPosition, boundingRect, scale) {
+        let clickedSegment = this._getClosestSegment(separators, clickHorizontalPosition, 0, boundingRect.width / scale);
         let str = counter.getSubString(clickedSegment.left, clickedSegment.right);
         if (str.length <= 0) {
             return;
@@ -420,17 +421,20 @@ class CounterWidgetOctHex extends CounterWidgetBase {
         this.closePopup();
     }
     
-    _showPopup(radix, counter, separators, clickHorizontalPosition, boundingRect) {
-        let clickedSegment = this._getClosestSegment(separators, clickHorizontalPosition, 0, boundingRect.width);
+    _showPopup(radix, counter, separators, clickHorizontalPosition, boundingRect, scale) {
+        let clickedSegment = this._getClosestSegment(separators, clickHorizontalPosition, 0, boundingRect.width / scale);
         
         this.#popupText.setValidationPattern(this.#popupPatterns.get(radix));
         
         let strValue = counter.getSubString(clickedSegment.left, clickedSegment.right);
         let popupWidth = clickedSegment.right - clickedSegment.left;
         
-        this.#popupText.showTextPopup(strValue, strValue.length, boundingRect.x + clickedSegment.left, boundingRect.y, popupWidth, newValue => {
+        this.#popupText.getPopupElement().style.transform = `scale(${scale})`;
+        
+        this.#popupText.showTextPopup(strValue, strValue.length, boundingRect.x + clickedSegment.left * scale, boundingRect.y, popupWidth, newValue => {
             let newValueNum = counter.setSubString(clickedSegment.left, clickedSegment.right, newValue);
             this._setValue(newValueNum);
+            this.#popupText.showTextPopup.style.removeProperty("transform");
         });
     }
     

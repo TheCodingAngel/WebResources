@@ -47,7 +47,7 @@ function initSeparators(separatorList, positionsConfig, overlayElement) {
         initialMargin = getIntValue(draggedElement.style.marginLeft);
         initialMarkerPos = initialMargin + Math.round(draggedElement.clientWidth / 2);
         
-        scale = getElementScale(draggedElement.parentElement.parentElement.parentElement);
+        scale = getElementScale(draggedElement);
         
         userSelect = document.body.style.userSelect;
         document.body.style.userSelect = "none";

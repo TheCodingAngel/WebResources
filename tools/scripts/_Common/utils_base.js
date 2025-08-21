@@ -440,7 +440,9 @@ function clearTableData(tableDataElement) {
 }
 
 function getElementScale(element) {
-    let matrix = window.getComputedStyle(element).transform;
+    /*let matrix = window.getComputedStyle(element).transform;
     let matrixData = matrix ? matrix.split("(")[1] : null;
-    return matrixData ? parseFloat(matrixData.split(",")[0]) : 1;
+    return matrixData ? parseFloat(matrixData.split(",")[0]) : 1;*/
+    let res = element.getBoundingClientRect().width / element.clientWidth;
+    return Math.round(res * 1000) / 1000;
 }
