@@ -1,0 +1,358 @@
+/* // start responsive ================== */
+
+@media only screen and (max-width: 1500px) {
+  body {
+    overflow-x: hidden;
+  }
+  /* character page  */
+
+  .character_section {
+    display: block;
+    margin: 0px auto;
+    max-width: 576px;
+    height: auto;
+  }
+  .details_h {
+    display: inline-block;
+    width: 100%;
+  }
+  .character_section .hardwarea_area,
+  .character_section .word_area {
+    margin: 20px 0px;
+  }
+  .characters_radios .radios {
+    align-items: flex-start;
+  }
+  .characters_radios .radios label::before {
+    top: 3px;
+  }
+  .hardware_names {
+    gap: 10px;
+  }
+}
+
+@media only screen and (max-width: 1094px) {
+  .mainbody {
+    min-width: unset;
+    width: 100%;
+    display: flex;
+    flex-wrap: wrap;
+    height: 100%;
+    position: relative;
+    margin-top: 35px;
+    padding: 10px;
+    gap: 10px;
+    &.sidebar-horizontal {
+      overflow-y: hidden;
+    }
+  }
+
+  .mainbody .section-input.input_bigger {
+    height: max-content;
+    min-width: 160px;
+    order: 1;
+    display: inline-block;
+    width: 100%;
+  }
+  .mainbody .rightarea {
+    max-width: unset;
+    height: 575px;
+    overflow: auto;
+    display: block;
+    overflow: unset;
+    flex: 1;
+  }
+  .printer_area .printer_textarea,
+  .teleprinter_area .printer_textarea {
+    height: 86px;
+  }
+  .section-input.input_bigger {
+    max-width: 100vw;
+  }
+
+  .rightarea .printer_area {
+    margin: 10px 0;
+  }
+  .section-input.input_bigger .left_textarea {
+    height: 180px;
+  }
+  .printer_area .printer_textarea {
+    width: 100%;
+  }
+  .memory_align label {
+    font-size: 12px;
+  }
+  .middle_area .flex-row.memory_align.end_top_m .file_memory {
+    margin-right: 4px;
+  }
+  .mainbody .middle_area {
+    height: 575px;
+    margin-right: 0;
+    min-width: unset;
+    flex: 1;
+  }
+
+  .table_middle {
+    height: 385px;
+  }
+  .rightarea .table_middle,
+  .rightarea .table_middle table.table_inner {
+    height: unset;
+  }
+
+  .navdirection .breadcrumb h1 {
+    font-size: 13px;
+  }
+  /* Hamburger icon */
+  .hamburger {
+    display: none;
+    flex-direction: column;
+    cursor: pointer;
+  }
+
+  .hamburger div {
+    width: 25px;
+    height: 3px;
+    background: #555555;
+    margin: 2px;
+  }
+  .menu-list {
+    display: flex;
+    background: white;
+    flex-direction: column;
+    position: absolute;
+    right: 0;
+    width: 100%;
+    padding: 10px;
+    z-index: 190;
+    top: -100%;
+    gap: 10px;
+    visibility: hidden;
+    opacity: 0;
+    transition: all 0.3s ease-in-out;
+  }
+
+  .menu-list.show {
+    display: flex;
+    visibility: visible;
+    opacity: 1;
+    top: 100%;
+    transition: all 0.3s ease-in-out;
+  }
+  .menu-list li {
+    display: inline-block;
+  }
+
+  .hamburger {
+    display: flex;
+  }
+  .menu_style {
+    align-items: flex-start;
+  }
+  .menu_style .dropdown_menu {
+    padding: 0;
+  }
+  .menu_style .dropdown_menu .menu_item {
+    width: max-content;
+    z-index: 99;
+  }
+  .menu_style .dropdown_menu .menu_item li a {
+    padding: 10px 20px;
+  }
+
+  .navdirection {
+    position: relative;
+  }
+  .mainbody .section-input.input_bigger {
+    margin-right: 0;
+  }
+  .containertop {
+    max-width: 100%;
+    padding: 0;
+  }
+  /* character page  */
+
+  .character_section {
+    padding-top: 40px;
+  }
+}
+
+@media only screen and (max-width: 784px) {
+  main {
+    display: inline-block;
+    width: 100%;
+  }
+  .mainbody {
+    max-width: 100%;
+    width: 100%;
+  }
+  .mainbody .middle_area {
+    order: 1;
+    height: 460px;
+    width: 100%;
+  }
+  .mainbody .rightarea {
+    height: fit-content;
+    max-width: 100%;
+    width: 100%;
+    display: contents;
+  }
+  .rightarea .cpu_area {
+    width: 100%;
+  }
+  .rightarea .printer_area {
+    order: 2;
+  }
+  .rightarea .teleprinter_area {
+    order: 2;
+  }
+  .mainbody .section-input.input_bigger {
+    order: 2;
+  }
+  .rightarea .table_middle table.table_inner,
+  .rightarea .table_middle table.table_inner {
+    height: 150px;
+  }
+  .middle_area input.numedit,
+  .cpu_align input.numedit {
+    max-width: 58px;
+    font-size: 12px;
+    margin-left: 2px;
+  }
+  .middle_area .checkbox_style label.smalllabel {
+    font-size: 12px;
+  }
+  .table_middle tbody tr td.memory-address,
+  .rightarea .table_middle tbody tr td.memory-cell,
+  .rightarea .cpu_table .table_inside .table-header,
+  .table_middle tbody tr .memory-cell,
+  .table_middle thead tr th.table-header {
+    font-size: 13px;
+  }
+  .printer_area .printer_textarea,
+  .teleprinter_area .printer_textarea {
+    max-width: 100%;
+  }
+  .checkbox_style label,
+  .radios label,
+  .counters_area .alignRightCenter,
+  .alignRightTop label {
+    font-size: 12px;
+    white-space: nowrap;
+  }
+  .hardware_names .radio_names .digit_radios p {
+    font-size: 14px;
+  }
+  .radios input[type="radio"] {
+    width: 14px;
+    height: 14px;
+    margin-top: 2px;
+  }
+  .radios label::before {
+    width: 8px;
+    height: 8px;
+    top: 7px;
+  }
+  .characters_radios .radios label::before {
+    top: 5px;
+  }
+  .counters_area .alignRightCenter {
+    min-width: 92px;
+  }
+  .hardware_names .radio_names .all_names,
+  .hardware_names .radio_names .digit_radios,
+  .hardware_names {
+    gap: 5px;
+  }
+
+  .checkbox_style input[type="checkbox"] + label::before {
+    width: 12px;
+    height: 12px;
+  }
+  .checkbox_style input[type="checkbox"] + label::after {
+    top: 5px;
+    left: 5px;
+  }
+  .character_section .hardwarea_area {
+    padding: 20px 10px;
+  }
+  .characters_radios {
+    flex-wrap: wrap;
+  }
+  .characters_radios .checkbox_style {
+    margin-left: 0;
+  }
+  .word_area .counters-grid {
+    grid-template-columns: repeat(1, auto);
+  }
+  .word_area .counters_area .alignRightCenter,
+  .word_area .alignRightTop label {
+    text-align: left;
+    min-width: 100%;
+  }
+  .word_area .alignRightTop {
+    margin-left: unset;
+  }
+  .characters_radios {
+    margin-bottom: 0px;
+  }
+  .memory_popup .mp_card,
+  .cpu_popup .mp_card,
+  .character_popup .mp_card {
+    max-width: 320px;
+  }
+  .middle_area button.button_style.btn_w {
+    white-space: nowrap;
+  }
+
+  .navdirection .containertop {
+    align-items: flex-start;
+  }
+
+  .breadcrumb {
+    display: flex;
+    flex-wrap: wrap; /* allows going to a new line */
+    list-style: none;
+    justify-content: flex-start;
+  }
+
+  .breadcrumb li:last-child {
+    flex-basis: 100%; /* forces h1 to take full width on new line */
+  }
+  .toolbar-horizontal {
+    align-self: unset;
+  }
+  .file-area .file-dummy,
+  .memory_align label {
+    font-size: 11px;
+  }
+  .topbar {
+    align-items: center;
+  }
+  .footer svg,
+  .topbar svg,
+  .navdirection svg {
+    width: 18px;
+    height: 18px;
+  }
+  .middle_area button.button_style,
+  .middle_area .checkbox_style {
+    white-space: nowrap;
+  }
+  .mainbody .middle_area {
+    width: 100%;
+  }
+  .middle_area .flex-row.memory_align label,
+  .rightarea .cpu_area .cpu_align label {
+    font-size: 12px;
+  }
+  .middle_area input.numedit {
+    margin-right: 2px;
+  }
+  .middle_area button.button_style {
+    margin-right: 4px;
+  }
+  .link_style a {
+    font-size: 13px;
+  }
+}

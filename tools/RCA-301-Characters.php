@@ -9,7 +9,7 @@ require '../common/php/utils.php';
   <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
   <title>RCA-301 - Numbers and Characters</title>
   <?php Page::printFavIcon("favicon.ico"); ?>
-  
+
 
   <link type="text/css" rel="stylesheet" href="scripts/_Common/base.css">
   <?php Page::printFontsCss(); ?>

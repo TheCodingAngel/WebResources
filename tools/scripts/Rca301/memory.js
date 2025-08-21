@@ -215,7 +215,7 @@ class Memory {
     }
 
     onShowHelp() {
-        alert("1. Selecting Memory cells:\n" +
+        /*alert("1. Selecting Memory cells:\n" +
             "- by dragging the mouse while having the left button pressed;\n" +
             "- by left clicking on a starting cell followed by a left clicking along with pressed Shift key on an end cell;\n" +
             "- clicking the column with addresses (on the left of the cell matrix) clears the selection.\n" +
@@ -224,7 +224,8 @@ class Memory {
             "\n4. Loading from a file works like point 2 (loading from the first selected memory cell or from address zero when there is no selection).\n" +
             "\n5. Saving to a file works like point 3 (saving the selected cells or all cells if there is no selection).\n" +
             "\n6. Direct editing of memory cells is done by double clicking with the left mouse button (unlike the single click for registers).\n" +
-            "\n7. Popup values are applied by the Return/Enter key and canceled by the Esc key or clicking outside the popup.");
+            "\n7. Popup values are applied by the Return/Enter key and canceled by the Esc key or clicking outside the popup.");*/
+        document.querySelector('.memory_popup').classList.add('activemp');
     }
 
     onSelectAddresses() {

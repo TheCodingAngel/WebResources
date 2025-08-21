@@ -434,4 +434,8 @@ class Emulator {
         this.pushValue(registers);
         this.#cpu.enterInterrupt(interruptNumber); // CS becomes negative and all addresses become physical
     }
+    
+    _showErrorPopup($message) {
+        document.querySelector('.cpu_popup').classList.add('activecpup');
+    }
 }
