@@ -70,10 +70,6 @@ class TextApi {
             this.#elementStrings.appendChild(option);
         }
         
-        // Initial automatic layout has finished but we want to disable it from now on.
-        // Reason - automatic layout switches height and width for vertical texts and this is ugly.
-        disableAutomaticResizing(this.#elementText);
-        
         let _this = this;
         
         this.#currentEncodingIdx = 0;
@@ -227,34 +223,44 @@ class TextApi {
     }
     
     _addTreeItem(listElement, codePoint, codePointIndex) {
-        let li = document.createElement('li');
+        let li = document.createElement("li");
         li.className = "tree-item data";
         
         let codePointStr = String.fromCodePoint(codePoint);
-        let name = "\u00A0\u00A0" + codePointStr + "\u00A0" + TextApi.getCodePointText(codePoint);
-        li.appendChild(document.createTextNode(name));
         
-        let code = document.createElement('label');
+        // Character part wrapped in span
+        let charSpan = document.createElement("span");
+        charSpan.className = "unicode-char";
+        charSpan.textContent = codePointStr;
+        li.appendChild(charSpan);
+
+        // Code part wrapped in span
+        let codeSpan = document.createElement("span");
+        codeSpan.className = "unicode-code";
+        codeSpan.textContent = TextApi.getCodePointText(codePoint);
+        li.appendChild(codeSpan);
+        
+        let code = document.createElement("label");
         code.textContent = this._getCodeUnitText(codePointStr);
         li.appendChild(code);
         
         let _this = this;
         
-        let upBtn = document.createElement('button');
+        let upBtn = document.createElement("button");
         upBtn.appendChild(document.createTextNode("↑"));
         upBtn.addEventListener("click", function() {
             _this._cpMoveUp(codePointIndex);
         });
         li.appendChild(upBtn);
         
-        let downBtn = document.createElement('button');
+        let downBtn = document.createElement("button");
         downBtn.appendChild(document.createTextNode("↓"));
         downBtn.addEventListener("click", function() {
             _this._cpMoveDown(codePointIndex);
         });
         li.appendChild(downBtn);
         
-        let delBtn = document.createElement('button');
+        let delBtn = document.createElement("button");
         delBtn.appendChild(document.createTextNode("x"));
         delBtn.addEventListener("click", function() {
             _this._cpDelete(codePointIndex);
@@ -262,21 +268,21 @@ class TextApi {
         li.appendChild(delBtn);
         
         // Add new lines when selecting and copying items to clipboard (for example, Firefox needs it)
-        li.appendChild(document.createElement('br'));
+        li.appendChild(document.createElement("br"));
         
         listElement.appendChild(li);
         return li;
     }
     
     _addTreeParent(listElement, graphemeCluster) {
-        let span = document.createElement('span');
+        let span = document.createElement("span");
         span.className = "caret caret-down";
         span.appendChild(document.createTextNode(graphemeCluster));
         
-        let sub = document.createElement('ul');
+        let sub = document.createElement("ul");
         sub.className = "nested active";
         
-        let li = document.createElement('li');
+        let li = document.createElement("li");
         li.className = "tree-item data";
         li.appendChild(span);
         li.appendChild(sub);
