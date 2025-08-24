@@ -7,7 +7,8 @@ class PopupBase {
         let scrollLeft = document.documentElement.scrollLeft || document.body.scrollLeft;
         let scrollTop = document.documentElement.scrollTop || document.body.scrollTop;
         
-        popupElement.style.left = `${ left + scrollLeft }px`;
+        let desiredLeft = left + scrollLeft;
+        popupElement.style.left = `${ desiredLeft }px`;
         popupElement.style.top = `${ top + scrollTop }px`;
         if (width) {
             popupElement.style.width = `${ width }px`;
@@ -22,6 +23,12 @@ class PopupBase {
         if (popupElement.focus) {
             popupElement.focus();
         }
+        
+        // Patch for correcting left position when scaling is used.
+        // The result is not "precise" but is close enough for "visibility" purposes.
+        let scaledRect = popupElement.getBoundingClientRect();
+        desiredLeft += desiredLeft - scaledRect.left;
+        popupElement.style.left = `${ desiredLeft }px`;
     }
     
     _hidePopup(popupElement) {

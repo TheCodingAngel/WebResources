@@ -10,7 +10,172 @@
     width: 100%;
   }
 }
+@media only screen and (max-width: 1180px) {
+  /* character page  */
 
+  .character_section {
+    padding-top: 88px;
+    padding-right: 10px;
+    padding-left: 10px;
+    display: block;
+    height: auto;
+    min-height: unset;
+  }
+  .character_section.wider_character_section {
+    max-width: 100%;
+  }
+  .charecter_breadcrumb.breadcrumb {
+    display: flex;
+    flex-wrap: wrap;
+    list-style: none;
+    justify-content: flex-start;
+  }
+  .charecter_breadcrumb.breadcrumb li:last-child {
+    flex-basis: 100%;
+  }
+  .charecter_breadcrumb.link_style a {
+    font-size: 13px;
+  }
+  .character_section .character_main_title {
+    display: block;
+  }
+  .charecter_title h3,
+  .character_section .hardwarea_area .hardwarea_title h3 {
+    font-size: 14px;
+  }
+  .character_section .checkbox_style label,
+  .character_section .radios label {
+    font-size: 12px;
+    white-space: nowrap;
+
+    min-width: max-content;
+    margin: 0px auto 0 0px;
+    align-self: center;
+  }
+  .character_section .alignRightCenter .checkbox_style label {
+    font-size: 15px;
+  }
+  .character_section .counters_area .alignRightCenter,
+  .alignRightTop label {
+    font-size: 15px;
+    white-space: nowrap;
+    min-width: 135px;
+  }
+  .character_section.wider_character_section .counters_area .alignRightCenter,
+  .alignRightTop label {
+    min-width: 120px;
+  }
+  .blockdetailes {
+    display: inline-flex;
+    width: auto;
+  }
+  .blockdetailes.rangeblock {
+    display: flex;
+    justify-content: flex-start;
+  }
+  .details_h .flex-pos-ortogonal-center {
+    align-self: flex-start;
+  }
+  .counters-grid {
+    margin-top: 0;
+    transform: scale(0.7) translate(-76px, -40px);
+    max-width: 450px;
+  }
+  .counters-grid.flex_mobile {
+    transform: scale(0.7) translate(-90px, -40px);
+  }
+  .counter_grid_input {
+    transform: scale(0.7) translate(-71px, -8px) !important;
+  }
+  .counters_area .counterhead {
+    margin-bottom: 0;
+  }
+  .decimal {
+    white-space: nowrap;
+  }
+  .character_section .word_area {
+    margin-left: 0;
+    padding: 20px 10px;
+  }
+
+  .hardware_names .radio_names .digit_radios p {
+    font-size: 14px;
+  }
+  .radios input[type="radio"] {
+    width: 14px;
+    height: 14px;
+    margin-top: 0px;
+  }
+  .radios label::before {
+    width: 8px;
+    height: 8px;
+    top: 6px;
+  }
+  .characters_radios .radios label::before {
+    top: 6px;
+  }
+  .hardware_names .radio_names .all_names,
+  .hardware_names .radio_names .digit_radios {
+    gap: 5px;
+  }
+  .checkbox_style input[type="checkbox"] + label::before {
+    width: 12px;
+    height: 12px;
+  }
+  .checkbox_style input[type="checkbox"] + label::after {
+    top: 5px;
+    left: 5px;
+  }
+  .character_section .hardwarea_area {
+    padding: 20px 10px;
+  }
+  .characters_radios {
+    flex-wrap: wrap;
+  }
+  .characters_radios .checkbox_style {
+    margin-left: 0;
+  }
+
+  .word_area .alignRightTop {
+    margin-left: unset;
+    padding: 0;
+    text-align: right;
+  }
+  .characters_radios {
+    margin-bottom: 0px;
+  }
+  .hardware_names .checkbox_names {
+    flex-basis: 100%;
+  }
+  .hardware_names {
+    justify-content: flex-start;
+    gap: 15px;
+  }
+
+  .character_page .footer svg,
+  .character_page .topbar svg,
+  .character_page .navdirection svg {
+    width: 18px;
+    height: 18px;
+  }
+  .character_page .toolbar-horizontal {
+    align-self: unset;
+  }
+  .character_page .navdirection .containertop {
+    align-items: flex-start;
+  }
+
+  .mobile_none {
+    display: none;
+  }
+  .overflow {
+    font-size: 13px;
+  }
+  .flex_mobile .counter-parent,
+  .hardware_counter .counter-parent {
+    width: max-content;
+  }
+}
 @media only screen and (max-width: 1094px) {
   .mainbody {
     min-width: unset;
@@ -188,158 +353,54 @@
     max-width: 100%;
     padding: 0;
   }
+
   /* character page  */
 
   .character_section {
     padding-top: 40px;
-    display: block;
-    height: auto;
   }
-  .charecter_breadcrumb.breadcrumb {
-    display: flex;
-    flex-wrap: wrap;
-    list-style: none;
-    justify-content: flex-start;
-  }
-  .charecter_breadcrumb.breadcrumb li:last-child {
-    flex-basis: 100%;
-  }
-  .charecter_breadcrumb.link_style a {
-    font-size: 13px;
-  }
-  .character_section .character_main_title {
-    display: block;
-  }
-  .charecter_title h3,
-  .character_section .hardwarea_area .hardwarea_title h3 {
-    font-size: 14px;
-  }
-  .character_section .checkbox_style label,
-  .character_section .radios label,
-  .character_section .counters_area .alignRightCenter,
-  .alignRightTop label {
-    font-size: 12px;
-    white-space: nowrap;
 
-    min-width: max-content;
-    margin: 0px auto 0 0px;
-    align-self: center;
+  /* text page  */
+
+  .text_section {
+    padding-top: 38px;
+    max-width: 100%;
   }
-  .blockdetailes {
-    display: inline-flex;
-    width: auto;
+  .text_section .text_flex .strings .left_text {
+    min-width: 100%;
+    width: unset;
+    margin-right: 0;
   }
-  .blockdetailes.rangeblock {
-    display: flex;
-    justify-content: flex-start;
+  .text_section .text_flex {
+    gap: 10px;
   }
-  .details_h .flex-pos-ortogonal-center {
+  .codepoint-panel-tree {
+    min-width: 100%;
+  }
+
+  .text_section .section-header {
+    font-size: 14px;
+    align-items: flex-start;
     align-self: flex-start;
   }
-  /* .word_area .counters-grid,
-  .counters-grid {
-    grid-template-columns: repeat(1, auto);
-    margin-top: 20px;
-  } */
-  .counters-grid {
-    margin-top: 0;
+  .text_section .popup_dialog {
+    width: calc(100% - 20px);
   }
-  .counters_area .counterhead {
-    margin-bottom: 0;
+  .codepoint-panel {
+    width: 100%;
   }
-  .word_area .counters_area .alignRightCenter,
-  .word_area .alignRightTop label,
-  .counters_area .alignRightCenter {
-    text-align: left;
-    min-width: max-content;
-    white-space: nowrap;
+  .text_section .text_flex .select_item {
+    margin: 0;
   }
-  .decimal {
-    white-space: nowrap;
+  .text_section .text_flex button {
+    margin-left: 5px;
   }
-  .character_section .word_area {
-    margin-left: 0;
-    padding: 20px 10px;
+  .text_section .text_flex .select_text {
+    padding: 6px 0px;
   }
-
-  .hardware_names .radio_names .digit_radios p {
-    font-size: 14px;
+  .text_page .breadcrumb li:last-child {
+    flex-basis: unset;
   }
-  .radios input[type="radio"] {
-    width: 14px;
-    height: 14px;
-    margin-top: 0px;
-  }
-  .radios label::before {
-    width: 8px;
-    height: 8px;
-    top: 6px;
-  }
-  .characters_radios .radios label::before {
-    top: 6px;
-  }
-  .hardware_names .radio_names .all_names,
-  .hardware_names .radio_names .digit_radios {
-    gap: 5px;
-  }
-  .checkbox_style input[type="checkbox"] + label::before {
-    width: 12px;
-    height: 12px;
-  }
-  .checkbox_style input[type="checkbox"] + label::after {
-    top: 5px;
-    left: 5px;
-  }
-  .character_section .hardwarea_area {
-    padding: 20px 10px;
-  }
-  .characters_radios {
-    flex-wrap: wrap;
-  }
-  .characters_radios .checkbox_style {
-    margin-left: 0;
-  }
-
-  .word_area .alignRightTop {
-    margin-left: unset;
-    padding: 0;
-  }
-  .characters_radios {
-    margin-bottom: 0px;
-  }
-  .hardware_names .checkbox_names {
-    flex-basis: 100%;
-  }
-  .hardware_names {
-    justify-content: flex-start;
-    gap: 15px;
-  }
-
-  .character_page .footer svg,
-  .character_page .topbar svg,
-  .character_page .navdirection svg {
-    width: 18px;
-    height: 18px;
-  }
-  .character_page .toolbar-horizontal {
-    align-self: unset;
-  }
-  .character_page .navdirection .containertop {
-    align-items: flex-start;
-  }
-
-  .mobile_none {
-    display: none;
-  }
-  .overflow {
-    font-size: 13px;
-  }
-  .flex_mobile .counter-parent,
-  .hardware_counter .counter-parent {
-    width: max-content;
-  }
-
-  /* popup  */
 }
 
 @media only screen and (max-width: 784px) {
@@ -458,15 +519,23 @@
   .link_style a {
     font-size: 13px;
   }
-}
 
-@media only screen and (max-width: 620px) {
-  body.character_page {
-    overflow-x: auto;
+  /* text page  */
+
+  .text_section {
+    height: unset;
   }
-  .character_section {
-    max-width: unset;
-    min-width: 540px;
-    width: 100%;
+  .text_section .text_flex {
+    flex-direction: column;
+    gap: 20px;
+  }
+  .text_section .text_flex .strings .left_text {
+    margin-right: 0;
+  }
+
+  /* text page  */
+
+  .text_page .breadcrumb li:last-child {
+    flex-basis: unset;
   }
 }

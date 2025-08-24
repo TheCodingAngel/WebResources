@@ -444,12 +444,9 @@ class CounterWidgetOctHex extends CounterWidgetBase {
         let strValue = counter.getSubString(clickedSegment.left, clickedSegment.right);
         let popupWidth = clickedSegment.right - clickedSegment.left;
         
-        this.#popupText.getPopupElement().style.transform = `scale(${scale})`;
-        
         this.#popupText.showTextPopup(strValue, strValue.length, boundingRect.x + clickedSegment.left * scale, boundingRect.y, popupWidth, newValue => {
             let newValueNum = counter.setSubString(clickedSegment.left, clickedSegment.right, newValue);
             this._setValue(newValueNum);
-            this.#popupText.showTextPopup.style.removeProperty("transform");
         });
     }
     

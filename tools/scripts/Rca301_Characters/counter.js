@@ -82,7 +82,7 @@ class Counter {
     }
     
     getSegment(left, right) {
-        let digitWidth = this.#digits[0].clientWidth;
+        let digitWidth = this.#digitsParent.firstElementChild.firstElementChild.clientWidth;
         let startPosition = Math.round(left / digitWidth);
         let positionCount = Math.round((right - left) / digitWidth);
 

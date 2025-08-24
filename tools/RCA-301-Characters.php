@@ -83,11 +83,11 @@ require '../common/php/utils.php';
 
 
 
-<input type="text" id="popupText" class="popup data" />
+<input type="text" id="popupText" class="popup data counter_grid_input" />
 
 
 
-<div id="popupCharacters" class="popup section flex-column">
+<div id="popupCharacters" class="popup section flex-column popup_dialog">
   <div id="charactersHeader" class="flex-row flex-stretch-ortogonal">
     <h3 id="charactersTitle" class="section-header flex-pos-ortogonal-center flex-stretch-center-children">Characters for page...</h3>
     <button class="button button_style flex-space-left" title="Close" onclick="counterOctHex.closePopup()">ˣ</button>
