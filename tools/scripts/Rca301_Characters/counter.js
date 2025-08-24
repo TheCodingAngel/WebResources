@@ -42,6 +42,7 @@ class Counter {
     #upperBound = 0;
     #lowerBound = 0;
     #allowNegative = false;
+    #wideDigits = false;
     
     #digitCount;
     #digits = [];  // Little Endian order
@@ -58,6 +59,7 @@ class Counter {
     constructor(config) {
         this.#radix = config.radix;
         this.#currentValue = config.initial || 0;
+        this.#wideDigits = config.wideDigits;
     
         this.#overflowSelector = document.getElementById(config.overflowSelectorId);
         this.#overflowTooltip = this.#overflowSelector.firstElementChild.firstElementChild.textContent;
@@ -197,7 +199,7 @@ class Counter {
             let isDigit = (i % positionsForDigit) == 0;
           
             let digit = document.createElement("div");
-            digit.className = "digit";
+            digit.className = this.#wideDigits ? "wide_digit" : "digit";
           
             let digitCurrent = document.createElement("div");
             digitCurrent.className = "digit-current";
@@ -209,7 +211,7 @@ class Counter {
             
             digit.appendChild(digitCurrent);
             digit.appendChild(digitNext);
-          
+
             // Add digits right-to-left
             if (counterElement.children.length > 0) {
                 counterElement.insertBefore(digit, counterElement.firstElementChild);

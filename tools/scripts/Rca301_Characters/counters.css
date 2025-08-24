@@ -64,14 +64,21 @@ body {
   border-collapse: collapse;
 }
 
-.counter .digit {
+.counter .digit, .counter .wide_digit {
   white-space: pre;
   position: relative;
   display: table-cell;
   padding: 4px 3px;
-  width: 28px;
   border-left: 1px solid rgba(255, 255, 255, 0.5);
   text-align: center;
+}
+
+.counter .digit {
+  width: 28px;
+}
+
+.counter .wide_digit {
+  width: 37px;
 }
 
 .counter, .data {

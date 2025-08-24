@@ -165,9 +165,6 @@
     align-items: flex-start;
   }
 
-  .mobile_none {
-    display: none;
-  }
   .overflow {
     font-size: 13px;
   }

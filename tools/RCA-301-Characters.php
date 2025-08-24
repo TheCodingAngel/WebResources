@@ -368,8 +368,12 @@ require '../common/php/utils.php';
           </svg>
         </div>
         
+        <hr>
+        <div></div>
+        <div></div>
+        
         <div id="ohLabelCharRca" class="alignRightCenter">
-          <label class="baseLabel">RCA-301 <span class="mobile_none">Characters</span>:</label>
+          <label class="baseLabel">RCA-301:</label>
         </div>
         <div id="ohRowCharRca" class="flex-row">
           <div id="ohDivCharRca" class="counter-parent">
@@ -388,7 +392,7 @@ require '../common/php/utils.php';
         </div>
         
         <div id="ohLabelCharAscii" class="alignRightCenter">
-          <label class="baseLabel">ASCII <span class="mobile_none">Characters</span>:</label>
+          <label class="baseLabel">ASCII:</label>
         </div>
         <div id="ohRowCharAscii" class="flex-row">
           <div id="ohDivCharAscii" class="counter-parent">

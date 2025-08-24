@@ -232,11 +232,11 @@ class CounterWidgetOctHex extends CounterWidgetBase {
             minValueLabelId: "ohMinValue",
             maxValueLabelId: "ohMaxValue",
             counters : [
-                new Counter({parentId: "ohDivBin", overflowSelectorId: 'ohDivBinOverflow', allPositions: CounterWidgetOctHex.#ALL_POSITIONS, positionsForDigit: 1, radix: 2}),
-                new Counter({parentId: "ohDivOct", overflowSelectorId: 'ohDivOctOverflow', allPositions: CounterWidgetOctHex.#ALL_POSITIONS, positionsForDigit: 3, radix: 8}),
-                new Counter({parentId: "ohDivHex", overflowSelectorId: 'ohDivHexOverflow', allPositions: CounterWidgetOctHex.#ALL_POSITIONS, positionsForDigit: 4, radix: 16}),
-                new Counter({parentId: "ohDivCharRca", overflowSelectorId: 'ohDivCharRcaOverflow', allPositions: CounterWidgetOctHex.#ALL_POSITIONS, positionsForDigit: 6, radix: 64}),
-                new Counter({parentId: "ohDivCharAscii", overflowSelectorId: 'ohDivCharAsciiOverflow', allPositions: CounterWidgetOctHex.#ALL_POSITIONS, positionsForDigit: 7, radix: 128}),
+                new Counter({parentId: "ohDivBin", overflowSelectorId: 'ohDivBinOverflow', allPositions: CounterWidgetOctHex.#ALL_POSITIONS, positionsForDigit: 1, radix: 2, wideDigits: true}),
+                new Counter({parentId: "ohDivOct", overflowSelectorId: 'ohDivOctOverflow', allPositions: CounterWidgetOctHex.#ALL_POSITIONS, positionsForDigit: 3, radix: 8, wideDigits: true}),
+                new Counter({parentId: "ohDivHex", overflowSelectorId: 'ohDivHexOverflow', allPositions: CounterWidgetOctHex.#ALL_POSITIONS, positionsForDigit: 4, radix: 16, wideDigits: true}),
+                new Counter({parentId: "ohDivCharRca", overflowSelectorId: 'ohDivCharRcaOverflow', allPositions: CounterWidgetOctHex.#ALL_POSITIONS, positionsForDigit: 6, radix: 64, wideDigits: true}),
+                new Counter({parentId: "ohDivCharAscii", overflowSelectorId: 'ohDivCharAsciiOverflow', allPositions: CounterWidgetOctHex.#ALL_POSITIONS, positionsForDigit: 7, radix: 128, wideDigits: true}),
             ],
             leadingCounterIdx: 0,
         });
