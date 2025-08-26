@@ -14,9 +14,9 @@ require '../common/php/utils.php';
   <link type="text/css" rel="stylesheet" href="scripts/_Common/base.css">
   <?php Page::printFontsCss(); ?>
   
+  <link type="text/css" rel="stylesheet" href="scripts/Text/text.css">
   <link type="text/css" rel="stylesheet" href="scripts/_Common/style.css" />
   <link type="text/css" rel="stylesheet" href="scripts/_Common/responsive.css" />
-  <link type="text/css" rel="stylesheet" href="scripts/Text/text.css">
 
   <script type="text/javascript" defer src="scripts/_Common/utils_base.js"></script>
   <script type="text/javascript" defer src="scripts/_Common/popups.js"></script>

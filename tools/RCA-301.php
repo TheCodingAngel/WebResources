@@ -14,9 +14,9 @@ require '../common/php/utils.php';
   <link type="text/css" rel="stylesheet" href="scripts/_Common/base.css">
   <?php Page::printFontsCss(); ?>
   
+  <link type="text/css" rel="stylesheet" href="scripts/Rca301/RCA-301.css">
   <link type="text/css" rel="stylesheet" href="scripts/_Common/style.css" />
   <link type="text/css" rel="stylesheet" href="scripts/_Common/responsive.css" />
-  <link type="text/css" rel="stylesheet" href="scripts/Rca301/RCA-301.css">
 
   <script type="text/javascript" defer src="scripts/_Common/utils_base.js"></script>
   <script type="text/javascript" defer src="scripts/_Common/popups.js"></script>
@@ -89,8 +89,8 @@ require '../common/php/utils.php';
 <div id="pageContent" class="flex-row height-constraints full_width">
 <!--
 <div id="wizard" class="flex-column">
-  <button class="button" onclick="wizard.onNext()">Next</button>
-  <button class="button" onclick="wizard.onPrevious()">Previous</button>
+  <button class="button button_style" onclick="wizard.onNext()">Next</button>
+  <button class="button button_style" onclick="wizard.onPrevious()">Previous</button>
 </div>
 -->
 
