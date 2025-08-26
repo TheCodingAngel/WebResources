@@ -105,7 +105,8 @@ body {
 #btDivTer{background:#d1d567}
 
 .overflow {
-  color: #c00;
+  align-self: start;
+  fill: #c00;
   text-shadow: 0 0 5px #f66;
 }
 
