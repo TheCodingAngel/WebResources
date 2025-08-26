@@ -75,7 +75,7 @@ require '../common/php/utils.php';
 
 <div class="text_section">
 
-<div id="popupStrings" class="popup section-codepoint flex-column">
+<div id="popupStrings" class="popup section-codepoint flex-column popup_dialog">
   <div id="stringsHeader" class="flex-row flex-stretch-ortogonal">
     <h3 id="stringsTitle" class="section-header flex-stretch-center-children">Unicode Strings</h3>
     <button class="button button_style flex-space-left" title="Close" onclick="textApi.closePopup()">ˣ</button>
@@ -96,7 +96,7 @@ require '../common/php/utils.php';
 
 
 
-<div id="popupCodePointTree" class="popup section-codepoint flex-column">
+<div id="popupCodePointTree" class="popup section-codepoint flex-column popup_dialog">
   <div id="codePointTreeHeader" class="flex-row flex-stretch-ortogonal">
     <h3 id="codePointTreeTitle" class="section-header flex-stretch-center-children">Code Points</h3>
     <button class="button button_style flex-space-left" title="Close" onclick="textApi.closePopup()">ˣ</button>
