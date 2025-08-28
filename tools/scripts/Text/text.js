@@ -232,7 +232,6 @@ class TextApi {
         
         let leftDiv = document.createElement("div");
         leftDiv.className = "codepoint-content";
-        leftDiv.textContent = TextApi.getCodePointText(codePoint);
         
         // Character part wrapped in span
         let charSpan = document.createElement("span");
@@ -256,7 +255,6 @@ class TextApi {
         
         let rightDiv = document.createElement("div");
         rightDiv.className = "codepoint-buttons";
-        rightDiv.textContent = TextApi.getCodePointText(codePoint);
         
         let _this = this;
         
