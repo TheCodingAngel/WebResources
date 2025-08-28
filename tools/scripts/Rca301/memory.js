@@ -23,17 +23,6 @@ class Memory {
         All: 0x0f
     };
 
-    static nextInstructionColor = 0xff0000;
-    
-    #markColors = [
-        {type: Memory.markType.Selected, color: 0xbbbbbb},
-        {type: Memory.markType.NextInstruction, color: Memory.nextInstructionColor},
-        {type: Memory.markType.Value, color: 0x00e700},
-        {type: Memory.markType.Label, color: 0x00aaff},
-        {type: Memory.markType.NextInstruction | Memory.markType.Value, color: 0xdf4635},
-        {type: Memory.markType.NextInstruction | Memory.markType.Label, color: 0xff24f3},
-    ];
-
     static #characterValueMap = [
         //{character:' ',  value:"\u02fd"},  // ˽
         {character:'\n', value:"LF"},  // "\ua71b"  ꜛ
@@ -398,38 +387,6 @@ class Memory {
             delete cell.dataset.mark;
         } else {
             cell.dataset.mark = cellMark;
-        }
-        
-        let color = null;
-        let cellMarkNoSelection = cellMark & (~Memory.markType.Selected & Memory.markType.All);
-        for (let i = 0; i < this.#markColors.length; i++) {
-            let element = this.#markColors[i];
-            if (element.type == Memory.markType.Selected) {
-                continue;
-            }
-            if (cellMarkNoSelection == element.type) {
-                color = element.color;
-                break;
-            } else if ((cellMarkNoSelection & element.type) != 0) {
-                color = element.color;
-            }
-        }
-        if ((cellMark & Memory.markType.Selected) == Memory.markType.Selected) {
-            if (!color) {
-                color = this.#markColors[0].color;
-            } else {
-                color = color | this.#markColors[0].color;
-            }
-        }
-
-        if (context.isOn) {
-            cell.style.backgroundColor = "#" + (color ? color.toString(16).padStart(6, '0') : 0x000000);
-        } else {
-            if (color) {
-                cell.style.backgroundColor = "#" + color.toString(16).padStart(6, '0');
-            } else {
-                cell.style.removeProperty("background-color");
-            }
         }
     }
 

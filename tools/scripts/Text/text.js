@@ -228,21 +228,35 @@ class TextApi {
         
         let codePointStr = String.fromCodePoint(codePoint);
         
+        // Left div (codepoint's character and code units)
+        
+        let leftDiv = document.createElement("div");
+        leftDiv.className = "codepoint-content";
+        leftDiv.textContent = TextApi.getCodePointText(codePoint);
+        
         // Character part wrapped in span
         let charSpan = document.createElement("span");
         charSpan.className = "unicode-char";
         charSpan.textContent = codePointStr;
-        li.appendChild(charSpan);
+        leftDiv.appendChild(charSpan);
 
         // Code part wrapped in span
         let codeSpan = document.createElement("span");
         codeSpan.className = "unicode-code";
         codeSpan.textContent = TextApi.getCodePointText(codePoint);
-        li.appendChild(codeSpan);
+        leftDiv.appendChild(codeSpan);
         
         let code = document.createElement("label");
         code.textContent = this._getCodeUnitText(codePointStr);
-        li.appendChild(code);
+        leftDiv.appendChild(code);
+        
+        li.appendChild(leftDiv);
+        
+        // Right div (buttons)
+        
+        let rightDiv = document.createElement("div");
+        rightDiv.className = "codepoint-buttons";
+        rightDiv.textContent = TextApi.getCodePointText(codePoint);
         
         let _this = this;
         
@@ -251,24 +265,26 @@ class TextApi {
         upBtn.addEventListener("click", function() {
             _this._cpMoveUp(codePointIndex);
         });
-        li.appendChild(upBtn);
+        rightDiv.appendChild(upBtn);
         
         let downBtn = document.createElement("button");
         downBtn.appendChild(document.createTextNode("↓"));
         downBtn.addEventListener("click", function() {
             _this._cpMoveDown(codePointIndex);
         });
-        li.appendChild(downBtn);
+        rightDiv.appendChild(downBtn);
         
         let delBtn = document.createElement("button");
         delBtn.appendChild(document.createTextNode("x"));
         delBtn.addEventListener("click", function() {
             _this._cpDelete(codePointIndex);
         });
-        li.appendChild(delBtn);
+        rightDiv.appendChild(delBtn);
+        
+        li.appendChild(rightDiv);
         
         // Add new lines when selecting and copying items to clipboard (for example, Firefox needs it)
-        li.appendChild(document.createElement("br"));
+        //li.appendChild(document.createElement("br"));
         
         listElement.appendChild(li);
         return li;

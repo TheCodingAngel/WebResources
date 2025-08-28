@@ -97,7 +97,6 @@ class CPU {
 
         let instructionAddress = this.logicalToPhysicalAddress(this.getInstructionPointer());
         memory.markAddresses(instructionAddress, CPU.instructionSize, Memory.markType.NextInstruction, true);
-        CPU._setHtmlRegisterBackground(CPU.#instructionPointerId, Memory.nextInstructionColor);
 
         this.#registersElement.addEventListener('click', function (e) {
             cpu._onEditRegisterValue(e.target.closest('td'), CPU.#PopupType.Register);
@@ -487,24 +486,6 @@ class CPU {
     _scrollInstructionIntoView() {
         let physicalAddress = this.logicalToPhysicalAddress(this.getInstructionPointer());
         this.#memory.scrollAddressesIntoView(physicalAddress, physicalAddress + CPU.instructionSize - 1);
-    }
-
-    static _setHtmlRegisterBackground(registerId, color) {
-        let columnHeader = document.getElementById(registerId);
-        if (!columnHeader) {
-            return;
-        }
-
-        let rowElement = columnHeader.parentElement;
-        for (let i = 0; i < CPU.registerSize; i++) {
-            // The first row cell is a "header", so data cells start at index 1
-            let cell = rowElement.cells[i+1];
-            if (color) {
-                cell.style.backgroundColor = "#" + color.toString(16).padStart(6, '0');
-            } else {
-                cell.style.removeProperty("background-color");
-            }
-        }
     }
 
     _onEditRegisterValue(cell, popupType) {
