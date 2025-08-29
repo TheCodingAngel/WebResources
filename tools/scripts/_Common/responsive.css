@@ -4,7 +4,7 @@
     height: 100%;
   }
   .codepoint_section .codepoint_area.flex_height .category_list select {
-    height: 100% !important;
+    height: 100%;
   }
 }
 @media only screen and (max-width: 1500px) {

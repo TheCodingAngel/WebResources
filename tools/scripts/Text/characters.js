@@ -76,8 +76,6 @@ class Characters {
             }
         });
         
-        disableAutomaticResizing(this.#characterList);
-        this.#characterList.style.width = "45rem";
         this._fillCategories(UnicodeCategories, this.#categories);
         
         this._setupCategoryElements(this.#categorySelect[0], this.#categories);
