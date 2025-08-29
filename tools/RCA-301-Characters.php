@@ -418,7 +418,7 @@ require '../common/php/utils.php';
             <input id="ohNumberInput" class="numinput" type="number" value="0"
               oninput="counterOctHex.setValueNumEdit(this.value)">
           </div>
-          <div class="flex-row">
+          <div class="counter_range flex-row">
             <label id="ohMinValue" for="ohValSlider" onclick="counterOctHex.setMinValue()">Min</label>
             <input id="ohValSlider" type="range" value="0" min="0" max="1023" step="0.1"
               title="This slider has a range determined by the counters but you can enter any number in the text box above."

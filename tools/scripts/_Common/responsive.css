@@ -1,5 +1,12 @@
 /* // start responsive ================== */
-
+@media only screen and (min-height: 795px) {
+  .codepoint_section .codepoint_area.flex_height .category_list {
+    height: 100%;
+  }
+  .codepoint_section .codepoint_area.flex_height .category_list select {
+    height: 100% !important;
+  }
+}
 @media only screen and (max-width: 1500px) {
   body {
     overflow-x: hidden;
@@ -31,7 +38,7 @@
     justify-content: flex-start;
   }
   .charecter_breadcrumb.breadcrumb li:last-child {
-    flex-basis: 100%;
+    flex-basis: unset;
   }
   .charecter_breadcrumb.link_style a {
     font-size: 13px;
@@ -59,7 +66,7 @@
   .alignRightTop label {
     font-size: 15px;
     white-space: nowrap;
-    min-width: 135px;
+    min-width: 100px;
   }
   .character_section.wider_character_section .counters_area .alignRightCenter,
   .alignRightTop label {
@@ -78,11 +85,11 @@
   }
   .counters-grid {
     margin-top: 0;
-    transform: scale(0.7) translate(-76px, -40px);
+    transform: scale(0.7) translate(-95px, -40px);
     max-width: 450px;
   }
   .counters-grid.flex_mobile {
-    transform: scale(0.7) translate(-90px, -40px);
+    transform: scale(0.7) translate(-100px, -40px);
   }
   .counter_grid_input {
     transform: scale(0.7) translate(-71px, -8px) !important;
@@ -96,6 +103,7 @@
   .character_section .word_area {
     margin-left: 0;
     padding: 20px 10px;
+    max-height: 550px;
   }
 
   .hardware_names .radio_names .digit_radios p {
@@ -128,6 +136,7 @@
   }
   .character_section .hardwarea_area {
     padding: 20px 10px;
+    height: 360px;
   }
   .characters_radios {
     flex-wrap: wrap;
@@ -174,6 +183,18 @@
   .flex_mobile .counter-parent,
   .hardware_counter .counter-parent {
     width: max-content;
+  }
+  .codepoint_page .popup_dialog {
+    /* top: 50% !important; */
+  }
+  .codepoint_page .codepoint-panel {
+    width: unset;
+  }
+  .codepoint_page .rs_width .codepoint-panel {
+    width: calc(45rem - 23px);
+  }
+  .codepoint_page .popup_dialog.encodingpopup .suggest_option {
+    padding-right: 20px;
   }
 }
 @media only screen and (max-width: 1094px) {
@@ -383,11 +404,8 @@
     align-items: flex-start;
     align-self: flex-start;
   }
-  .text_section .popup_dialog {
-    width: calc(100% - 20px);
-  }
   .codepoint-panel {
-    width: 100%;
+    /* width: 100%; */
   }
   .text_section .text_flex .select_item {
     margin: 0;
@@ -403,13 +421,50 @@
   }
 
   .popup_dialog {
-    top: 50% !important;
+    /* top: 50% !important; */
   }
 
   /* ExtendedASCII page */
 
   .extended_section {
     padding-top: 47px;
+  }
+
+  /* codepoint page  */
+
+  .codepoint_section {
+    padding-top: 45px;
+    min-height: unset;
+    height: max-content;
+    padding-bottom: 10px;
+  }
+  .codepoint_section .middle_inside {
+    flex-direction: column;
+    gap: 15px;
+  }
+  .codepoint_section .middle_table {
+    width: 100%;
+  }
+  .codepoint_section .middle_textarea {
+    padding-right: 0;
+    border-right: 0;
+  }
+  .codepoint_section .middle_items {
+    margin-left: 0;
+  }
+  .codepoint_section .middle_items .items_m {
+    height: 100px;
+  }
+  .codepoint_section .middle_table .character_title {
+    width: 100%;
+  }
+  .codepoint_page .popup_dialog {
+    width: calc(100% - 10px);
+    max-width: 450px;
+  }
+  .codepoint_page .rs_width.popup_dialog {
+    max-width: 45rem;
+    width: 100%;
   }
 }
 
@@ -491,7 +546,7 @@
   }
 
   .breadcrumb li:last-child {
-    flex-basis: 100%; /* forces h1 to take full width on new line */
+    flex-basis: unset; /* forces h1 to take full width on new line */
   }
   .toolbar-horizontal {
     align-self: unset;
@@ -534,6 +589,7 @@
 
   .text_section {
     height: unset;
+    min-height: unset;
   }
   .text_section .text_flex {
     flex-direction: column;
@@ -590,5 +646,45 @@
   .extended_section .bytes_area .byte_table td {
     padding: 1px;
     font-size: 11px;
+  }
+
+  /* codepoint page  */
+
+  .codepoint_section .codepoint_area {
+    overflow-y: auto;
+    flex: unset;
+  }
+  .numbers_allbtn {
+    /* flex-direction: column; */
+    gap: 10px;
+  }
+  .codepoint_section .middle_range_sarea {
+    padding: 0;
+  }
+  .codepoint_section .middle_range_sarea .input_number input {
+    min-width: 100px;
+  }
+  .codepoint_section .numbers_table {
+    width: 720px;
+  }
+  .codepoint_page .breadcrumb li:last-child {
+    flex-basis: unset;
+  }
+  .codepoint_page .breadcrumb {
+    width: max-content;
+  }
+  .codepoint_page .popup_dialog.encodingpopup .suggest_option {
+    padding-left: 120px;
+    gap: 20px;
+    padding-right: 10px;
+  }
+  .codepoint-panel {
+    width: 100%;
+  }
+  .codepoint_page .rs_width .codepoint-panel {
+    max-width: 100%;
+  }
+  .text_section .popup_dialog {
+    width: calc(100% - 20px);
   }
 }

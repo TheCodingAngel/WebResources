@@ -175,7 +175,7 @@ require '../common/php/utils.php';
     </select>
     <button class="button button_style" onclick="ascii.showTextEncodePopup(this)">?</button>
   </div>
-  <div id="textEncodePanel" class="flex-column flex-stretch-ortogonal disable-dbl-tap-zoom">
+  <div id="textEncodePanel" class="flex-column flex-stretch-ortogonal disable-dbl-tap-zoom textarea_flex">
     <textarea id="textEncode" class="data-big flex-stretch-ortogonal textarea_inside" rows="3" cols="40"></textarea>
   </div>
 </div>
@@ -243,7 +243,7 @@ require '../common/php/utils.php';
     </select>
     <button class="button button_style" onclick="ascii.showDecodePagePopup(this)">Show Code Page</button>
   </div>
-  <div id="textDecodePanel" class="flex-column flex-stretch-ortogonal disable-dbl-tap-zoom">
+  <div id="textDecodePanel" class="flex-column flex-stretch-ortogonal disable-dbl-tap-zoom textarea_flex">
     <textarea id="textDecode" class="data-big flex-stretch-ortogonal textarea_inside" readonly rows="3" cols="40"></textarea>
   </div>
 </div>

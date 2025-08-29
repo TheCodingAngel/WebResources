@@ -832,7 +832,7 @@ button.button_style:hover {
   width: 100%;
   max-width: 1094px;
   margin: 0px auto;
-  min-height: 650px;
+  min-height: 700px;
 }
 .character_section.wider_character_section {
   max-width: fit-content;
@@ -1019,11 +1019,16 @@ button.button_style:hover {
 .counters_area .counter_range {
   gap: 8px;
 }
+.counters_area .value_space {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
 
 .popup_dialog {
   left: 50% !important;
-  top: 32% !important;
-  transform: translate(-50%, -50%);
+  top: 100px !important;
+  transform: translate(-50%, 0%);
   position: fixed;
   border-radius: 8px;
   overflow: hidden;
@@ -1063,6 +1068,7 @@ button.button_style:hover {
   width: 100%;
   max-width: 1094px;
   margin: 0px auto;
+  min-height: 600px;
 }
 .text_section .text_flex {
   display: flex;
@@ -1158,13 +1164,25 @@ button.button_style:hover {
 .text_section .codepointhex .tree {
   width: 100%;
 }
+.text_section .codepointhex .nested {
+  width: 100%;
+}
+.text_section .codepointhex .nested .tree-item {
+  padding-right: 0;
+}
+.text_section .codepointhex .codepoint-buttons,
+.text_section .codepointhex .codepoint-content {
+  display: flex;
+  gap: 5px;
+}
 .text_section .codepointhex .tree-item {
   display: flex;
   align-items: center;
   gap: 5px;
-  padding: 5px 0px;
+  padding: 5px 5px 5px 0;
   border-bottom: 1px solid #dddddd;
   width: 100%;
+  justify-content: space-between;
 }
 .text_section .codepointhex .tree-item button {
   margin-left: 0;
@@ -1247,6 +1265,12 @@ button.button_style:hover {
   width: 100%;
   max-width: 1094px;
   margin: 0px auto;
+  height: 100vh;
+  min-height: 756px;
+}
+.extended_section .textarea_flex {
+  height: 100%;
+  flex: 1;
 }
 .extended_section .text_encode_area,
 .extended_section .bytes_area,
@@ -1259,6 +1283,7 @@ button.button_style:hover {
   border: 1px solid #dddddd;
   border-radius: 10px;
   padding: 5px;
+  flex: 1;
 }
 .extended_section .text_encode_area .section-header,
 .extended_section .bytes_area .section-header,
@@ -1300,6 +1325,12 @@ button.button_style:hover {
   border-radius: 10px;
   margin: 0px;
   font-family: "Roboto Mono", monospace;
+  flex: 1;
+}
+.extended_section .text_encode_area .textarea_inside:invalid,
+.extended_section .bytes_area .textarea_inside:invalid,
+.extended_section .decoded_area .textarea_inside:invalid {
+  border-color: red;
 }
 .extended_section .text_encode_area label.mr_5,
 .extended_section .bytes_area label.mr_5,
@@ -1340,3 +1371,272 @@ button.button_style:hover {
 .extended_section .arrow {
   font-size: 30px;
 }
+
+.codepoint_page .popup_dialog {
+  padding: 8px;
+}
+.codepoint_page .popup_dialog .clear-table {
+  height: unset;
+}
+.codepoint_page .popup_dialog.encodingpopup .button.button_style {
+  width: max-content;
+  height: 25px;
+  display: inline-block;
+  font-size: 12px;
+}
+.codepoint_page .popup_dialog.encodingpopup .suggest_option {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  border-radius: 5px;
+  padding: 8px 0px;
+  padding-right: 40px;
+  padding-left: 136px;
+}
+.codepoint_page .popup_dialog.encodingpopup .info-static {
+  color: #5350b1;
+}
+.codepoint_page .popup_dialog.encodingpopup p {
+  font-size: 14px;
+  padding: 6px 0;
+}
+.codepoint_page .popup_dialog.encodingpopup .center_inside {
+  padding-left: 60px;
+}
+.codepoint_page .popup_dialog.encodingpopup .b-zero {
+  border-top: 0;
+}
+.codepoint_page .popup_dialog.encodingpopup .codepoint_text {
+  display: inline-block;
+  white-space: nowrap;
+}
+.codepoint_page .popup_dialog.encodingpopup .codepage_btn {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  justify-content: space-between;
+}
+.codepoint_page .popup_dialog.encodingpopup .codepage_btn .buttton.button_style {
+  margin-bottom: 0;
+  margin-top: 0;
+}
+.codepoint_page .popup_dialog.encodingpopup .codepoint_endcode {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  border-top: 1px solid #dddddd;
+  border-bottom: 1px solid #dddddd;
+  padding: 5px 0;
+}
+.codepoint_page .popup_dialog.encodingpopup .codepoint_endcode .button.button_style {
+  padding: 4px 6px;
+}
+.codepoint_page .popup_dialog.encodingpopup .b_area {
+  border: 1px solid #dddddd;
+  border-radius: 5px;
+  padding: 5px;
+  margin: 8px 0;
+  box-shadow: 0px 1px 10px 0px rgba(45, 19, 106, 0.05);
+}
+
+.codepoint_section {
+  padding: 78px 10px 0px;
+  height: 100vh;
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+  max-width: 1094px;
+  margin: 0px auto 10px;
+  gap: 10px;
+  min-height: 720px;
+}
+.codepoint_section .codepoint_area {
+  width: 100%;
+  margin: 0;
+  box-shadow: 0px 1px 10px 0px rgba(45, 19, 106, 0.12);
+  border: 1px solid #dddddd;
+  border-radius: 10px;
+  padding: 5px;
+}
+.codepoint_section .codepoint_area.flex_height {
+  flex: 1;
+}
+.codepoint_section .codepoint_middleblock {
+  width: 100%;
+  margin: 0;
+}
+.codepoint_section .codepoint_middleblock .codepoint_inside {
+  width: 100%;
+  margin: 0;
+  box-shadow: 0px 1px 10px 0px rgba(45, 19, 106, 0.12);
+  border: 1px solid #dddddd;
+  border-radius: 10px;
+  margin: 0;
+  padding: 5px;
+}
+.codepoint_section .section-header {
+  margin: 0;
+  font-size: 16px;
+}
+.codepoint_section .button.button_style {
+  padding: 2px 5px;
+  border-radius: 6px;
+  width: max-content;
+}
+.codepoint_section .select_option {
+  padding: 4px 6px;
+  background: #ddd;
+  border: 1px solid #888;
+  border-radius: 6px;
+  cursor: pointer;
+}
+.codepoint_section .numbers_allbtn .button_style {
+  margin: 0px 4px;
+}
+.codepoint_section .numbers_table {
+  width: calc(100% - 5px);
+}
+.codepoint_section .numbers_table table {
+  border-radius: 8px;
+  overflow: hidden;
+  margin: 2px 0;
+}
+.codepoint_section .numbers_table table tr {
+  border-bottom: 1px solid #f8f9ff;
+}
+.codepoint_section .numbers_table table tr td.digit-indexes {
+  background: #bfc7f0;
+}
+.codepoint_section .numbers_table table tr td.digit-cell:hover {
+  background: rgba(83, 80, 177, 0.3);
+}
+.codepoint_section .right_btns,
+.codepoint_section .left_btns {
+  display: flex;
+}
+.codepoint_section .middle_range_sarea {
+  padding: 0px 20px;
+}
+.codepoint_section .middle_range_sarea .input_number {
+  display: flex;
+  gap: 10px;
+}
+.codepoint_section .middle_range_sarea .input_number input {
+  padding: 2px 4px;
+  border: 1px solid #dddddd;
+  border-radius: 6px;
+  outline: none;
+  margin: 0 0;
+  box-shadow: 0px 1px 10px 0px rgba(45, 19, 106, 0.05);
+  margin-left: 0;
+}
+.codepoint_section .middle_inside {
+  width: 100%;
+}
+.codepoint_section .middle_table {
+  width: 466px;
+  margin-right: 10px;
+}
+.codepoint_section .middle_table .character_title {
+  font-size: 13px;
+}
+.codepoint_section .middle_table table {
+  border-radius: 8px;
+  overflow: hidden;
+  width: 100%;
+  margin-top: 5px !important;
+}
+.codepoint_section .middle_table table tr {
+  border-bottom: 1px solid #f8f9ff;
+}
+.codepoint_section .middle_table table tr th:first-child {
+  width: 120px;
+}
+.codepoint_section .middle_table table tr td.byte-indexes {
+  background: #bfc7f0;
+  width: 120px;
+}
+.codepoint_section .middle_table table tr td.byte-cell:hover {
+  background: rgba(83, 80, 177, 0.3);
+}
+.codepoint_section .middle_textarea {
+  padding-right: 10px;
+  border-right: 1px solid #dddddd;
+  width: 100%;
+}
+.codepoint_section .middle_textarea textarea {
+  width: 100%;
+  height: 100px;
+  border: 1px solid #dddddd;
+  outline: none;
+  padding: 5px;
+  border-radius: 10px;
+  font-size: 15px;
+  font-family: "Roboto Mono", monospace;
+}
+.codepoint_section .middle_textarea a {
+  margin-top: 5px;
+  font-size: 14px;
+}
+.codepoint_section .middle_items {
+  margin-left: 10px;
+  background: #f5f4ff;
+  min-width: 270px;
+  padding: 5px;
+  padding-left: 10px;
+  border-radius: 5px;
+}
+.codepoint_section .middle_items ul li {
+  font-size: 14px;
+  padding: 2px 0 2px;
+}
+.codepoint_section .middle_items .items_m {
+  margin: 0;
+}
+.codepoint_section .metadata_serch {
+  align-items: center;
+  gap: 10px;
+}
+.codepoint_section .metadata_serch input {
+  border: 1px solid #dddddd;
+  border-radius: 5px;
+  padding: 2px 5px;
+  height: 24px;
+  box-shadow: 0px 1px 10px 0px rgba(45, 19, 106, 0.05);
+  outline: none;
+  margin: 0 0;
+  box-shadow: 0px 1px 10px 0px rgba(45, 19, 106, 0.05);
+  margin-left: 0;
+}
+.codepoint_section .metadata_serch .button.button_style {
+  padding: 2px 5px;
+  height: 24px;
+  line-height: 1;
+}
+.codepoint_section .catagory_select {
+  gap: 10px;
+  margin: 5px 0;
+  width: 100%;
+}
+.codepoint_section .catagory_select select {
+  padding: 2px 5px;
+}
+.codepoint_section .catagory_select .button.button_style {
+  padding: 2px 5px;
+  height: 24px;
+  line-height: 1;
+}
+.codepoint_section .category_list {
+  width: 100%;
+}
+.codepoint_section .category_list select {
+  width: 100% !important;
+  height: 150px !important;
+}
+
+.popup-background {
+  background: rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(5px);
+}/*# sourceMappingURL=style.css.map */

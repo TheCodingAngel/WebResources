@@ -8,7 +8,9 @@ require '../common/php/utils.php';
 <head>
   <meta charset="UTF-8">
   <title>Code Points</title>
-  
+  <?php Page::printFavIcon("favicon.ico"); ?>
+
+
   <!-- Full list of Noto Fonts: https://notofonts.github.io/noto-docs/specimen/
   <link rel='stylesheet' href='https://fonts.googleapis.com/css?family=Noto Color Emoji'>
   <link rel='stylesheet' href='https://fonts.googleapis.com/css?family=Noto Music'>
@@ -17,7 +19,11 @@ require '../common/php/utils.php';
   -->
 
   <link type="text/css" rel="stylesheet" href="scripts/_Common/base.css">
+  <?php Page::printFontsCss(); ?>
+  
   <link type="text/css" rel="stylesheet" href="scripts/Text/text.css">
+  <link type="text/css" rel="stylesheet" href="scripts/_Common/style.css" />
+  <link type="text/css" rel="stylesheet" href="scripts/_Common/responsive.css" />
   
   <script type="text/javascript" defer src="scripts/_Common/utils_base.js"></script>
   <script type="text/javascript" defer src="scripts/_Common/popups.js"></script>
@@ -37,7 +43,13 @@ require '../common/php/utils.php';
   <script type="text/javascript" defer src="scripts/Text/init_characters.js"></script>
 </head>
 
-<body>
+<body class="codepoint_page">
+
+<div class="preloader">
+  <div></div>
+  <div></div>
+  <div></div>
+</div>
 
 <main class="flex-column flex-stretch">
 
@@ -45,31 +57,33 @@ require '../common/php/utils.php';
 
 <?php Page::printTop(); ?>
 
-<div id="pageHeader" class="page-header flex-row flex-stretch-ortogonal">
-  <ul class="breadcrumb">
-    <li><a href="/">Home</a></li>
-    <li>»</li>
-    <li><a href="">Tools</a></li>
-    <li>»</li>
-    <li><h1 class="title">Code Points</h1></li>
-  </ul>
-  <div class="flex-stretch-center-children">
-  </div>
-  <div class="toolbar-horizontal">
-    <!--
-    <a href="#" onclick="memory.saveToFile()">
-      <svg width="24" height="24" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512">
-        <title>Download Offline Copy</title>
-        <path d="M64 0C28.7 0 0 28.7 0 64L0 448c0 35.3 28.7 64 64 64l256 0c35.3 0 64-28.7 64-64l0-288-128 0c-17.7 0-32-14.3-32-32L224 0 64 0zM256 0l0 128 128 0L256 0zM216 232l0 102.1 31-31c9.4-9.4 24.6-9.4 33.9 0s9.4 24.6 0 33.9l-72 72c-9.4 9.4-24.6 9.4-33.9 0l-72-72c-9.4-9.4-9.4-24.6 0-33.9s24.6-9.4 33.9 0l31 31L168 232c0-13.3 10.7-24 24-24s24 10.7 24 24z"/>
-      </svg>
-    </a>
-    -->
-    <a href="https://TheCodingAngel.org/tools/arch/CodePoints.zip">
-      <svg width="24" height="24" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
-        <title>Download Offline Copy (Open CodePoints.html)</title>
-        <path d="M288 32c0-17.7-14.3-32-32-32s-32 14.3-32 32l0 242.7-73.4-73.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3l128 128c12.5 12.5 32.8 12.5 45.3 0l128-128c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L288 274.7 288 32zM64 352c-35.3 0-64 28.7-64 64l0 32c0 35.3 28.7 64 64 64l384 0c35.3 0 64-28.7 64-64l0-32c0-35.3-28.7-64-64-64l-101.5 0-45.3 45.3c-25 25-65.5 25-90.5 0L165.5 352 64 352zm368 56a24 24 0 1 1 0 48 24 24 0 1 1 0-48z"/>
-      </svg>
-    </a>
+<div id="pageHeader" class="page-header flex-row flex-stretch-ortogonal navdirection">
+  <div class="containertop">
+    <ul class="breadcrumb link_style">
+      <li><a href="/">Home</a></li>
+      <li>»</li>
+      <li><a href="">Tools</a></li>
+      <li>»</li>
+      <li><h1 class="title character_main_title">Code Points</h1></li>
+    </ul>
+    <div class="flex-stretch-center-children">
+    </div>
+    <div class="toolbar-horizontal">
+      <!--
+      <a href="#" onclick="memory.saveToFile()">
+        <svg width="24" height="24" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512">
+          <title>Download Offline Copy</title>
+          <path d="M64 0C28.7 0 0 28.7 0 64L0 448c0 35.3 28.7 64 64 64l256 0c35.3 0 64-28.7 64-64l0-288-128 0c-17.7 0-32-14.3-32-32L224 0 64 0zM256 0l0 128 128 0L256 0zM216 232l0 102.1 31-31c9.4-9.4 24.6-9.4 33.9 0s9.4 24.6 0 33.9l-72 72c-9.4 9.4-24.6 9.4-33.9 0l-72-72c-9.4-9.4-9.4-24.6 0-33.9s24.6-9.4 33.9 0l31 31L168 232c0-13.3 10.7-24 24-24s24 10.7 24 24z"/>
+        </svg>
+      </a>
+      -->
+      <a href="https://TheCodingAngel.org/tools/arch/CodePoints.zip">
+        <svg width="24" height="24" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+          <title>Download Offline Copy (Open CodePoints.html)</title>
+          <path d="M288 32c0-17.7-14.3-32-32-32s-32 14.3-32 32l0 242.7-73.4-73.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3l128 128c12.5 12.5 32.8 12.5 45.3 0l128-128c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L288 274.7 288 32zM64 352c-35.3 0-64 28.7-64 64l0 32c0 35.3 28.7 64 64 64l384 0c35.3 0 64-28.7 64-64l0-32c0-35.3-28.7-64-64-64l-101.5 0-45.3 45.3c-25 25-65.5 25-90.5 0L165.5 352 64 352zm368 56a24 24 0 1 1 0 48 24 24 0 1 1 0-48z"/>
+        </svg>
+      </a>
+    </div>
   </div>
 </div>
 
@@ -99,7 +113,7 @@ require '../common/php/utils.php';
     <option value="F">F</option>
 </select>
 
-<div id="popupBlock" class="popup section-codepoint flex-column">
+<div id="popupBlock" class="popup section-codepoint flex-column popup_dialog rs_width">
   <div id="blockCharactersHeader" class="flex-row flex-stretch-ortogonal">
     <button class="button flex-pos-ortogonal-end "
       onmousedown="codePointData.viewPrevBlockStart(event)" onmouseup="codePointData.viewPrevBlockStop(event)"
@@ -141,7 +155,7 @@ require '../common/php/utils.php';
   </div>
 </div>
 
-<div id="popupCodePoints" class="popup section-codepoint flex-column">
+<div id="popupCodePoints" class="popup section-codepoint flex-column popup_dialog">
   <div id="codePointsHeader" class="flex-row flex-stretch-ortogonal">
     <h3 id="codePointsTitle" class="section-header flex-stretch-center-children">Code Points</h3>
     <button class="button flex-space-left" title="Close" onclick="codePointData.closePopup()">ˣ</button>
@@ -151,20 +165,22 @@ require '../common/php/utils.php';
        <b>1F</b>FFFF<sub>16</sub> - it is <b>10</b>FFFF<sub>16</sub>.
        Designation is "U+" followed by hexadecimal value using at least 4 digits (so U+0041 instead of U+41).
     </p>
+    <br>
     <p>A little more than 10% of all <b>1&nbsp;114&nbsp;112</b> possible values are assigned to characters
       or are used for internal, private or encoding functionality.
     </p>
+    <br>
     <p>The entire range <b>0000<sub>16</sub>&nbsp;-&nbsp;10FFFF<sub>16</sub> (0&nbsp;-&nbsp;1&nbsp;114&nbsp;111)</b>
       <br>is split into 17 <b>planes</b>,
       <br>each containing <b>10000<sub>16</sub> (65&nbsp;536)</b>
       different values (or Code Points).
     </p>
-    <p>
-    </p>
+    <br>
     <p>Code points are logically groupped into <b>blocks</b> with different sizes.
       One block is for a separate writing system or for math / musical and other types of symbols.
       With time blocks with extensions and supplements for previous blocks were added.
     </p>
+    <br>
     <p>Code Point Blocks are defined in the
       <a href="https://unicode-org.github.io/icu/design/props/ppucd">Unicode Character Database</a> from
       <a href="https://raw.githubusercontent.com/unicode-org/icu/master/icu4c/source/data/unidata/ppucd.txt">here</a>.
@@ -177,71 +193,83 @@ require '../common/php/utils.php';
   </div>
 </div>
 
-<div id="popupCharacterInfo" class="popup section-codepoint flex-column">
+<div id="popupCharacterInfo" class="popup section-codepoint flex-column popup_dialog encodingpopup">
   <div id="characterInfoHeader" class="flex-row flex-stretch-ortogonal">
     <h3 id="characterInfoTitle" class="section-header flex-stretch-center-children">Encoding Code Points into Code Units</h3>
     <button class="button flex-space-left" title="Close" onclick="characters.closePopup()">ˣ</button>
   </div>
   <div id="characterInfoPanel" class="codepoint-panel flex-shrink">
-    <p>Code Point:
-      <button class="button" onclick="codeUnits.prevSpecial(event)">《</button>
-      <button class="button"
-        onmousedown="codeUnits.prevCharacterStart(event)" onmouseup="codeUnits.prevCharacterStop(event)"
-        ontouchstart="codeUnits.prevCharacterStart(event)" ontouchend="codeUnits.prevCharacterStop(event)">❰ Prev</button>
-      <a id="characterInfoPreview" class="info-inactive"></a>
-      <a id="characterInfoCode" class="info-inactive"></a>
-      <button class="button"
-        onmousedown="codeUnits.nextCharacterStart(event)" onmouseup="codeUnits.nextCharacterStop(event)"
-        ontouchstart="codeUnits.nextCharacterStart(event)" ontouchend="codeUnits.nextCharacterStop(event)">Next ❱</button>
-      <button class="button" onclick="codeUnits.nextSpecial(event)">》</button>
-    </p>
+    <div class="codepoint_endcode flex-column">
+      <!--div class="codepoint_text">Code Point:</div-->
+      <div class="codepage_btn">
+        <div class="prev_codebtn">
+          <button class="button button_style" onclick="codeUnits.prevSpecial(event)">《</button>
+          <button class="button button_style"
+            onmousedown="codeUnits.prevCharacterStart(event)" onmouseup="codeUnits.prevCharacterStop(event)"
+            ontouchstart="codeUnits.prevCharacterStart(event)" ontouchend="codeUnits.prevCharacterStop(event)">❰ Prev</button>
+        </div>
+        <div class="center_btn">
+          <a id="characterInfoPreview" class="info-inactive"></a>
+          <a id="characterInfoCode" class="info-inactive"></a>
+        </div>
+        <div class="right_btn">
+          <button class="button button_style"
+            onmousedown="codeUnits.nextCharacterStart(event)" onmouseup="codeUnits.nextCharacterStop(event)"
+            ontouchstart="codeUnits.nextCharacterStart(event)" ontouchend="codeUnits.nextCharacterStop(event)">Next ❱</button>
+          <button class="button button_style" onclick="codeUnits.nextSpecial(event)">》</button>
+        </div>
+      </div>
+    </div>
     <p>Some bits are <a class="info-static">static</a> (hard-coded by the standard)
       and some are <a class="info-ignore">ignored</a> while the <a class="info-active">selected</a> bits
       may be <a class="info-modified">calculated</a> or
       <a class="info-active">directly copied</a> into the Code Units.
     </p>
-    <p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-      <button class="button" onclick="codeUnits.prevBits(event, 'utf8')">❰ Bits</button>
-      <span id="characterInfoUtf8Code">
-      </span>
-      <button class="button" onclick="codeUnits.nextBits(event, 'utf8')">Bits ❱</button>
-    </p>
-    <p><label title="Encoding in bytes (Code Unit size is 8 bits)">UTF-8:</label>
-      <span id="characterInfoUtf8">
-      </span>
-      =
-      <span id="characterInfoUtf8Bytes">
-      </span>
-    </p>
-    <p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-      <button class="button" onclick="codeUnits.prevBits(event, 'utf16')">❰ Bits</button>
-      <span id="characterInfoUtf16Code">
-      </span>
-      <button class="button" onclick="codeUnits.nextBits(event, 'utf16')">Bits ❱</button>
-      <br>
-      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-      <a id="characterInfoUtf16Operation" class="info-modified">-1</a>
-      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-      Big Endian /
-      Little Endian
-    </p>
-    <p><label title="Encoding in byte pairs (Code Unit size is 16 bits or 2 bytes)">UTF-16:</label>
-      <span id="characterInfoUtf16">
-      </span>
-      =
-      <span id="characterInfoUtf16BE">
-      </span>
-      /
-      <span id="characterInfoUtf16LE">
-      </span>
-    </p>
-    <p>The Code Units are taken from left to right (Endianness affects only the order of the 2 bytes of each separate UTF-16 Code Unit).
-    </p>
+    <div class="b_area">
+      <p class="center_inside">
+        <button class="button button_style" onclick="codeUnits.prevBits(event, 'utf8')">❰ Bits</button>
+        <span id="characterInfoUtf8Code">
+        </span>
+        <button class="button button_style" onclick="codeUnits.nextBits(event, 'utf8')">Bits ❱</button>
+      </p>
+      <p class="center_utf">
+        <label title="Encoding in bytes (Code Unit size is 8 bits)">UTF-8:</label>
+        <span id="characterInfoUtf8">
+        </span>
+        =
+        <span id="characterInfoUtf8Bytes">
+        </span>
+      </p>
+    </div>
+    <div class="b_area">
+      <p class="center_inside">
+        <button class="button button_style" onclick="codeUnits.prevBits(event, 'utf16')">❰ Bits</button>
+        <span id="characterInfoUtf16Code">
+        </span>
+        <button class="button button_style" onclick="codeUnits.nextBits(event, 'utf16')">Bits ❱</button>
+      </p>
+      <div class="suggest_option">
+        <a id="characterInfoUtf16Operation" class="info-modified">-1</a>
+        <div class="big_endian">Big Endian / Little Endian</div>
+      </div>
+      <p class="center_utf b-zero">
+        <label title="Encoding in byte pairs (Code Unit size is 16 bits or 2 bytes)">UTF-16:</label>
+        <span id="characterInfoUtf16">
+        </span>
+        =
+        <span id="characterInfoUtf16BE">
+        </span>
+        /
+        <span id="characterInfoUtf16LE">
+        </span>
+      </p>
+      <p>The Code Units are taken from left to right (Endianness affects only the order of the 2 bytes of each separate UTF-16 Code Unit).
+      </p>
+    </div>
   </div>
 </div>
 
-<div id="popupCategories" class="popup section-codepoint flex-column">
+<div id="popupCategories" class="popup section-codepoint flex-column popup_dialog">
   <div id="categoriesHeader" class="flex-row flex-stretch-ortogonal">
     <h3 id="categoriesTitle" class="section-header flex-stretch-center-children">Character categories</h3>
     <button class="button flex-space-left" title="Close" onclick="characters.closePopup()">ˣ</button>
@@ -251,6 +279,7 @@ require '../common/php/utils.php';
       are just one type of metadata for Code Points.
       Here an incomplete database (of about 24 000 characters) is used.
     </p>
+    <br>
     <p>
       The original of the database can be downloaded <a href="https://www.unicode.org/notes/tn36/Categories.txt">as a text file</a>.
       <br>
@@ -259,6 +288,7 @@ require '../common/php/utils.php';
       <br>
       <button class="button" onclick="characters.saveCategories()">Convert to JavaScript a "categories.txt" file from your computer</button>
     </p>
+    <br>
     <p>Searching supports both characters (π) and Code Points (U+03C0).<br>
        Code Point ranges are also supported - example: U+009C-03CE.<br>
        Searching for empty string gives all characters in the database.
@@ -268,17 +298,17 @@ require '../common/php/utils.php';
 
 
 
-<div class="flex-column">
+<div class="flex-column codepoint_section">
 
 
-<div id="valueSection" class="section-codepoint flex-column">
+<div id="valueSection" class="section-codepoint flex-column codepoint_area">
   <div id="valueHeader" class="flex-row flex-stretch-ortogonal">
     <h3 class="section-header flex-pos-ortogonal-center">Code Points are represented by 21-bit numbers:</h3>
     <button class="button flex-space-left" onclick="codePointData.showCodePointsPopup(this)">?</button>
   </div>
   
   <div class="flex-row">
-    <select id="planes" class="data flex-pos-ortogonal-center">
+    <select id="planes" class="data flex-pos-ortogonal-center select_option">
       <option value="00000">0000–​FFFF Basic Multilingual Plane</option>
       <option value="10000">10000–​1FFFF Supplementary Multilingual Plane</option>
       <option value="20000">20000–​2FFFF Supplementary Ideographic Plane</option>
@@ -299,11 +329,11 @@ require '../common/php/utils.php';
     </select>
     <div class="flex-row">
       <label for="showBlock" class="label flex-pos-ortogonal-center">Block:</label>
-      <button id="showBlock" class="button" onclick="codePointData.showBlockPopup(this)">Block</button>
+      <button id="showBlock" class="button button_style" onclick="codePointData.showBlockPopup(this)">Block</button>
     </div>
   </div>
   
-  <div id="codePointPanel" class="codepoint-panel-table flex-shrink">
+  <div id="codePointPanel" class="codepoint-panel-table flex-shrink numbers_table">
     <table id="codePoint" class="data clear-table">
       <thead>
         <tr>
@@ -384,21 +414,23 @@ require '../common/php/utils.php';
     </table>
   </div>
 
-  <div class="flex-row flex-stretch-ortogonal">
-    <button class="button flex-pos-ortogonal-end"
-      onmousedown="codePointData.prevPlaneStart(event)" onmouseup="codePointData.prevPlaneStop(event)"
-      ontouchstart="codePointData.prevPlaneStart(event)" ontouchend="codePointData.prevPlaneStop(event)">《 Plane</button>
-    <button class="button flex-pos-ortogonal-end"
-      onmousedown="codePointData.prevSpecialStart(event)" onmouseup="codePointData.prevSpecialStop(event)"
-      ontouchstart="codePointData.prevSpecialStart(event)" ontouchend="codePointData.prevSpecialStop(event)">❰ Special</button>
-    <button class="button flex-pos-ortogonal-end"
-      onmousedown="codePointData.prevBlockStart(event)" onmouseup="codePointData.prevBlockStop(event)"
-      ontouchstart="codePointData.prevBlockStart(event)" ontouchend="codePointData.prevBlockStop(event)">❮ Block</button>
-    <button class="button flex-pos-ortogonal-end"
-      onmousedown="codePointData.decrementStart(event)" onmouseup="codePointData.decrementStop(event)"
-      ontouchstart="codePointData.decrementStart(event)" ontouchend="codePointData.decrementStop(event)">-</button>
-    <div class="flex-column flex-stretch-parallel">
-      <div class="flex-row flex-stretch-ortogonal">
+  <div class="flex-row flex-stretch-ortogonal numbers_allbtn">
+    <div class="left_btns">
+      <button class="button button_style flex-pos-ortogonal-end"
+        onmousedown="codePointData.prevPlaneStart(event)" onmouseup="codePointData.prevPlaneStop(event)"
+        ontouchstart="codePointData.prevPlaneStart(event)" ontouchend="codePointData.prevPlaneStop(event)">《 Plane</button>
+      <button class="button button_style flex-pos-ortogonal-end"
+        onmousedown="codePointData.prevSpecialStart(event)" onmouseup="codePointData.prevSpecialStop(event)"
+        ontouchstart="codePointData.prevSpecialStart(event)" ontouchend="codePointData.prevSpecialStop(event)">❰ Special</button>
+      <button class="button button_style flex-pos-ortogonal-end"
+        onmousedown="codePointData.prevBlockStart(event)" onmouseup="codePointData.prevBlockStop(event)"
+        ontouchstart="codePointData.prevBlockStart(event)" ontouchend="codePointData.prevBlockStop(event)">❮ Block</button>
+      <button class="button button_style flex-pos-ortogonal-end"
+        onmousedown="codePointData.decrementStart(event)" onmouseup="codePointData.decrementStop(event)"
+        ontouchstart="codePointData.decrementStart(event)" ontouchend="codePointData.decrementStop(event)">-</button>
+    </div>
+    <div class="flex-column flex-stretch-parallel middle_range_sarea">
+      <div class="flex-row flex-stretch-ortogonal input_number">
         <input id="textCodePoint" type="text" class="flex-stretch-parallel" readonly>
         <input id="numeditCodePoint" type="number" class="flex-stretch-parallel" value="0"
           oninput="codePointData.setValue(parseInt(this.value))"
@@ -408,18 +440,20 @@ require '../common/php/utils.php';
         oninput="codePointData.setValue(parseInt(this.value))"
         onchange="codePointData.setValue(parseInt(this.value))">
     </div>
-    <button class="button flex-pos-ortogonal-end"
-      onmousedown="codePointData.incrementStart(event)" onmouseup="codePointData.incrementStop(event)"
-      ontouchstart="codePointData.incrementStart(event)" ontouchend="codePointData.incrementStop(event)">+</button>
-    <button class="button flex-pos-ortogonal-end"
-      onmousedown="codePointData.nextBlockStart(event)" onmouseup="codePointData.nextBlockStop(event)"
-      ontouchstart="codePointData.nextBlockStart(event)" ontouchend="codePointData.nextBlockStop(event)">Block ❯</button>
-    <button class="button flex-pos-ortogonal-end"
-      onmousedown="codePointData.nextSpecialStart(event)" onmouseup="codePointData.nextSpecialStop(event)"
-      ontouchstart="codePointData.nextSpecialStart(event)" ontouchend="codePointData.nextSpecialStop(event)">Special ❱</button>
-    <button class="button flex-pos-ortogonal-end"
-      onmousedown="codePointData.nextPlaneStart(event)" onmouseup="codePointData.nextPlaneStop(event)"
-      ontouchstart="codePointData.nextPlaneStart(event)" ontouchend="codePointData.nextPlaneStop(event)">Plane 》</button>
+    <div class="right_btns">
+      <button class="button button_style flex-pos-ortogonal-end"
+        onmousedown="codePointData.incrementStart(event)" onmouseup="codePointData.incrementStop(event)"
+        ontouchstart="codePointData.incrementStart(event)" ontouchend="codePointData.incrementStop(event)">+</button>
+      <button class="button button_style flex-pos-ortogonal-end"
+        onmousedown="codePointData.nextBlockStart(event)" onmouseup="codePointData.nextBlockStop(event)"
+        ontouchstart="codePointData.nextBlockStart(event)" ontouchend="codePointData.nextBlockStop(event)">Block ❯</button>
+      <button class="button button_style flex-pos-ortogonal-end"
+        onmousedown="codePointData.nextSpecialStart(event)" onmouseup="codePointData.nextSpecialStop(event)"
+        ontouchstart="codePointData.nextSpecialStart(event)" ontouchend="codePointData.nextSpecialStop(event)">Special ❱</button>
+      <button class="button button_style flex-pos-ortogonal-end"
+        onmousedown="codePointData.nextPlaneStart(event)" onmouseup="codePointData.nextPlaneStop(event)"
+        ontouchstart="codePointData.nextPlaneStart(event)" ontouchend="codePointData.nextPlaneStop(event)">Plane 》</button>
+    </div>
   </div>
 
 </div>
@@ -427,16 +461,16 @@ require '../common/php/utils.php';
 
 
 
-<div class="flex-row">
+<div class="flex-row codepoint_middleblock">
 
-<div id="codePointSection" class="section-codepoint flex-column">
+<div id="codePointSection" class="section-codepoint flex-column codepoint_inside">
   <div id="codePointHeader" class="flex-row flex-stretch-ortogonal">
     <h3 id="charDescription" class="section-header flex-pos-ortogonal-center">Code Point</h3>
     <button class="button flex-space-left" onclick="characters.showCharacterInfoPopup(this)">?</button>
   </div>
-  <div class="flex-row">
-  <div class="flex-column flex-stretch-ortogonal">
-    <label id="charName" class="character-name">Name</label>
+  <div class="flex-row middle_inside">
+  <div class="flex-column flex-stretch-ortogonal middle_table">
+    <label id="charName" class="character-name character_title">Name</label>
     <table id="encoding" class="data clear-table encoding-table flex-space-top">
       <thead>
         <tr>
@@ -472,12 +506,12 @@ require '../common/php/utils.php';
       </tbody>
     </table>
   </div>
-  <div class="flex-column">
+  <div class="flex-column middle_textarea">
     <textarea id="characterPreview" readonly class="data-big" rows="2" cols="8"></textarea>
     <a id="linkDetails" href=""></a>
   </div>
-  <div class="flex-column flex-stretch-ortogonal">
-    <ul id="categories" class="bullet-root">
+  <div class="flex-column flex-stretch-ortogonal middle_items">
+    <ul id="categories" class="bullet-root items_m">
       <li id="cat_0" class="bullet-no"></li>
         <ul class="bullet-offset">
           <li id="cat_1" class="bullet-no"></li>
@@ -489,7 +523,7 @@ require '../common/php/utils.php';
           </ul>
         </ul>
     </ul>
-    <button id="applyCategories" class="button flex-space-top" onclick="characters.applyCategories()">Apply Categories</button>
+    <button id="applyCategories" class="button button_style flex-space-top" onclick="characters.applyCategories()">Apply Categories</button>
   </div>
   </div>
 </div>
@@ -499,19 +533,19 @@ require '../common/php/utils.php';
 
 
 
-<div id="metadataSection" class="section-codepoint flex-column">
+<div id="metadataSection" class="section-codepoint flex-column codepoint_area flex_height">
   <div id="metadataHeader" class="flex-row flex-stretch-ortogonal">
     <h3 class="section-header flex-pos-ortogonal-center">Character Categories (Code Point Metadata):</h3>
     <button class="button flex-space-left" onclick="characters.showCategoriesPopup(this)">?</button>
   </div>
   
-  <div class="flex-row">
+  <div class="flex-row metadata_serch">
     <input type="text" id="textSearch">
-    <button id="searchCodePoints" class="button flex-pos-ortogonal-center" onclick="characters.searchCharacter()">Search</button>
+    <button id="searchCodePoints" class="button button_style flex-pos-ortogonal-center" onclick="characters.searchCharacter()">Search</button>
   </div>
 
 
-  <div class="flex-row">
+  <div class="flex-row catagory_select">
     <label class="label flex-pos-ortogonal-center">Category:</label>
     <select id="category_0" class="category-filter data flex-pos-ortogonal-center">
     </select>
@@ -521,10 +555,10 @@ require '../common/php/utils.php';
     </select>
     <select id="category_3" class="category-filter data flex-pos-ortogonal-center">
     </select>
-    <button class="button flex-pos-ortogonal-center" onclick="characters.getCharactersByCategory()">Get</button>
+    <button class="button button_style flex-pos-ortogonal-center" onclick="characters.getCharactersByCategory()">Get</button>
   </div>
 
-  <div class="flex-row">
+  <div class="flex-row category_list">
     <select id="characterList" size="12" class="data resizeable scroll-horizontal">
     </select>
   </div>
@@ -542,5 +576,29 @@ require '../common/php/utils.php';
 
 </main>
 
+<script>
+  window.addEventListener("load", function () {
+    document.querySelector(".preloader").style.display = "none";
+  });
+
+  // submenu
+  document.addEventListener("click", function (e) {
+    const dropdown = document.querySelector(".dropdown_menu");
+    // if click is outside dropdown
+    if (dropdown && !e.target.closest(".dropdown_menu")) {
+      dropdown.classList.remove("submenu");
+    }
+  });
+  const hamburger = document.querySelector(".hamburger");
+  const menu = document.querySelector(".menu-list");
+  if (hamburger && menu) {
+    hamburger.addEventListener("click", () => {
+      menu.classList.toggle("show");
+      hamburger.classList.toggle("showbar");
+    });
+  }
+</script>
+
 </body>
+
 </html>
