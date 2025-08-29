@@ -138,11 +138,10 @@ require '../common/php/utils.php';
 
 <div id="combiningSection" class="section-codepoint flex-column left_text">
   <div id="combiningHeader" class="flex-row flex-stretch-ortogonal">
-    <h3 class="section-header flex-stretch-center-children">Code Point Strings</h3>
+    <h3 class="section-header flex-stretch-center-children">Text (Strings of Code Points)</h3>
     <button class="button button_style flex-space-left" onclick="textApi.showStringsPopup(this)">?</button>
   </div>
 
-<label class="vertical-margins textlabel"><strong>Text:</strong></label>
 <select id="languageList" class="data text_data">
 </select>
 
@@ -225,7 +224,7 @@ require '../common/php/utils.php';
 <div id="codePointSection" class="section-codepoint flex-column flex-stretch-ortogonal codepointhex">
   <div id="codePointHeader" class="flex-row flex-stretch-ortogonal">
     <div class="flex-column flex-stretch-ortogonal hex_pl">
-      <h3 id="planeTitle" class="section-header flex-stretch-center-children">Code Points [Code Units], Hex</h3>
+      <h3 id="planeTitle" class="section-header flex-stretch-center-children">Code Points [Code Units, Hex]</h3>
       <div class="flex-row gap_hex">
         <div class="flex-row">
           <input type="radio" id="encUtf8">

@@ -116,14 +116,14 @@ require '../common/php/utils.php';
 <div id="popupBlock" class="popup section-codepoint flex-column popup_dialog rs_width">
   <div id="blockCharactersHeader" class="flex-row flex-stretch-ortogonal">
     <button class="button flex-pos-ortogonal-end "
-      onmousedown="codePointData.viewPrevBlockStart(event)" onmouseup="codePointData.viewPrevBlockStop(event)"
-      ontouchstart="codePointData.viewPrevBlockStart(event)" ontouchend="codePointData.viewPrevBlockStop(event)">Prev Block</button>
+      onpointerdown="codePointData.viewPrevBlockStart(event)"
+      onpointerup="codePointData.viewPrevBlockStop(event)">Prev Block</button>
     
     <h3 id="blockTitle" class="section-header flex-stretch-center-children">Block</h3>
     
     <button class="button flex-pos-ortogonal-end flex-space-left"
-      onmousedown="codePointData.viewNextBlockStart(event)" onmouseup="codePointData.viewNextBlockStop(event)"
-      ontouchstart="codePointData.viewNextBlockStart(event)" ontouchend="codePointData.viewNextBlockStop(event)">Next Block</button>
+      onpointerdown="codePointData.viewNextBlockStart(event)"
+      onpointerup="codePointData.viewNextBlockStop(event)">Next Block</button>
     <button class="button" title="Close" onclick="codePointData.closePopup()">ˣ</button>
   </div>
   <div id="blockCharactersPanel" class="codepoint-panel flex-shrink">
@@ -195,18 +195,17 @@ require '../common/php/utils.php';
 
 <div id="popupCharacterInfo" class="popup section-codepoint flex-column popup_dialog encodingpopup">
   <div id="characterInfoHeader" class="flex-row flex-stretch-ortogonal">
-    <h3 id="characterInfoTitle" class="section-header flex-stretch-center-children">Encoding Code Points into Code Units</h3>
+    <h3 id="characterInfoTitle" class="section-header flex-stretch-center-children">Encoding a Code Point into Code Units</h3>
     <button class="button flex-space-left" title="Close" onclick="characters.closePopup()">ˣ</button>
   </div>
   <div id="characterInfoPanel" class="codepoint-panel flex-shrink">
     <div class="codepoint_endcode flex-column">
-      <!--div class="codepoint_text">Code Point:</div-->
       <div class="codepage_btn">
         <div class="prev_codebtn">
           <button class="button button_style" onclick="codeUnits.prevSpecial(event)">《</button>
           <button class="button button_style"
-            onmousedown="codeUnits.prevCharacterStart(event)" onmouseup="codeUnits.prevCharacterStop(event)"
-            ontouchstart="codeUnits.prevCharacterStart(event)" ontouchend="codeUnits.prevCharacterStop(event)">❰ Prev</button>
+            onpointerdown="codeUnits.prevCharacterStart(event)"
+            onpointerup="codeUnits.prevCharacterStop(event)">❰ Prev</button>
         </div>
         <div class="center_btn">
           <a id="characterInfoPreview" class="info-inactive"></a>
@@ -214,8 +213,8 @@ require '../common/php/utils.php';
         </div>
         <div class="right_btn">
           <button class="button button_style"
-            onmousedown="codeUnits.nextCharacterStart(event)" onmouseup="codeUnits.nextCharacterStop(event)"
-            ontouchstart="codeUnits.nextCharacterStart(event)" ontouchend="codeUnits.nextCharacterStop(event)">Next ❱</button>
+            onpointerdown="codeUnits.nextCharacterStart(event)"
+            onpointerup="codeUnits.nextCharacterStop(event)">Next ❱</button>
           <button class="button button_style" onclick="codeUnits.nextSpecial(event)">》</button>
         </div>
       </div>
@@ -226,14 +225,15 @@ require '../common/php/utils.php';
       <a class="info-active">directly copied</a> into the Code Units.
     </p>
     <div class="b_area">
-      <p class="center_inside">
+      <label>UTF-8 - Encoding in bytes</label>
+      <label>(Code Unit size is 8 bits):</label>
+      <p class="bit_group">
         <button class="button button_style" onclick="codeUnits.prevBits(event, 'utf8')">❰ Bits</button>
         <span id="characterInfoUtf8Code">
         </span>
         <button class="button button_style" onclick="codeUnits.nextBits(event, 'utf8')">Bits ❱</button>
       </p>
       <p class="center_utf">
-        <label title="Encoding in bytes (Code Unit size is 8 bits)">UTF-8:</label>
         <span id="characterInfoUtf8">
         </span>
         =
@@ -242,7 +242,9 @@ require '../common/php/utils.php';
       </p>
     </div>
     <div class="b_area">
-      <p class="center_inside">
+      <label>UTF-16 - Encoding in byte pairs</label>
+      <label>(Code Unit size is 16 bits or 2 bytes):</label>
+      <p class="bit_group">
         <button class="button button_style" onclick="codeUnits.prevBits(event, 'utf16')">❰ Bits</button>
         <span id="characterInfoUtf16Code">
         </span>
@@ -250,20 +252,20 @@ require '../common/php/utils.php';
       </p>
       <div class="suggest_option">
         <a id="characterInfoUtf16Operation" class="info-modified">-1</a>
-        <div class="big_endian">Big Endian / Little Endian</div>
       </div>
       <p class="center_utf b-zero">
-        <label title="Encoding in byte pairs (Code Unit size is 16 bits or 2 bytes)">UTF-16:</label>
         <span id="characterInfoUtf16">
         </span>
         =
-        <span id="characterInfoUtf16BE">
+        <span title="Big Endian" id="characterInfoUtf16BE">
         </span>
         /
-        <span id="characterInfoUtf16LE">
+        <span title="Little Endian" id="characterInfoUtf16LE">
         </span>
       </p>
-      <p>The Code Units are taken from left to right (Endianness affects only the order of the 2 bytes of each separate UTF-16 Code Unit).
+      <p>The Code Units are always taken from left to right (Endianness affects only the order of the 2 bytes of each separate UTF-16 Code Unit).
+      </p>
+      <p>Hovering the UTF-16 Code Units shows whether the hexadecimal number is in Big or Little Endian.
       </p>
     </div>
   </div>
@@ -417,17 +419,17 @@ require '../common/php/utils.php';
   <div class="flex-row flex-stretch-ortogonal numbers_allbtn">
     <div class="left_btns">
       <button class="button button_style flex-pos-ortogonal-end"
-        onmousedown="codePointData.prevPlaneStart(event)" onmouseup="codePointData.prevPlaneStop(event)"
-        ontouchstart="codePointData.prevPlaneStart(event)" ontouchend="codePointData.prevPlaneStop(event)">《 Plane</button>
+        onpointerdown="codePointData.prevPlaneStart(event)"
+        onpointerup="codePointData.prevPlaneStop(event)">《 Plane</button>
       <button class="button button_style flex-pos-ortogonal-end"
-        onmousedown="codePointData.prevSpecialStart(event)" onmouseup="codePointData.prevSpecialStop(event)"
-        ontouchstart="codePointData.prevSpecialStart(event)" ontouchend="codePointData.prevSpecialStop(event)">❰ Special</button>
+        onpointerdown="codePointData.prevSpecialStart(event)"
+        onpointerup="codePointData.prevSpecialStop(event)">❰ Special</button>
       <button class="button button_style flex-pos-ortogonal-end"
-        onmousedown="codePointData.prevBlockStart(event)" onmouseup="codePointData.prevBlockStop(event)"
-        ontouchstart="codePointData.prevBlockStart(event)" ontouchend="codePointData.prevBlockStop(event)">❮ Block</button>
+        onpointerdown="codePointData.prevBlockStart(event)"
+        onpointerup="codePointData.prevBlockStop(event)">❮ Block</button>
       <button class="button button_style flex-pos-ortogonal-end"
-        onmousedown="codePointData.decrementStart(event)" onmouseup="codePointData.decrementStop(event)"
-        ontouchstart="codePointData.decrementStart(event)" ontouchend="codePointData.decrementStop(event)">-</button>
+        onpointerdown="codePointData.decrementStart(event)"
+        onpointerup="codePointData.decrementStop(event)">-</button>
     </div>
     <div class="flex-column flex-stretch-parallel middle_range_sarea">
       <div class="flex-row flex-stretch-ortogonal input_number">
@@ -442,17 +444,17 @@ require '../common/php/utils.php';
     </div>
     <div class="right_btns">
       <button class="button button_style flex-pos-ortogonal-end"
-        onmousedown="codePointData.incrementStart(event)" onmouseup="codePointData.incrementStop(event)"
-        ontouchstart="codePointData.incrementStart(event)" ontouchend="codePointData.incrementStop(event)">+</button>
+        onpointerdown="codePointData.incrementStart(event)"
+        onpointerup="codePointData.incrementStop(event)">+</button>
       <button class="button button_style flex-pos-ortogonal-end"
-        onmousedown="codePointData.nextBlockStart(event)" onmouseup="codePointData.nextBlockStop(event)"
-        ontouchstart="codePointData.nextBlockStart(event)" ontouchend="codePointData.nextBlockStop(event)">Block ❯</button>
+        onpointerdown="codePointData.nextBlockStart(event)"
+        onpointerup="codePointData.nextBlockStop(event)">Block ❯</button>
       <button class="button button_style flex-pos-ortogonal-end"
-        onmousedown="codePointData.nextSpecialStart(event)" onmouseup="codePointData.nextSpecialStop(event)"
-        ontouchstart="codePointData.nextSpecialStart(event)" ontouchend="codePointData.nextSpecialStop(event)">Special ❱</button>
+        onpointerdown="codePointData.nextSpecialStart(event)"
+        onpointerup="codePointData.nextSpecialStop(event)">Special ❱</button>
       <button class="button button_style flex-pos-ortogonal-end"
-        onmousedown="codePointData.nextPlaneStart(event)" onmouseup="codePointData.nextPlaneStop(event)"
-        ontouchstart="codePointData.nextPlaneStart(event)" ontouchend="codePointData.nextPlaneStop(event)">Plane 》</button>
+        onpointerdown="codePointData.nextPlaneStart(event)"
+        onpointerup="codePointData.nextPlaneStop(event)">Plane 》</button>
     </div>
   </div>
 

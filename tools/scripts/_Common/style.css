@@ -287,23 +287,23 @@ button.button_style:hover {
   border-bottom: 1px solid #dddddd;
 }
 .table_middle tbody tr .memory-cell:hover {
-  background-color: rgba(83, 80, 177, 0.2) !important;
+  background-color: rgba(83, 80, 177, 0.2);
 }
 .table_middle tbody tr .memory-cell[data-mark="1"] {
-  background-color: #e4e4f2 !important;
+  background-color: #e4e4f2;
 }
 .table_middle tbody tr .memory-cell[data-mark="1"]:hover {
-  background-color: rgba(83, 80, 177, 0.3) !important;
+  background-color: rgba(83, 80, 177, 0.3);
 }
 .table_middle tbody tr .memory-cell[data-mark="2"] {
   color: rgb(255, 255, 255);
   background: rgb(255, 0, 0);
 }
 .table_middle tbody tr .memory-cell[data-mark="2"]:hover {
-  background: rgb(249, 87, 87) !important;
+  background: rgb(249, 87, 87);
 }
 .table_middle tbody tr .memory-cell[data-mark="3"] {
-  background: rgb(255, 121, 121) !important;
+  background: rgb(255, 121, 121);
   color: rgb(255, 255, 255);
 }
 
@@ -312,7 +312,7 @@ button.button_style:hover {
   background: rgb(255, 0, 0);
 }
 #eipRow .memory-cell:hover {
-  background: rgb(249, 87, 87) !important;
+  background: rgb(249, 87, 87);
 }
 
 .rightarea {
@@ -839,7 +839,10 @@ button.button_style:hover {
 }
 .character_section .hardwarea_area,
 .character_section .word_area {
+  height: 100%;
+  height: -moz-available;
   height: -webkit-fill-available;
+  height: stretch;
   padding: 20px 15px;
   box-shadow: 0px 1px 10px 0px rgba(45, 19, 106, 0.12);
   border: 1px solid #dddddd;
@@ -1392,18 +1395,15 @@ button.button_style:hover {
   border-radius: 5px;
   padding: 8px 0px;
   padding-right: 40px;
-  padding-left: 136px;
-}
-.codepoint_page .popup_dialog.encodingpopup .info-static {
-  color: #5350b1;
+  padding-left: 5em;
 }
 .codepoint_page .popup_dialog.encodingpopup p {
   font-size: 14px;
   padding: 6px 0;
 }
-.codepoint_page .popup_dialog.encodingpopup .center_inside {
+/*.codepoint_page .popup_dialog.encodingpopup .bit_group {
   padding-left: 60px;
-}
+}*/
 .codepoint_page .popup_dialog.encodingpopup .b-zero {
   border-top: 0;
 }
@@ -1426,7 +1426,6 @@ button.button_style:hover {
   display: flex;
   align-items: center;
   width: 100%;
-  border-top: 1px solid #dddddd;
   border-bottom: 1px solid #dddddd;
   padding: 5px 0;
 }
@@ -1439,6 +1438,10 @@ button.button_style:hover {
   padding: 5px;
   margin: 8px 0;
   box-shadow: 0px 1px 10px 0px rgba(45, 19, 106, 0.05);
+}
+.codepoint_page .popup_dialog.encodingpopup .b_area label {
+  display: block;
+  text-align: center;
 }
 
 .codepoint_section {
@@ -1575,8 +1578,7 @@ button.button_style:hover {
   outline: none;
   padding: 5px;
   border-radius: 10px;
-  font-size: 15px;
-  font-family: "Roboto Mono", monospace;
+  /*font-family: "Roboto Mono", monospace;*/
 }
 .codepoint_section .middle_textarea a {
   margin-top: 5px;

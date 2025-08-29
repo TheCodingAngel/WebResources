@@ -181,10 +181,10 @@ class PopupCombo extends PopupBase {
         });
     }
     
-    showComboPopup(value, left, top, onEditDone) {
+    showComboPopup(value, left, top, width, onEditDone) {
         this.#callback = onEditDone;
         this.#popupCombo.value = value;
-        super._showPopup(this.#popupCombo, 1, left, top, null);
+        super._showPopup(this.#popupCombo, 1, left, top, width);
         //this.#popupCombo.click();
     }
 

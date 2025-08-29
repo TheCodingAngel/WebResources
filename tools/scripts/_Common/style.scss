@@ -301,24 +301,24 @@ button.button_style {
         background: $white;
         border-bottom: 1px solid $border;
         &:hover {
-          background-color: rgba($color: $primary, $alpha: 0.2) !important;
+          background-color: rgba($color: $primary, $alpha: 0.2);
         }
         &[data-mark="1"] {
-          background-color: #e4e4f2 !important;
+          background-color: #e4e4f2;
 
           &:hover {
-            background-color: rgba($color: $primary, $alpha: 0.3) !important;
+            background-color: rgba($color: $primary, $alpha: 0.3);
           }
         }
         &[data-mark="2"] {
           color: $white;
           background: rgb(255, 0, 0);
           &:hover {
-            background: rgb(249, 87, 87) !important;
+            background: rgb(249, 87, 87);
           }
         }
         &[data-mark="3"] {
-          background: rgb(255, 121, 121) !important;
+          background: rgb(255, 121, 121);
           color: $white;
         }
       }
@@ -330,7 +330,7 @@ button.button_style {
     color: $white;
     background: rgb(255, 0, 0);
     &:hover {
-      background: rgb(249, 87, 87) !important;
+      background: rgb(249, 87, 87);
     }
   }
 }
@@ -845,7 +845,10 @@ button.button_style {
   }
   .hardwarea_area,
   .word_area {
+    height: 100%;
+    height: -moz-available;
     height: -webkit-fill-available;
+    height: stretch;
     padding: 20px 15px;
     box-shadow: $shadow;
     border: 1px solid $border;
@@ -1398,18 +1401,15 @@ button.button_style {
         border-radius: 5px;
         padding: 8px 0px;
         padding-right: 40px;
-        padding-left: 136px;
-      }
-      .info-static {
-        color: $primary;
+        padding-left: 5em;
       }
       p {
         font-size: 14px;
         padding: 6px 0;
       }
-      .center_inside {
+      /*.bit_group {
         padding-left: 60px;
-      }
+      }*/
       .b-zero {
         border-top: 0;
       }
@@ -1432,7 +1432,6 @@ button.button_style {
         display: flex;
         align-items: center;
         width: 100%;
-        border-top: 1px solid $border;
         border-bottom: 1px solid $border;
         padding: 5px 0;
         .button.button_style {
@@ -1445,6 +1444,10 @@ button.button_style {
         padding: 5px;
         margin: 8px 0;
         box-shadow: $shadow_two;
+        label {
+          display: block;
+          text-align: center;
+        }
       }
     }
   }
@@ -1588,8 +1591,7 @@ button.button_style {
       outline: none;
       padding: 5px;
       border-radius: 10px;
-      font-size: 15px;
-      font-family: "Roboto Mono", monospace;
+      /*font-family: "Roboto Mono", monospace;*/
     }
     a {
       margin-top: 5px;

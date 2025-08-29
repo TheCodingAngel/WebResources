@@ -464,7 +464,7 @@ class CodePointData {
         let cellRect = cellElement.getBoundingClientRect();
         
         let _this = this;
-        combo.showComboPopup(value, cellRect.left, cellRect.top + 3, newValue => {
+        combo.showComboPopup(value, cellRect.left, cellRect.top + 3, cellElement.clientWidth, newValue => {
             let isHex = cellElement.id[2] == 'h';
             let textValue = isHex ? _this.#value.toString(16) : _this.#value.toString(2);
             

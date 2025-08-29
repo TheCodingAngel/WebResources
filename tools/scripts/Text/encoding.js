@@ -227,7 +227,7 @@ class CodeUnits {
         this.#characterPreview.textContent = String.fromCodePoint(this.#codePoint);
         this.#characterCode.textContent = "U+" + toHexString(this.#codePoint, 4);
         
-        this.#operationUtf16.textContent = this.#codePoint < 0x10000 ? "\u00A0\u00A0" : "-1";
+        this.#operationUtf16.parentElement.style.display = this.#codePoint < 0x10000 ? "none" : "flex";
         
         this._setUtf8CodeUnits(codePointBinary);
         this._setUtf16CodeUnits(codePointBinary);
