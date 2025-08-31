@@ -111,7 +111,7 @@ require '../common/php/utils.php';
       <div id="punchReaderWrap" class="card-reader-wrap flex-row checkbox_style">
         <input type="checkbox" class="checkbox flex-pos-ortogonal-center" id="punchReaderWrapCheckbox" onchange="io.toggleReaderWrap(this)">
         <label for="punchReaderWrapCheckbox" class="label flex-pos-ortogonal-center">Wrap Text</label>
-        <input type="checkbox" class="checkbox flex-pos-ortogonal-center" id="punchReaderIgnoreSingleNewLinesCheckbox" onchange="io.toggleReaderWrap(this)">
+        <input type="checkbox" class="checkbox flex-pos-ortogonal-center" id="punchReaderIgnoreSingleNewLinesCheckbox" onchange="io.toggleIgnoreSingleNewLines(this)">
         <label for="punchReaderIgnoreSingleNewLinesCheckbox" class="label flex-pos-ortogonal-center">Ignore Single New Lines</label>
       </div>
       <textarea id="punchReader" name="input" cols="16" placeholder="Type Here..." class="card-reader flex-stretch-parallel left_textarea disable-wrap"></textarea>      

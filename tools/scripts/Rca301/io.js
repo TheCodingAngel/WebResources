@@ -121,7 +121,7 @@ class IO {
         }
     }
     
-    toggleReaderWrap(checkBox) {
+    toggleIgnoreSingleNewLines(checkBox) {
         this.#ignoreSingleNewLines = checkBox.checked;
     }
 
