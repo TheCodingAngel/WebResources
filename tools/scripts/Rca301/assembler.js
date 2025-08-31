@@ -101,6 +101,7 @@ class Assembler {
     _clear() {
         this.#statements.splice(0);
         
+        this.#constants.splice(0);
         this.#variables.splice(0);
         this.#labels.splice(0);
         this.#procedures.splice(0);
@@ -237,18 +238,8 @@ class Assembler {
         return {lineIndex: lineIndex, start: start, end: end, expression: tokens};
     }
     
-    _parseInstruction(tokens) {
-        let opcode = Assembler.#mnemonics.get(tokens[0].toUpperCase());
-        if (!isValid(opcode)) {
-            throw new AssemblerError(`incorrect mnemonic code ${tokens[0]}`);
-        }
-        let first = tokens.length > 1 ? tokens[1] : null;
-        let second = tokens.length > 2 ? tokens[2] : null;
-        this.#instructions.push({opcode: opcode, first: first, second: second});
-    }
-    
     _onSecondPass(statementInfo) {
-        statementInfo.memoryAddress = 60;  // null if not an instruction
+        statementInfo.memoryAddress = 60;  // null if a directive or a constant
         
         for (let label of this.#labels) {
             label.address += this.#origin;
@@ -284,6 +275,16 @@ class Assembler {
                 base.push(t);
             }
         }
+    }
+    
+    _parseInstruction(tokens) {
+        let opcode = Assembler.#mnemonics.get(tokens[0].toUpperCase());
+        if (!isValid(opcode)) {
+            throw new AssemblerError(`incorrect mnemonic code ${tokens[0]}`);
+        }
+        let first = tokens.length > 1 ? tokens[1] : null;
+        let second = tokens.length > 2 ? tokens[2] : null;
+        this.#instructions.push({opcode: opcode, first: first, second: second});
     }
     
     _getValue(str) {
