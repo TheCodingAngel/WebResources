@@ -112,7 +112,7 @@ require '../common/php/utils.php';
         <label for="punchReaderWrapCheckbox" class="label flex-pos-ortogonal-center">Wrap Text</label>
       </div>
       <textarea id="punchReader" name="input" cols="16" placeholder="Type Here..." class="card-reader flex-stretch-parallel left_textarea disable-wrap"></textarea>      
-      <div id="resizerInput" data-resize="punchReader" data-overlay="frameOverlay" class="resizer-vertical"></div>
+      <!-- div id="resizerInput" data-resize="punchReader" data-overlay="frameOverlay" class="resizer-vertical"></div -->
     </div>
 
     <div id="memorySection" class="section-memory flex-column flex-shrink bg_slight middle_area memory_inside">
@@ -275,7 +275,7 @@ require '../common/php/utils.php';
                     <td class="memory-cell">0</td>
                   </tr>
                   <tr id="csRow">
-                    <td id="cs" class="memory-address"><span title="Program Load Address (Code Segment)">CS</span></td>
+                    <td id="cs" class="memory-address"><span title="Code Segment (Program Load Address)">CS</span></td>
                     <td class="memory-cell">0</td>
                     <td class="memory-cell">0</td>
                     <td class="memory-cell">0</td>

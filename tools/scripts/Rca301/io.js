@@ -9,6 +9,8 @@ class IO {
 
     #punchReader;
     #teleprinter;
+    
+    #ignoreSingleNewLines;
 
     static #teleprinterInputCapacity = 80;
     static #teleprinterPrintCapacity = 80;
@@ -21,7 +23,7 @@ class IO {
         [3, {read: this._readFile.bind(this),        write: this._writeFile.bind(this),        hasData : this._isFileReady.bind(this)}],
     ]);
 
-    constructor(memory, readerElement, writerElement, teleprinterElement) {
+    constructor(memory, readerElement, ignoreSingleNewLinesCheckbox, writerElement, teleprinterElement) {
         this.#memory = memory;
 
         this.#readerElement = readerElement;
@@ -30,6 +32,8 @@ class IO {
 
         this.#punchReader = new ReaderBuffer(readerElement.value);
         this.#teleprinter = new CircularBuffer(IO.#teleprinterInputCapacity);
+        
+        this.#ignoreSingleNewLines = !ignoreSingleNewLinesCheckbox || ignoreSingleNewLinesCheckbox.checked;
 
         teleprinterElement.addEventListener('select', function() {
             this.selectionStart = this.value.length;
@@ -90,6 +94,11 @@ class IO {
     }
 
     onLoadTextAtStartAddress() {
+        if (!this.#ignoreSingleNewLines) {
+            this.#memory.onLoadTextAtStartAddress(this.#readerElement.value);
+            return;
+        }
+        
         // Ignore new line characters but treat an empty line as a new line character
         let lines = this.#readerElement.value.split("\n");
         for (let i = 0; i < lines.length - 1; i++) {
@@ -110,6 +119,10 @@ class IO {
         } else {
             this.#readerElement.classList.add('disable-wrap');
         }
+    }
+    
+    toggleReaderWrap(checkBox) {
+        this.#ignoreSingleNewLines = checkBox.checked;
     }
 
     onPrintTextAtSelectedAddresses() {

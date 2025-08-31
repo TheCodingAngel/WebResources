@@ -14,9 +14,10 @@ function init() {
     memory = new Memory(addressStartElement, addressEndElement, memoryPanel, memoryData, magneticTape, editMemoryByRows.checked);
 
     let punchReader = document.getElementById("punchReader");
+    let ignoreSingleNewLinesCheckbox = document.getElementById("punchReaderIgnoreSingleNewLinesCheckbox");
     let printer = document.getElementById('printer');
     let teleprinter = document.getElementById('teleprinter');
-    io = new IO(memory, punchReader, printer, teleprinter);
+    io = new IO(memory, punchReader, ignoreSingleNewLinesCheckbox, printer, teleprinter);
 
     let registersElement = document.getElementById("REGS_GENERAL");
     let registerPointersElement = document.getElementById("REGS_POINTERS");

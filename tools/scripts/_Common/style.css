@@ -44,6 +44,9 @@ textarea {
   margin-left: 0;
   min-width: 15em;
 }
+.section-input.input_bigger.asm_width {
+  min-width: 22em;
+}
 .section-input.input_bigger .flexbar {
   padding: 10px;
   width: 100%;

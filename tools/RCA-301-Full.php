@@ -102,7 +102,7 @@ require '../common/php/utils.php';
 
   <div id="simulator" class="sidebar-horizontal flex-row flex-shrink mainbody">
 
-    <div id="inputSection" class="section-input sidebar-vertical flex-column flex-stretch-ortogonal input_bigger bg_slight">
+    <div id="inputSection" class="section-input sidebar-vertical flex-column flex-stretch-ortogonal input_bigger asm_width bg_slight">
       <div class="flexbar">
         <h3 id="cardReader" class="section-header">Card Reader:</h3>
         <button id="loadAtStartAddress" class="button button_style" onclick="io.onLoadTextAtStartAddress()">Load at Selection Start</button>
@@ -111,9 +111,11 @@ require '../common/php/utils.php';
       <div id="punchReaderWrap" class="card-reader-wrap flex-row checkbox_style">
         <input type="checkbox" class="checkbox flex-pos-ortogonal-center" id="punchReaderWrapCheckbox" onchange="io.toggleReaderWrap(this)">
         <label for="punchReaderWrapCheckbox" class="label flex-pos-ortogonal-center">Wrap Text</label>
+        <input type="checkbox" class="checkbox flex-pos-ortogonal-center" id="punchReaderIgnoreSingleNewLinesCheckbox" onchange="io.toggleReaderWrap(this)">
+        <label for="punchReaderIgnoreSingleNewLinesCheckbox" class="label flex-pos-ortogonal-center">Ignore Single New Lines</label>
       </div>
       <textarea id="punchReader" name="input" cols="16" placeholder="Type Here..." class="card-reader flex-stretch-parallel left_textarea disable-wrap"></textarea>      
-      <div id="resizerInput" data-resize="punchReader" data-overlay="frameOverlay" class="resizer-vertical"></div>
+      <!-- div id="resizerInput" data-resize="punchReader" data-overlay="frameOverlay" class="resizer-vertical"></div -->
     </div>
 
     <div id="memorySection" class="section-memory flex-column flex-shrink bg_slight middle_area memory_inside">
@@ -276,7 +278,7 @@ require '../common/php/utils.php';
                     <td class="memory-cell">0</td>
                   </tr>
                   <tr id="csRow">
-                    <td id="cs" class="memory-address"><span title="Program Load Address (Code Segment)">CS</span></td>
+                    <td id="cs" class="memory-address"><span title="Code Segment (Program Load Address)">CS</span></td>
                     <td class="memory-cell">0</td>
                     <td class="memory-cell">0</td>
                     <td class="memory-cell">0</td>

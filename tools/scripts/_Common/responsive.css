@@ -269,111 +269,6 @@
   .navdirection .breadcrumb h1 {
     font-size: 13px;
   }
-  /* Hamburger icon */
-  .hamburger {
-    display: none;
-    flex-direction: column;
-    cursor: pointer;
-  }
-
-  .hamburger div {
-    width: 25px;
-    height: 3px;
-    background: #555555;
-    margin: 2px;
-    transform: rotate(0deg);
-    position: relative;
-    opacity: 1;
-    top: 0;
-    transition: all 0.3s ease-in-out;
-  }
-  .hamburger.showbar div {
-    transition: all 0.3s ease-in-out;
-  }
-  .hamburger.showbar div:nth-child(2) {
-    opacity: 0;
-  }
-  .hamburger.showbar div:first-child {
-    transform: rotate(45deg);
-    top: 7px;
-  }
-  .hamburger.showbar div:last-child {
-    transform: rotate(-45deg);
-    top: -7px;
-  }
-  .menu-list {
-    display: flex;
-    background: white;
-    flex-direction: column;
-    position: absolute;
-    right: 0;
-    width: 100%;
-    padding: 10px;
-    z-index: 190;
-    top: -100%;
-    gap: 10px;
-    border-bottom: 1px solid #dddddd;
-    visibility: hidden;
-    opacity: 0;
-    transition: all 0.3s ease-in-out;
-  }
-
-  .menu-list.show {
-    display: flex;
-    visibility: visible;
-    opacity: 1;
-    top: 100%;
-    transition: all 0.3s ease-in-out;
-  }
-  .menu-list li {
-    display: inline-block;
-    padding-top: 5px;
-    padding-bottom: 5px;
-  }
-
-  .hamburger {
-    display: flex;
-  }
-  .menu_style {
-    align-items: flex-start;
-  }
-  .menu_style .dropdown_menu {
-    padding: 0;
-    flex-direction: column;
-  }
-  .menu_style .dropdown_menu.submenu .menu_item {
-    display: block;
-  }
-  .menu_style .dropdown_menu .menu_item {
-    position: relative;
-    display: none;
-    opacity: 1;
-    transform: translate(0, 0);
-    top: 0;
-    visibility: visible;
-    margin-top: 5px;
-  }
-  .menu_style .dropdown_menu .menu_item li a {
-    padding: 10px 20px;
-  }
-  .menu_style .dropdown_menu:hover .menu_title img {
-    transform: rotateX(180deg);
-  }
-  .menu_style .dropdown_menu:hover .menu_item {
-    opacity: unset;
-    visibility: unset;
-    transform: unset;
-  }
-  .navdirection {
-    position: relative;
-  }
-  .mainbody .section-input.input_bigger {
-    margin-right: 0;
-  }
-  .containertop {
-    max-width: 100%;
-    padding: 0;
-  }
 
   /* character page  */
 
@@ -533,6 +428,115 @@
   .middle_area button.button_style.btn_w {
     white-space: nowrap;
   }
+  
+  /* Hamburger dropdown - begin */
+  .hamburger {
+    display: none;
+    flex-direction: column;
+    cursor: pointer;
+  }
+
+  .hamburger div {
+    width: 25px;
+    height: 3px;
+    background: #555555;
+    margin: 2px;
+    transform: rotate(0deg);
+    position: relative;
+    opacity: 1;
+    top: 0;
+    transition: all 0.3s ease-in-out;
+  }
+  .hamburger.showbar div {
+    transition: all 0.3s ease-in-out;
+  }
+  .hamburger.showbar div:nth-child(2) {
+    opacity: 0;
+  }
+  .hamburger.showbar div:first-child {
+    transform: rotate(45deg);
+    top: 7px;
+  }
+  .hamburger.showbar div:last-child {
+    transform: rotate(-45deg);
+    top: -7px;
+  }
+  .menu-list {
+    display: flex;
+    background: white;
+    flex-direction: column;
+    position: absolute;
+    right: 0;
+    width: 100%;
+    padding: 10px;
+    z-index: 190;
+    top: -100%;
+    gap: 10px;
+    border-bottom: 1px solid #dddddd;
+    visibility: hidden;
+    opacity: 0;
+    transition: all 0.3s ease-in-out;
+  }
+
+  .menu-list.show {
+    display: flex;
+    visibility: visible;
+    opacity: 1;
+    top: 100%;
+    transition: all 0.3s ease-in-out;
+  }
+  .menu-list li {
+    display: inline-block;
+    padding-top: 5px;
+    padding-bottom: 5px;
+  }
+
+  .hamburger {
+    display: flex;
+  }
+  .menu_style {
+    align-items: flex-start;
+  }
+  .menu_style .dropdown_menu {
+    padding: 0;
+    flex-direction: column;
+  }
+  .menu_style .dropdown_menu.submenu .menu_item {
+    display: block;
+  }
+  .menu_style .dropdown_menu .menu_item {
+    position: relative;
+    display: none;
+    opacity: 1;
+    transform: translate(0, 0);
+    top: 0;
+    visibility: visible;
+    margin-top: 5px;
+  }
+  .menu_style .dropdown_menu .menu_item li a {
+    padding: 10px 20px;
+  }
+  .menu_style .dropdown_menu:hover .menu_title img {
+    transform: rotateX(180deg);
+  }
+  .menu_style .dropdown_menu:hover .menu_item {
+    opacity: unset;
+    visibility: unset;
+    transform: unset;
+  }
+  .navdirection {
+    position: relative;
+  }
+  .mainbody .section-input.input_bigger {
+    margin-right: 0;
+  }
+  .containertop {
+    max-width: 100%;
+    padding: 0;
+  }
+  /* Hamburger dropdown - end */
+  
+  /* Breadcrumb */
 
   .navdirection .containertop {
     align-items: flex-start;
