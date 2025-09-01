@@ -223,6 +223,7 @@
   .mainbody .rightarea {
     max-width: unset;
     height: 575px;
+    margin-top: 40px;
     overflow: auto;
     display: block;
     overflow: unset;
@@ -253,6 +254,7 @@
   }
   .mainbody .middle_area {
     height: 575px;
+    margin-top: 40px;
     margin-right: 0;
     min-width: unset;
     flex: 1;
@@ -272,14 +274,9 @@
 
   /* character page  */
 
-  .character_section {
-    padding-top: 40px;
-  }
-
   /* text page  */
 
   .text_section {
-    padding-top: 38px;
     max-width: 100%;
   }
   .text_section .text_flex .strings .left_text {
@@ -321,14 +318,10 @@
 
   /* ExtendedASCII page */
 
-  .extended_section {
-    padding-top: 47px;
-  }
-
   /* codepoint page  */
 
   .codepoint_section {
-    padding-top: 45px;
+    padding-top: 80px;
     min-height: unset;
     height: max-content;
     padding-bottom: 10px;
@@ -589,9 +582,16 @@
     font-size: 13px;
   }
 
+  /* characters page  */
+  
+  .character_section {
+    padding-top: 40px;
+  }
+  
   /* text page  */
-
+  
   .text_section {
+    padding-top: 38px;
     height: unset;
     min-height: unset;
   }
@@ -610,6 +610,11 @@
   }
 
   /* ExtendedASCII page  */
+  
+  .extended_section {
+    padding-top: 47px;
+  }
+  
   .extended_section .text_encode_area .extended_header,
   .extended_section .bytes_area .extended_header,
   .extended_section .decoded_area .extended_header {
@@ -653,6 +658,10 @@
   }
 
   /* codepoint page  */
+  
+  .codepoint_section {
+    padding-top: 45px;
+  }
 
   .codepoint_section .codepoint_area {
     overflow-y: auto;
