@@ -7,29 +7,29 @@ require '../common/php/utils.php';
 
 <head>
   <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-  <title>RCA-301 - A Character-Oriented Decimal Computer</title>
+  <title>Character-Oriented Decimal Computer</title>
   <?php Page::printFavIcon("favicon.ico"); ?>
 
 
   <link type="text/css" rel="stylesheet" href="scripts/_Common/base.css">
   <?php Page::printFontsCss(); ?>
   
-  <link type="text/css" rel="stylesheet" href="scripts/Rca301/RCA-301.css">
+  <link type="text/css" rel="stylesheet" href="scripts/Computer/computer.css">
   <link type="text/css" rel="stylesheet" href="scripts/_Common/style.css" />
   <link type="text/css" rel="stylesheet" href="scripts/_Common/responsive.css" />
 
   <script type="text/javascript" defer src="scripts/_Common/utils_base.js"></script>
   <script type="text/javascript" defer src="scripts/_Common/popups.js"></script>
   <script type="text/javascript" defer src="scripts/_Common/wizard_base.js"></script>
-  <script type="text/javascript" defer src="scripts/Rca301/wizard.js"></script>
+  <script type="text/javascript" defer src="scripts/Computer/wizard.js"></script>
   
-  <script type="text/javascript" defer src="scripts/Rca301/utils.js"></script>
-  <script type="text/javascript" defer src="scripts/Rca301/memory.js"></script>
-  <script type="text/javascript" defer src="scripts/Rca301/io.js"></script>
-  <script type="text/javascript" defer src="scripts/Rca301/cpu.js"></script>
-  <script type="text/javascript" defer src="scripts/Rca301/emulator.js"></script>
-  <script type="text/javascript" defer src="scripts/Rca301/instructions.js"></script>
-  <script type="text/javascript" defer src="scripts/Rca301/init.js"></script>
+  <script type="text/javascript" defer src="scripts/Computer/utils.js"></script>
+  <script type="text/javascript" defer src="scripts/Computer/memory.js"></script>
+  <script type="text/javascript" defer src="scripts/Computer/io.js"></script>
+  <script type="text/javascript" defer src="scripts/Computer/cpu.js"></script>
+  <script type="text/javascript" defer src="scripts/Computer/emulator.js"></script>
+  <script type="text/javascript" defer src="scripts/Computer/instructions.js"></script>
+  <script type="text/javascript" defer src="scripts/Computer/init.js"></script>
 </head>
 
 <body>
@@ -57,7 +57,7 @@ require '../common/php/utils.php';
       <li>»</li>
       <li><a href="">Tools</a></li>
       <li>»</li>
-      <li><h1 class="title">RCA-301 - A Character-Oriented Decimal Computer</h1></li>
+      <li><h1 class="title">Character-Oriented Decimal Computer</h1></li>
     </ul>
     <div class="flex-stretch-center-children">
     </div>
@@ -76,9 +76,9 @@ require '../common/php/utils.php';
         </svg>
       </a>
       -->
-      <a href="https://TheCodingAngel.org/tools/arch/RCA-301.zip">
+      <a href="https://TheCodingAngel.org/tools/arch/Computer.zip">
         <svg width="24" height="24" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
-          <title>Download Offline Copy (Open RCA-301.html)</title>
+          <title>Download Offline Copy (Open Computer.html)</title>
           <path d="M288 32c0-17.7-14.3-32-32-32s-32 14.3-32 32l0 242.7-73.4-73.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3l128 128c12.5 12.5 32.8 12.5 45.3 0l128-128c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L288 274.7 288 32zM64 352c-35.3 0-64 28.7-64 64l0 32c0 35.3 28.7 64 64 64l384 0c35.3 0 64-28.7 64-64l0-32c0-35.3-28.7-64-64-64l-101.5 0-45.3 45.3c-25 25-65.5 25-90.5 0L165.5 352 64 352zm368 56a24 24 0 1 1 0 48 24 24 0 1 1 0-48z"/>
         </svg>
       </a>
@@ -187,7 +187,7 @@ require '../common/php/utils.php';
     <div id="activitySection" class="flex-column flex-stretch-ortogonal rightarea">
       <div id="cpuSection" class="section-cpu flex-stretch-ortogonal bg_slight cpu_area">
         <div id="cpuHeader" class="cpu-header flex-row flex-stretch-ortogonal link_style">
-          <h3 class="section-header flex-pos-ortogonal-center">CPU:</h3>
+          <h3 class="section-header flex-pos-ortogonal-center">CPU (<a href="https://en.wikipedia.org/wiki/I386">~i386</a>):</h3>
           <a id="instructionReference" href="#" class="instruction-reference flex-space-left">Instructions reference</a>
           <button class="button button_style" onclick="cpu.reset()">Reset</button>
         </div>

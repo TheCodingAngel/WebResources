@@ -41,37 +41,41 @@ copy /Y ..\res\images\close.png images > NUL 2>&1
 copy /Y ..\favicon.ico images > NUL 2>&1
 
 
-set "FN_RCA_301=RCA-301"
-echo %FN_RCA_301%.zip
-%PHP% %FN_RCA_301%.php offline > %FN_RCA_301%.html
+set "FN_Computer=Computer"
+echo %FN_Computer%.zip
+%PHP% %FN_Computer%.php offline > %FN_Computer%.html
 %ARCH% --exclude-vcs --exclude "wizard_full.js" --exclude "assembler.js" --exclude "*_demo.*" ^
-  -acf "arch\%FN_RCA_301%.zip" ^
-  "%FN_RCA_301%.html" ^
+  -acf "arch\%FN_Computer%.zip" ^
+  "%FN_Computer%.html" ^
   "scripts\_Common\base.css" ^
   "scripts\_Common\fonts_local.css" ^
+  "scripts\_Common\responsive.css" ^
+  "scripts\_Common\style.css" ^
   "scripts\_Common\utils_base.js" ^
   "scripts\_Common\popups.js" ^
   "scripts\_Common\wizard_base.js" ^
-  "scripts\Rca301\*.*" ^
+  "scripts\Computer\*.*" ^
   "fonts\*.*" ^
   "images\*.*"
 
-set "FN_RCA_301_FULL=RCA-301-Full"
-echo %FN_RCA_301_FULL%.zip
-%PHP% %FN_RCA_301_FULL%.php offline > %FN_RCA_301_FULL%.html
+set "FN_Computer_FULL=Computer-Full"
+echo %FN_Computer_FULL%.zip
+%PHP% %FN_Computer_FULL%.php offline > %FN_Computer_FULL%.html
 %ARCH% --exclude-vcs --exclude "wizard.js" --exclude "*_demo.*" ^
-  -acf "arch\%FN_RCA_301_FULL%.zip" ^
-  "%FN_RCA_301_FULL%.html" ^
+  -acf "arch\%FN_Computer_FULL%.zip" ^
+  "%FN_Computer_FULL%.html" ^
   "scripts\_Common\base.css" ^
   "scripts\_Common\fonts_local.css" ^
+  "scripts\_Common\responsive.css" ^
+  "scripts\_Common\style.css" ^
   "scripts\_Common\utils_base.js" ^
   "scripts\_Common\popups.js" ^
   "scripts\_Common\wizard_base.js" ^
-  "scripts\Rca301\*.*" ^
+  "scripts\Computer\*.*" ^
   "fonts\*.*" ^
   "images\*.*"
 
-set "FN_CHARS=RCA-301-Characters"
+set "FN_CHARS=Characters"
 echo %FN_CHARS%.zip
 %PHP% %FN_CHARS%.php offline > %FN_CHARS%.html
 %ARCH% --exclude-vcs ^
@@ -79,11 +83,13 @@ echo %FN_CHARS%.zip
   "%FN_CHARS%.html" ^
   "scripts\_Common\base.css" ^
   "scripts\_Common\fonts_local.css" ^
+  "scripts\_Common\responsive.css" ^
+  "scripts\_Common\style.css" ^
   "scripts\_Common\utils_base.js" ^
   "scripts\_Common\popups.js" ^
   "scripts\_Common\table.js" ^
   "scripts\_Common\wizard_base.js" ^
-  "scripts\Rca301_Characters\*.*" ^
+  "scripts\Characters\*.*" ^
   "fonts\*.*" ^
   "images\*.*"
 
@@ -95,6 +101,8 @@ echo %FN_EXTENDED_ASCII%.zip
   "%FN_EXTENDED_ASCII%.html" ^
   "scripts\_Common\base.css" ^
   "scripts\_Common\fonts_local.css" ^
+  "scripts\_Common\responsive.css" ^
+  "scripts\_Common\style.css" ^
   "scripts\_Common\utils_base.js" ^
   "scripts\_Common\popups.js" ^
   "scripts\_Common\table.js" ^
@@ -114,6 +122,8 @@ echo %FN_CODEPOINTS%.zip
   "%FN_CODEPOINTS%.html" ^
   "scripts\_Common\base.css" ^
   "scripts\_Common\fonts_local.css" ^
+  "scripts\_Common\responsive.css" ^
+  "scripts\_Common\style.css" ^
   "scripts\_Common\utils_base.js" ^
   "scripts\_Common\popups.js" ^
   "scripts\Text\*.*" ^
@@ -130,6 +140,8 @@ echo %FN_TEXT%.zip
   "%FN_TEXT%.html" ^
   "scripts\_Common\base.css" ^
   "scripts\_Common\fonts_local.css" ^
+  "scripts\_Common\responsive.css" ^
+  "scripts\_Common\style.css" ^
   "scripts\_Common\utils_base.js" ^
   "scripts\_Common\popups.js" ^
   "scripts\Text\text.css" ^
@@ -143,13 +155,13 @@ set "FN_TOOLS=Tools"
 echo %FN_TOOLS%.zip
 %ARCH% --exclude-vcs --exclude "*_demo.*" --exclude "fonts.css" ^
   -acf "arch\%FN_TOOLS%.zip" ^
-  "%FN_RCA_301%.html" "%FN_RCA_301_FULL%.html" "%FN_CHARS%.html" ^
+  "%FN_Computer%.html" "%FN_Computer_FULL%.html" "%FN_CHARS%.html" ^
   "%FN_EXTENDED_ASCII%.html" "%FN_CODEPOINTS%.html" "%FN_TEXT%.html" ^
   "scripts\*.*" "data\*.*" "fonts\*.*" "images\*.*"
 
 
 
-for %%a in (%FN_RCA_301% %FN_RCA_301_FULL% %FN_CHARS% ^
+for %%a in (%FN_Computer% %FN_Computer_FULL% %FN_CHARS% ^
             %FN_EXTENDED_ASCII% %FN_CODEPOINTS% %FN_TEXT%) do (
     del %%a.html
 )
