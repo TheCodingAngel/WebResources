@@ -67,18 +67,23 @@ class Emulator {
     }
 
     _runLoop() {
+        if (!confirm("The page will not be interactive during this execution.\n" +
+                     "Press OK only if the program finishes (halts) and doesn't need user input.\n" +
+                     "Programs with infinite loops will make the page unresponsive!")) {
+            return;
+        }
+        
         this.#currentExecution = Emulator.ExecutionMode.Running;
         
         try {
             this.#buttonRun.disabled = true;
             while(this.#currentExecution != Emulator.ExecutionMode.Stopped) {
-                let nextInstructionStr = this.#cpu.getNextInstruction();
-                this.executeInstruction(nextInstructionStr);
+                this.executeInstruction(this.#cpu.getNextInstruction());
             }
         } catch(err) {
             if (err instanceof InstructionError) {
-                alert("Error executing " + nextInstructionStr + ":\n" + err.message);
-                console.log("Error executing " + nextInstructionStr + ": " + err.message);
+                alert("Instruction Error: " + err.message);
+                console.log("Instruction Error: " + err.message);
                 if (err.stack) {
                     console.log(err.stack);
                 }
