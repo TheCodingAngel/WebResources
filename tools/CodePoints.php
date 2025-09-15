@@ -1,5 +1,5 @@
 <?php
-require '../common/php/utils.php';
+require '../common/php/page.php';
 $page = new Page('..');
 ?>
 <!DOCTYPE html>
