@@ -35,10 +35,18 @@ md arch > NUL 2>&1
 
 
 md images > NUL 2>&1
-copy /Y ..\res\images\icon.png images > NUL 2>&1
-copy /Y ..\res\images\arrow.png images > NUL 2>&1
-copy /Y ..\res\images\close.png images > NUL 2>&1
+
+set IMG_Files=icon.png arrow.png close.png
+for %%i in (%IMG_Files%) do (
+  copy /Y ..\res\images\%%i images > NUL 2>&1
+)
 copy /Y ..\favicon.ico images > NUL 2>&1
+
+
+set SCR_Common=base.css responsive.css style.css
+for %%s in (%SCR_Common%) do (
+  copy /Y ..\common\scripts\%%s scripts\_Common\ > NUL 2>&1
+)
 
 
 set "FN_Computer=Computer"
@@ -163,10 +171,13 @@ echo %FN_TOOLS%.zip
 
 for %%a in (%FN_Computer% %FN_Computer_FULL% %FN_CHARS% ^
             %FN_EXTENDED_ASCII% %FN_CODEPOINTS% %FN_TEXT%) do (
-    del %%a.html
+    del /F %%a.html
 )
 
 rd /S /Q images
+del /F scripts\_Common\base.css > NUL 2>&1
+del /F scripts\_Common\responsive.css > NUL 2>&1
+del /F scripts\_Common\style.css > NUL 2>&1
 
 popd
 

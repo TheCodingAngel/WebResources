@@ -2,64 +2,140 @@
 
 class Page
 {
-    const ONLINE_IMAGE_PATH = "../res/images/";
-    const OFFLINE_IMAGE_PATH = "images/";
+    const IMAGE_PATH = 'res/images/';
+    const OFFLINE_IMAGE_PATH = 'images/';
     
-    private static $top;
-    private static $bottom;
+    protected $rootRelativePath = '';
     
-    public static function isOffline()
+    protected $scriptFolder = '';   // 'C:/apache/mysite/tools'
+    protected $baseUri = '';        // 'http://mysite.com'
+    protected $uriFolder = '';      // '/tools'
+    protected $page = '';           // 'index.php'
+    
+    protected $top;
+    protected $bottom;
+    protected $hamburger;
+    protected $preloader;
+    
+    public function __construct($rootRelativePath)
+    {
+        $this->rootRelativePath = $rootRelativePath.'/';
+        
+        $this->baseUri = '';
+        if (!empty($_SERVER['HTTPS']) && ('on' == $_SERVER['HTTPS'])) {
+            $this->baseUri = 'https://';
+        } else {
+            $this->baseUri = 'http://';
+        }
+        $this->baseUri .= $_SERVER['HTTP_HOST'] ?? '';
+        
+        //$uri = $_SERVER['REQUEST_URI'];
+        $uri = $_SERVER['SCRIPT_NAME'];
+        $tempArray = explode('/',$uri);
+        $this->page = $tempArray[count($tempArray) - 1];
+        
+        $this->uriFolder = dirname($_SERVER['SCRIPT_NAME']);
+        $uriLen = strlen($this->uriFolder);
+        if ($uriLen > 0 && $this->uriFolder[$uriLen - 1] != '/')
+            $this->uriFolder .= '/';
+        $this->scriptFolder = dirname($_SERVER['SCRIPT_FILENAME']);
+    }
+    
+    public function traceFields()
+    {
+        $res  = 'scriptFolder = '.$this->scriptFolder.'<br />'."\n";
+      
+        $res .= "\n<br />\n";
+        $res .= 'baseUri = '.$this->baseUri.'<br />'."\n";
+        $res .= 'uriFolder = '.$this->uriFolder.'<br />'."\n";
+        $res .= 'page = '.$this->page.'<br />'."\n";
+        $res .= 'rootRelativePath = '.$this->rootRelativePath.'<br />'."\n";
+        
+        print($res);
+    }
+    
+    public function isOffline()
     {
         if (php_sapi_name() != 'cli')
         {
             return false;
         }
         $cmdArgs = $argv ?? $_SERVER['argv'];
-        return $cmdArgs[1] == "offline";
+        return $cmdArgs[1] == 'offline';
     }
     
-    public static function printFavIcon($iconFileName)
+    public function printFavIcon($iconFileName)
     {
-        if (self::isOffline()) {
-            print("<link rel=\"icon\" type=\"image/x-icon\" href=\"images/{$iconFileName}\">");
+        if ($this->isOffline()) {
+            print("<link rel=\"icon\" type=\"image/x-icon\" href=\"images/{$iconFileName}\">\n");
         }
     }
     
-    public static function printFontsCss()
+    public function printCommonCss($fileName)
     {
-        $pathRelativeToPage = "scripts/_Common/";
-        $fontsFileName = self::isOffline() ? "fonts_local.css" : "fonts.css";
-        print(self::getCssLink($pathRelativeToPage . $fontsFileName));
+        $pathRelativeToPage = $this->isOffline() ? 'scripts/_Common/' : $this->rootRelativePath.'common/scripts/';
+        print($this->getCssLink($pathRelativeToPage . $fileName) . "\n");
     }
     
-    public static function printImagePath($imageFileName)
+    public function printFontsCss()
     {
-        $baseDir = self::isOffline() ? self::OFFLINE_IMAGE_PATH : self::ONLINE_IMAGE_PATH;
+        $pathRelativeToPage = 'scripts/_Common/';
+        $fontsFileName = $this->isOffline() ? 'fonts_local.css' : 'fonts.css';
+        print($this->getCssLink($pathRelativeToPage . $fontsFileName) . "\n");
+    }
+    
+    public function printImagePath($imageFileName)
+    {
+        $baseDir = $this->isOffline() ?
+            self::OFFLINE_IMAGE_PATH :
+            ($this->rootRelativePath . self::IMAGE_PATH);
         print($baseDir . $imageFileName);
     }
     
-    public static function printTop()
+    public function printTop()
     {
-        if (!isset(self::$top))
+        if (!isset($this->top))
         {
-            $temp = file_get_contents(self::addPathRelativeToThis("page-top.htm"));
-            self::$top = self::isOffline() ? str_replace(self::ONLINE_IMAGE_PATH, self::OFFLINE_IMAGE_PATH, $temp) : $temp;
+            $temp = file_get_contents($this->addPathRelativeToThis('page-top.htm'));
+            $this->top = $this->isOffline() ?
+                str_replace(self::IMAGE_PATH, self::OFFLINE_IMAGE_PATH, $temp) :
+                str_replace(self::IMAGE_PATH, $this->rootRelativePath . self::IMAGE_PATH, $temp);
         }
         
-        print(self::$top);
+        print($this->top);
     }
     
-    public static function printBottom()
+    public function printBottom()
     {
-        if (!isset(self::$bottom))
+        if (!isset($this->bottom))
         {
-            self::$bottom = file_get_contents(self::addPathRelativeToThis("page-bottom.htm"));
+            $this->bottom = file_get_contents($this->addPathRelativeToThis('page-bottom.htm'));
         }
         
-        print(self::$bottom);
+        print($this->bottom);
     }
     
-    public static function getAbsoluteEntryPath($pathRelativeToEntryPage = null)
+    public function printHamburgerMenuScript()
+    {
+        if (!isset($this->hamburger))
+        {
+            $this->hamburger = file_get_contents($this->addPathRelativeToThis('hamburger.js'));
+        }
+        
+        print($this->hamburger);
+    }
+    
+    public function printPreloaderScript()
+    {
+        if (!isset($this->preloader))
+        {
+            $this->preloader = file_get_contents($this->addPathRelativeToThis('preloader.js'));
+        }
+        
+        print($this->preloader);
+    }
+    
+    public function getAbsoluteEntryPath($pathRelativeToEntryPage = null)
     {
         $base = realpath(dirname($_SERVER['SCRIPT_FILENAME']));
         if (is_null($pathRelativeToEntryPage))
@@ -70,12 +146,12 @@ class Page
         return realpath($base.DIRECTORY_SEPARATOR.$pathRelativeToEntryPage);
     }
     
-    private static function addPathRelativeToThis($pathRelativeToThisFile)
+    private function addPathRelativeToThis($pathRelativeToThisFile)
     {
         return dirname(__FILE__).DIRECTORY_SEPARATOR.$pathRelativeToThisFile;
     }
     
-    private static function getCssLink($cssFileName)
+    private function getCssLink($cssFileName)
     {
         return "<link type=\"text/css\" rel=\"stylesheet\" href=\"{$cssFileName}\" />";
     }

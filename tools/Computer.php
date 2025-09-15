@@ -1,5 +1,6 @@
 <?php
 require '../common/php/utils.php';
+$page = new Page('..');
 ?>
 <!DOCTYPE html>
 
@@ -8,15 +9,15 @@ require '../common/php/utils.php';
 <head>
   <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
   <title>Character-Oriented Decimal Computer</title>
-  <?php Page::printFavIcon("favicon.ico"); ?>
-
-
-  <link type="text/css" rel="stylesheet" href="scripts/_Common/base.css">
-  <?php Page::printFontsCss(); ?>
   
+  <?php $page->printFavIcon('favicon.ico'); ?>
+
+  <?php $page->printCommonCss('base.css'); ?>
+  <?php $page->printFontsCss(); ?>
+
   <link type="text/css" rel="stylesheet" href="scripts/Computer/computer.css">
-  <link type="text/css" rel="stylesheet" href="scripts/_Common/style.css" />
-  <link type="text/css" rel="stylesheet" href="scripts/_Common/responsive.css" />
+  <?php $page->printCommonCss('style.css'); ?>
+  <?php $page->printCommonCss('responsive.css'); ?>
 
   <script type="text/javascript" defer src="scripts/_Common/utils_base.js"></script>
   <script type="text/javascript" defer src="scripts/_Common/popups.js"></script>
@@ -48,7 +49,7 @@ require '../common/php/utils.php';
 
 <noscript><h1><b>You need to enable JavaScript to use this emulator.</b></h1></noscript>
 
-<?php Page::printTop(); ?>
+<?php $page->printTop(); ?>
 
 <div id="pageHeader" class="page-header flex-row flex-stretch-ortogonal navdirection">
   <div class="containertop">
@@ -355,7 +356,7 @@ require '../common/php/utils.php';
 
 </div> <!-- pageContent -->
 
-<?php Page::printBottom(); ?>
+<?php $page->printBottom(); ?>
 
 </main>
 
@@ -367,7 +368,7 @@ require '../common/php/utils.php';
   <div class="mp_card">
     <div class="clos_btn"
          onclick="document.querySelector('.memory_popup').classList.remove('activemp')">
-      <img src="<?php Page::printImagePath('close.png'); ?>" />
+      <img src="<?php $page->printImagePath('close.png'); ?>" />
     </div>
     <ul>
       <li>
@@ -424,7 +425,7 @@ require '../common/php/utils.php';
    </div>
   <div class="mp_card">
     <div class="clos_btn" onclick="document.querySelector('.cpu_popup').classList.remove('activecpup')">
-      <img src="<?php Page::printImagePath('close.png'); ?>" />
+      <img src="<?php $page->printImagePath('close.png'); ?>" />
     </div>
     <ul>
       <li>
@@ -439,26 +440,9 @@ require '../common/php/utils.php';
 <!-- end cpu popup  -->
 
 <script>
-  window.addEventListener("load", function () {
-    document.querySelector(".preloader").style.display = "none";
-  });
-  
-  // submenu
-  document.addEventListener("click", function (e) {
-    const dropdown = document.querySelector(".dropdown_menu");
-    // if click is outside dropdown
-    if (dropdown && !e.target.closest(".dropdown_menu")) {
-      dropdown.classList.remove("submenu");
-    }
-  });
-  const hamburger = document.querySelector(".hamburger");
-  const menu = document.querySelector(".menu-list");
-  if (hamburger && menu) {
-    hamburger.addEventListener("click", () => {
-      menu.classList.toggle("show");
-      hamburger.classList.toggle("showbar");
-    });
-  }
+<?php $page->printPreloaderScript(); ?>
+
+<?php $page->printHamburgerMenuScript(); ?>
 </script>
 
 </body>

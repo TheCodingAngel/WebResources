@@ -34,6 +34,16 @@
   touch-action: manipulation;
 }
 
+.page-content {
+  padding-top: 78px;
+  padding-bottom: 8px;
+}
+@media only screen and (max-width: 784px) {
+  /* Necessary because of the switch to "hamburger" menu */
+  .page-content {
+    padding-top: 50px;
+  }
+}
 
 .flex-row {
   display: flex;
