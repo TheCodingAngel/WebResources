@@ -44,13 +44,9 @@ $page = new Page('..');
 
 <div id="pageHeader" class="page-header flex-row flex-stretch-ortogonal navdirection">
   <div class="containertop">
-    <ul class="breadcrumb_inside breadcrumb link_style">
-      <li><a href="/">Home</a></li>
-      <li>»</li>
-      <li><a href="">Tools</a></li>
-      <li>»</li>
-      <li><h1 class="title breadcrumb_main_title">Extended ASCII</h1></li>
-    </ul>
+
+<?php $page->printBreadcrumb('Extended ASCII'); ?>
+
     <div class="flex-stretch-center-children">
     </div>
     <div class="toolbar-horizontal">

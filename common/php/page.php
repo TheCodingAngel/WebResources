@@ -125,6 +125,19 @@ class Page
         print($this->hamburger);
     }
     
+    public function printBreadcrumb($pageName)
+    {
+        $offset = '  ';
+        $baseOffset = $offset . $offset;
+        print($baseOffset . '<ul class="charecter_breadcrumb breadcrumb link_style">' . "\n");
+        print($baseOffset . $offset . '<li><a href="https://thecodingangel.org/">Root</a></li>' . "\n");
+        print($baseOffset . $offset . '<li>»</li>' . "\n");
+        print($baseOffset . $offset . '<li><a href="https://thecodingangel.org/tools/">Tools</a></li>' . "\n");
+        print($baseOffset . $offset . '<li>»</li>' . "\n");
+        print($baseOffset . $offset . '<li><h1 class="title">' . $pageName . '</h1></li>' . "\n");
+        print($baseOffset . '</ul>' . "\n");
+    }
+    
     public function printPreloaderScript()
     {
         if (!isset($this->preloader))
