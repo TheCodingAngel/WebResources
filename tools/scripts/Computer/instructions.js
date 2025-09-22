@@ -117,6 +117,15 @@ class Instructions {
         return result;
     }
     
+    getTwoValueSuffix(first, second) {
+        for (const [key, value] of this.#twoValueSufixes) {
+            if (value[0] == first && value[1] == second) {
+                return key;
+            }
+        }
+        return null;
+    }
+    
     _halt(opcode, suffix, a, b) {
         return this.#emulator.executeInterrupt(CPU.Interrupts.Halt);
     }

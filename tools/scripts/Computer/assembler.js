@@ -1,5 +1,3 @@
-var assembler;
-
 class AssemblerError extends Error {
     constructor(message) {
         super("\n" + message);
@@ -11,16 +9,17 @@ class AssemblerError extends Error {
 class Assembler {
     #input;
     #memory;
+    #instructionsModule;
     
     #statements = [];
     
     #origin = 0;
     #variablesSize = 0;
     
-    #constants = [];
-    #variables = [];
-    #labels = [];
-    #procedures = [];  // labels (call instead of jump; body ends with "ret")
+    #constants = new Map();
+    #variables = new Map();
+    #labels = new Map();
+    #procedures = new Map();  // labels (call instead of jump; body ends with "ret")
     
     #instructions = [];
     #data = [];
@@ -76,41 +75,32 @@ class Assembler {
             this.#mnemonics = instructions.getMnemonics();
         }
         
-        if (isValid(assembler)) {
-            assembler._clear();
+        let assembler = new Assembler(io.getPunchReader(), memory, instructions);
+        if (assembler.parseSourceStatements()) {
+            assembler.generateCode();
+            alert("Assembling Successful");
         }
-        assembler = new Assembler(io.getPunchReader(), memory);
-        assembler.generateCode();
     }
     
-    constructor(input, memory) {
+    constructor(input, memory, instructionsModule) {
         this.#input = input;
         this.#memory = memory;
-        
-        this._parseSourceStatements();
+        this.#instructionsModule = instructionsModule;
     }
     
-    generateCode() {
-        for (let statement of this.#statements) {
-            this._onSecondPass(statement);
-        }
-        
-        //this.#memory.onLoadTextAtStartAddress(this.#instructions.join("") + this.#data.join(""));
-    }
-    
-    _clear() {
+    clear() {
         this.#statements.splice(0);
         
-        this.#constants.splice(0);
-        this.#variables.splice(0);
-        this.#labels.splice(0);
-        this.#procedures.splice(0);
+        this.#constants.clear();
+        this.#variables.clear();
+        this.#labels.clear();
+        this.#procedures.clear();
         
         this.#instructions.splice(0);
         this.#data.splice(0);
     }
     
-    _parseSourceStatements() {
+    parseSourceStatements() {
         //let lines = this.#input.value.split(/\r\n|\r|\n/g);
         
         let src = this.#input.value;
@@ -146,102 +136,23 @@ class Assembler {
                 ch = src[lineEnd];
             }
             if (lineEnd < src.length) {
-                this._onNextStatement(lineIndex, lineStart, lineEnd, src.substring(lineStart, lineEnd));
+                if (!this._onNextStatement(lineIndex, lineStart, lineEnd, src.substring(lineStart, lineEnd))) {
+                    return false;
+                }
                 lineStart = lineEnd;
             } else {
-                this._onNextStatement(lineIndex, lineStart, src.length, src.substring(lineStart));
+                if (!this._onNextStatement(lineIndex, lineStart, src.length, src.substring(lineStart))) {
+                    return false;
+                }
                 break;
             }
         }
+        
+        return true;
     }
     
-    _isNewLine(ch) {
-        return ch == '\n' || ch == '\r';
-    }
-    
-    _onNextStatement(lineIndex, start, end, text) {
-        let withoutComment = text.split(";")[0];
-        let expressionTokens = withoutComment.trim().split(" ");
-        let statementInfo = this._onFirstPass(lineIndex, start, end, text, expressionTokens);
-        if (isValid(statementInfo)) {
-            this.#statements.push(statementInfo);
-        }
-    }
-    
-    _onFirstPass(lineIndex, start, end, text, expressionTokens) {
-        let success = true;
-        
-        let tokens = this._getTrimmedTokens(expressionTokens);
-        
-        try
-        {
-            if (tokens.length <= 0) {
-                return null;
-            }
-            
-            if (tokens.length >= 2) {
-                let first = tokens[0].toUpperCase();
-                let second = tokens[1].toUpperCase();
-                switch(second) {
-                    case Assembler.#DEF_CONST:
-                        if (tokens.length != 3) {
-                            throw new AssemblerError(tokens.length > 3 ? "too many values for constant" : "constant needs a value");
-                        }
-                        this.#constants.push({name: tokens[0], value: this._getValue(tokens[2])});
-                        break;
-                    case Assembler.#DEF_RESERVE:
-                        if (tokens.length != 3) {
-                            throw new AssemblerError(tokens.length > 3 ? "too many values for reservation" : "reservation needs a number of characters");
-                        }
-                        let size = this._getIntValue(tokens[2]);
-                        this.#variables.push({name: tokens[0], value: "".padEnd(size, "0"), address: this.#variablesSize});
-                        this.#variablesSize += size;
-                        break;
-                    default:
-                        let varSize = Assembler.#DEF_TYPES.get(second);
-                        if (isValid(varSize)) {
-                            let value = this._getVariableValue(varSize, tokens);
-                            this.#variables.push({name: tokens[0], value: value, address: this.#variablesSize});
-                            this.#variablesSize += value.length;
-                        } else {
-                            if (first == Assembler.#DEF_ORIGIN) {
-                                this.#origin = this._getIntValue(tokens[1]);
-                            } else {
-                                this._parseInstruction(tokens);
-                            }
-                        }
-                        break;
-                }
-            } else {
-                let t = tokens[0];
-                if (t.endsWith(":")) {
-                    this.#labels.push({name: t.substring(0, t.length - 1),
-                        address: this.#instructions.length * CPU.instructionSize});
-                } else {
-                    this._parseInstruction(tokens);
-                }
-            }
-        } catch(err) {
-            if (err instanceof AssemblerError) {
-                alert(`Error on line ${lineIndex} - ${err.message}:\n${text}`);
-                console.log(`Error on line ${lineIndex} - ${err.message}: ${text}`);
-                this._selectSourceLine(start, end);
-                if (err.stack) {
-                    console.log(err.stack);
-                }
-                return null;
-            } else {
-                throw err;
-            }
-        }
-        
-        return {lineIndex: lineIndex, start: start, end: end, expression: tokens};
-    }
-    
-    _onSecondPass(statementInfo) {
-        statementInfo.memoryAddress = 60;  // null if a directive or a constant
-        
-        for (let label of this.#labels) {
+    generateCode() {
+        for (let label of this.#labels.values()) {
             label.address += this.#origin;
         }
         
@@ -253,9 +164,138 @@ class Assembler {
         
         address += CPU.instructionSize;  // buffer of 1 empty instruction
         
-        for (let v of this.#variables) {
+        for (let v of this.#variables.values()) {
             v.address += address;
         }
+        
+        let dataText = "";
+        let codeText = "";
+        for (let statementInfo of this.#statements) {
+            if (statementInfo.variable) {
+                dataText += this._onSecondPass(statementInfo);
+            } else if (statementInfo.instruction) {
+                codeText += this._onSecondPass(statementInfo);
+            } else {
+                this._onSecondPass(statementInfo);
+            }
+        }
+        
+        this.#memory.onLoadTextAtStartAddress(codeText +
+            padOrCutString("", CPU.instructionSize, "0") + dataText);
+    }
+    
+    _isNewLine(ch) {
+        return ch == '\n' || ch == '\r';
+    }
+    
+    _onNextStatement(lineIndex, start, end, text) {
+        try
+        {
+            let withoutComment = text.split(";")[0];
+            let expressionTokens = withoutComment.trim().split(" ");
+            let statementInfo = this._onFirstPass(lineIndex, start, end, text, expressionTokens);
+            if (isValid(statementInfo)) {
+                this.#statements.push(statementInfo);
+            }
+            return true;
+        } catch(err) {
+            if (err instanceof AssemblerError) {
+                alert(`Error on line ${lineIndex}: ${err.message}:\n${text}`);
+                console.log(`Error on line ${lineIndex} - ${err.message}: ${text}`);
+                this._selectSourceLine(start, end);
+                if (err.stack) {
+                    console.log(err.stack);
+                }
+                return false;
+            } else {
+                throw err;
+            }
+        }
+    }
+    
+    _onFirstPass(lineIndex, start, end, text, expressionTokens) {
+        let tokens = this._getTrimmedTokens(expressionTokens);
+        if (tokens.length <= 0) {
+            return null;
+        }
+        
+        let statementInfo = {lineIndex: lineIndex, start: start, end: end, expression: tokens};
+        
+        if (tokens.length >= 2) {
+            let first = tokens[0].toUpperCase();
+            let second = tokens[1].toUpperCase();
+            switch(second) {
+                case Assembler.#DEF_CONST:
+                    if (tokens.length != 3) {
+                        throw new AssemblerError(tokens.length > 3 ? "too many values for constant" : "constant needs a value");
+                    }
+                    this.#constants.set(tokens[0], {name: tokens[0], value: this._getValue(tokens[2])});
+                    break;
+                case Assembler.#DEF_RESERVE:
+                    if (tokens.length != 3) {
+                        throw new AssemblerError(tokens.length > 3 ? "too many values for reservation" : "reservation needs a number of characters");
+                    }
+                    let size = this._getIntValue(tokens[2]);
+                    let variable = {name: tokens[0], value: "".padEnd(size, "0"), address: this.#variablesSize};
+                    this.#variables.set(tokens[0], variable);
+                    statementInfo.variable = variable;
+                    this.#variablesSize += size;
+                    break;
+                default:
+                    let varSize = Assembler.#DEF_TYPES.get(second);
+                    if (isValid(varSize)) {
+                        let value = this._getVariableValue(varSize, tokens);
+                        let variable = {name: tokens[0], value: value, address: this.#variablesSize};
+                        this.#variables.set(tokens[0], variable);
+                        statementInfo.variable = variable;
+                        this.#variablesSize += value.length;
+                    } else {
+                        if (first == Assembler.#DEF_ORIGIN) {
+                            this.#origin = this._getIntValue(tokens[1]);
+                        } else {
+                            statementInfo.instruction = this._parseInstruction(tokens);
+                        }
+                    }
+                    break;
+            }
+        } else {
+            let t = tokens[0];
+            if (t.endsWith(":")) {
+                let labelName = t.substring(0, t.length - 1);
+                this.#labels.set(labelName, {name: labelName,
+                    address: this.#instructions.length * CPU.instructionSize});
+            } else {
+                statementInfo.instruction = this._parseInstruction(tokens);
+            }
+        }
+        
+        return statementInfo;
+    }
+    
+    _onSecondPass(statementInfo) {
+        if (statementInfo.variable) {
+            statementInfo.memoryAddress = statementInfo.variable.address;
+            if (statementInfo.variable.value) {
+                return statementInfo.variable.value.toString();
+            }
+        }
+        
+        if (statementInfo.instruction) {
+            statementInfo.memoryAddress = statementInfo.instruction.address;
+            
+            let firstOperand = this._getOperandInfo(statementInfo.instruction.first)
+            let secondOperand = this._getOperandInfo(statementInfo.instruction.second)
+            if (firstOperand != null && secondOperand != null) {
+                let suffix = this.#instructionsModule.getTwoValueSuffix(firstOperand.suffix, secondOperand.suffix);
+                return statementInfo.instruction.opcode + suffix + firstOperand.value + secondOperand.value;
+            } else if (firstOperand != null) {
+                return statementInfo.instruction.opcode + firstOperand.suffix + firstOperand.value + "0000";
+            } else {
+                return statementInfo.instruction.opcode + " 00000000";
+            }
+        }
+        
+        return "";
     }
     
     _getTrimmedTokens(tokens) {
@@ -284,7 +324,10 @@ class Assembler {
         }
         let first = tokens.length > 1 ? tokens[1] : null;
         let second = tokens.length > 2 ? tokens[2] : null;
-        this.#instructions.push({opcode: opcode, first: first, second: second});
+        
+        let res = {opcode: opcode, first: first, second: second};
+        this.#instructions.push(res);
+        return res;
     }
     
     _getValue(str) {
@@ -370,6 +413,62 @@ class Assembler {
         }
         let padChars = Math.ceil(value.length / varSize) * varSize;
         return padWithHaltOrCut(value, padChars);
+    }
+    
+    _getOperandInfo(operand) {
+        if (!isValid(operand)) {
+            return null;
+        }
+        
+        if (typeof(operand) == "number") {
+            return {suffix: "V", value: Assembler._getOperandValue(operand)};
+        }
+        
+        if (operand.length > 2 && operand[0] == '[' && operand[operand.length - 1] == ']') {
+            let referenced = operand.slice(1, -1);
+            
+            let constant = this.#constants.get(referenced);
+            if (isValid(constant)) {
+                referenced = constant;
+            }
+            
+            let operandData = this._getOperandData(referenced);
+            return {suffix: operandData.isRegister ? "A" : "P", value: operandData.value};
+        } else if (operand.length > 0) {
+            let constant = this.#constants.get(operand);
+            if (isValid(constant)) {
+                operand = constant;
+            }
+            
+            let operandData = this._getOperandData(operand);
+            return {suffix: operandData.isRegister ? "R" : "V", value: operandData.value};
+        }
+    }
+    
+    _getOperandData(operand) {
+        let register = Assembler.#registers.get(operand.toUpperCase());
+        if (isValid(register)) {
+            return {isRegister: true, value: Assembler._getOperandValue(register)};
+        }
+        
+        let variable = this.#variables.get(operand);
+        if (isValid(variable)) {
+            return {isRegister: false, value: Assembler._getOperandValue(variable.address)};
+        }
+        
+        let label = this.#labels.get(operand);
+        if (isValid(label)) {
+            return {isRegister: false, value: Assembler._getOperandValue(label.address)};
+        }
+        
+        return {isRegister: false, value: Assembler._getOperandValue(operand)};
+    }
+    
+    static _getOperandValue(value) {
+        if (typeof(value) == "number") {
+            return padOrCutNumber(value, CPU.registerSize);
+        }
+        return padOrCutString(value.toString(), CPU.registerSize, '0');
     }
     
     _selectStatement(statementInfo) {
