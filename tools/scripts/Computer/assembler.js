@@ -30,6 +30,8 @@ class Assembler {
         ["n", "\n"],
         ["r", "\r"],
         ["t", "\t"],
+        ["v", "\v"],
+        ["b", "\b"],
         ["'", "'"],
         ['"', '"'],
     ]);
@@ -472,7 +474,9 @@ class Assembler {
     }
     
     _selectStatement(statementInfo) {
-        this._selectSourceLine(statementInfo.start, statementInfo.end);
+        if (isValid(statementInfo)) {
+            this._selectSourceLine(statementInfo.start, statementInfo.end);
+        }
     }
     
     _selectSourceLine(start, end) {
