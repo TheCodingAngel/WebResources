@@ -433,7 +433,7 @@ class Emulator {
                 return this.#cpu.getInstructionPointer();
             } else {
                 let memoryCapacity = this.#memory.getCapacity();
-                throw new InstructionError(`Incorrect Stack Pointer value for interrupts: "${stackPointer}" (must be between ${registers.length} and ${memoryCapacity - 1}).`);
+                throw new InstructionError(`Incorrect Stack Pointer value for interrupts: "${stackPointer}" (must be between ${registers.length + 1} and ${memoryCapacity - 1}).`);
             }
         }
         
