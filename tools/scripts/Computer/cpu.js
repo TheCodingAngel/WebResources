@@ -70,8 +70,8 @@ class CPU {
         ['3', {registerId: "ecx", hasSubRegisters: true}],
         ['4', {registerId: "esp", hasSubRegisters: false}],
         ['5', {registerId: "ebp", hasSubRegisters: false}],
-        ['6', {registerId: "idt", hasSubRegisters: false}],
-        ['7', {registerId: CPU.#codeSegmentId, hasSubRegisters: false}],
+        ['6', {registerId: CPU.#codeSegmentId, hasSubRegisters: false}],
+        ['7', {registerId: "idt", hasSubRegisters: false}],
     ]);
 
     #flags = CPU.FlagsMask.None;

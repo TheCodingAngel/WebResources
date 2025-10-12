@@ -275,7 +275,7 @@ $page = new Page('..');
                     <td class="memory-cell">0</td>
                   </tr>
                   <tr id="csRow">
-                    <td id="cs" class="memory-address"><span title="Code Segment (Program Load Address)">CS</span></td>
+                    <td id="cs" class="memory-address"><span title="Code Segment">CS</span></td>
                     <td class="memory-cell">0</td>
                     <td class="memory-cell">0</td>
                     <td class="memory-cell">0</td>
@@ -315,7 +315,7 @@ $page = new Page('..');
                     <td class="memory-cell">0</td>
                   </tr>
                   <tr id="idtRow">
-                    <td id="idt" class="memory-address"><span title="Interrupt Description Table Register">IDTR</span></td>
+                    <td id="idt" class="memory-address"><span title="Interrupt Descriptor Table Register">IDTR</span></td>
                     <td class="memory-cell">0</td>
                     <td class="memory-cell">0</td>
                     <td class="memory-cell">0</td>
