@@ -439,7 +439,7 @@ class Assembler {
         } else if (operand.length > 0) {
             let constant = this.#constants.get(operand);
             if (isValid(constant)) {
-                operand = constant;
+                operand = constant.value;
             }
             
             let operandData = this._getOperandData(operand);
@@ -448,9 +448,11 @@ class Assembler {
     }
     
     _getOperandData(operand) {
-        let register = Assembler.#registers.get(operand.toUpperCase());
-        if (isValid(register)) {
-            return {isRegister: true, value: Assembler._getOperandValue(register)};
+        if (typeof(operand) == "string") {
+            let register =  Assembler.#registers.get(operand.toUpperCase());
+            if (isValid(register)) {
+                return {isRegister: true, value: Assembler._getOperandValue(register)};
+            }
         }
         
         let variable = this.#variables.get(operand);

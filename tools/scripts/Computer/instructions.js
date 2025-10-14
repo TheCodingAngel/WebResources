@@ -135,8 +135,8 @@ class Instructions {
     }
     
     _int(opcode, suffix, a, b) {
-        if (suffix != ' ') {
-            throw new InstructionError(`Incorrect suffix "${suffix}" for instruction "${opcode}" (int); only the default suffix of empty space is allowed as a suffix.`);
+        if (suffix != ' ' && suffix != 'V') {
+            throw new InstructionError(`Incorrect suffix "${suffix}" for instruction "${opcode}" (int); allowed suffixes are 'V' and the default one (empty space).`);
         }
         let interruptNumber = parseIntOrNull(a);
         if (interruptNumber == null) {
