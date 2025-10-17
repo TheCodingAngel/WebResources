@@ -192,14 +192,6 @@ class Emulator {
             throw new InstructionError(`Instructions must have ${CPU.instructionSize} characters but the next one is with ${characters.length}. Maybe EIP has incorrect value?`);
         }
         
-        for (let [interrupt, portData] of this.#hardwareInterrupts) {
-            let handlerAddress = this._checkHardwareInterrupt(interrupt, portData);
-            if (handlerAddress != null) {
-                this.#cpu.setInstructionPointer(handlerAddress);
-                return;
-            }
-        }
-        
         let nextInstructionAddress = this.#executeInstructionCallback(characters);
         
         if (typeof(nextInstructionAddress) == "undefined" || nextInstructionAddress === null) {
@@ -208,6 +200,16 @@ class Emulator {
             this.#cpu.setInstructionPointer(nextInstructionAddress);
         } else {
             throw new InstructionError("Incorrect result for instruction with opcode " + opcode);
+        }
+        
+        if (characters[0] != Instructions.IRET_OPCODE) {
+            for (let [interrupt, portData] of this.#hardwareInterrupts) {
+                let handlerAddress = this._checkHardwareInterrupt(interrupt, portData);
+                if (handlerAddress != null) {
+                    this.#cpu.setInstructionPointer(handlerAddress);
+                    return;
+                }
+            }
         }
         
         if (this.#currentExecution == Emulator.ExecutionMode.SteppingOut && this.#steppedInCount <= this.#stepOutAtCount) {

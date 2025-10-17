@@ -14,6 +14,8 @@ class Instructions {
     #cpu;
     #emulator;
     
+    static IRET_OPCODE = ':';
+    
     #all = new Map([
         [' ', {mnemonic: "NOP",  execute: this._nop.bind(this)}],
 
@@ -37,7 +39,7 @@ class Instructions {
         ['T', {mnemonic: "INT",  execute: this._int.bind(this)}],  // inTerrupt = Trap
         ['.', {mnemonic: "HLT",  execute: this._halt.bind(this)}],
         [',', {mnemonic: "INT3", execute: this._breakpoint.bind(this)}],
-        [':', {mnemonic: "IRET", execute: this._iret.bind(this)}],
+        [Instructions.IRET_OPCODE, {mnemonic: "IRET", execute: this._iret.bind(this)}],
         ["'", {mnemonic: "CLGI", execute: this._clgi.bind(this)}],
         ['@', {mnemonic: "CALL", execute: this._call.bind(this)}],
         [';', {mnemonic: "RET",  execute: this._ret.bind(this)}],
