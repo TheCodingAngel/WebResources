@@ -418,9 +418,12 @@ class Instructions {
     }
 
     _divide(opcode, suffix, a, b) {
-        this._arithmetic_2("div", opcode, suffix, a, b, (valueA, valueB) => {
+        let res = this._arithmetic_2("div", opcode, suffix, a, b, (valueA, valueB) => {
             return Math.floor(valueA / valueB);
         });
+        if (!Number.isFinite(res)) {
+            return this.#emulator.executeError(CPU.Interrupts.DivideByZero);
+        }
     }
 
     _modulus(opcode, suffix, a, b) {
@@ -507,6 +510,11 @@ class Instructions {
         let newValue = 0;
         if (valueA != null && valueB != null) {
             newValue = operation(valueA, valueB);
+            if (!Number.isFinite(newValue)) {
+                // Setting both positive and negative flags means "Invalid" state
+                this.#cpu.setFlags(true, true, null);
+                return newValue;
+            }
             let fixedValue = fixIfOverflown(newValue, valuesInfo.getCharacterCount());
             this.#cpu.setFlags(fixedValue > 0, fixedValue < 0, fixedValue != newValue);
             newValue = fixedValue;
@@ -519,6 +527,8 @@ class Instructions {
         if (valuesInfo.isUsingCustomCounter()) {
             this.#cpu.setCustomCounter(0);
         }
+        
+        return newValue;
     }
 
     _arithmetic_1(name, opcode, suffix, a, operation) {
@@ -531,6 +541,11 @@ class Instructions {
         let newValue = 0;
         if (value != null) {
             newValue = operation(value);
+            if (!Number.isFinite(newValue)) {
+                // Setting both positive and negative flags means "Invalid" state
+                this.#cpu.setFlags(true, true, null);
+                return newValue;
+            }
             let isOverflown = newValue.toString(10).length > valuesInfo.getCharacterCount();
             this.#cpu.setFlags(newValue > 0, newValue < 0, isOverflown);
         } else {
@@ -542,6 +557,8 @@ class Instructions {
         if (valuesInfo.isUsingCustomCounter()) {
             this.#cpu.setCustomCounter(0);
         }
+        
+        return newValue;
     }
     
     _getValueTypePair(name, opcode, suffix, defaultValueTypePair) {
