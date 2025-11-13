@@ -148,6 +148,12 @@ class Instructions {
     }
     
     _iret(opcode, suffix, a, b) {
+        let esp = this.#cpu.getStackPointer();
+        let allRegistersSize = this.#cpu.getAllRegistersSize();
+        if (esp < allRegistersSize) {
+            throw new InstructionError(`The iret instruction ("${opcode}") requires the stack to have all registers, so the "stack pointer" register should be at least ${allRegistersSize} (now ESP is ${esp})`);
+        }
+        
         return this.#emulator.returnFromInterrupt();
     }
     
@@ -156,6 +162,11 @@ class Instructions {
     }
     
     _call(opcode, suffix, a, b) {
+        let esp = this.#cpu.getStackPointer();
+        if (esp <= 0) {
+            throw new InstructionError(`The call instruction ("${opcode}") requires positive value for the "stack pointer" register (now ESP is ${esp})`);
+        }
+        
         this.#emulator.enterCall();
         
         let valueType = this._getValueType("call", opcode, suffix, 'V');
@@ -178,10 +189,20 @@ class Instructions {
     }
     
     _ret(opcode, suffix, a, b) {
+        let esp = this.#cpu.getStackPointer();
+        if (esp < CPU.registerSize) {
+            throw new InstructionError(`The ret instruction ("${opcode}") requires the stack to have an address, so the "stack pointer" register should be at least ${CPU.registerSize} (now ESP is ${esp})`);
+        }
+        
         return this.#emulator.exitCall();
     }
     
     _push(opcode, suffix, a, b) {
+        let esp = this.#cpu.getStackPointer();
+        if (esp <= 0) {
+            throw new InstructionError(`The push instruction ("${opcode}") requires positive value for the "stack pointer" register (now ESP is ${esp})`);
+        }
+        
         let valueType = this._getValueType("push", opcode, suffix, 'R');
         let valuesInfo = this._getValuesInfo(valueType, null, a, null);
         
@@ -190,6 +211,11 @@ class Instructions {
     }
     
     _pop(opcode, suffix, a, b) {
+        let esp = this.#cpu.getStackPointer();
+        if (esp <= 0) {
+            throw new InstructionError(`The pop instruction ("${opcode}") requires positive value for the "stack pointer" register (now ESP is ${esp})`);
+        }
+        
         let valueType = this._getValueType("pop", opcode, suffix, 'R');
         this._verifyInstructionPointer("pop", opcode, "change", valueType, a);
         
