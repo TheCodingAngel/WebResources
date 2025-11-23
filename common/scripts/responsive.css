@@ -7,6 +7,16 @@
     height: 100%;
   }
 }
+@media only screen and (min-height: 720px) and (min-width: 660px) {
+  .status-registers {
+    height: 100%;
+  }
+}
+@media only screen and (min-height: 960px) and (max-width: 660px) {
+  .status-registers {
+    height: 100%;
+  }
+}
 @media only screen and (max-width: 1500px) {
   body {
     overflow-x: hidden;
