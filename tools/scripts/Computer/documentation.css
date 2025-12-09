@@ -37,6 +37,10 @@ body {
   max-width: 35rem;
 }
 
+.text-area ul {
+  margin-left: 1rem;
+}
+
 .text-small {
   font-size: 10px;
 }

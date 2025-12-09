@@ -155,7 +155,6 @@ the instructions here have things from
 </div>
 
 <div id="instructions" class="section text-area mono-space">
-  <div>
     <p>
     <h4>[Space] - NOP</h4>
     </p>
@@ -487,6 +486,13 @@ the instructions here have things from
     </p>
     <p>
     Input from a port in the second operand to an address or register in the first operand.<br>
+    <br>
+    <ul>
+    <li>Port 1 is the Card Reader (an input devise);</li>
+    <li>Port 2 is the Teleprinter (an input and output device).</li>
+    </ul>
+    <br>
+    <br>
     The <strong>"Is Overflown"</strong> flag is set if not all characters could be read.
     </p>
     <br><hr><br>
@@ -496,9 +502,14 @@ the instructions here have things from
     </p>
     <p>
     Output the data from the second operand to a port in the first operand.<br>
+    <br>
+    <ul>
+    <li>Port 0 is the Printer (an output device);</li>
+    <li>Port 2 is the Teleprinter (an input and output device).</li>
+    </ul>
+    <br>
     The <strong>"Is Overflown"</strong> flag is set if not all characters could be sent.
     </p>
-  </div>
 </div>
 
 </div> <!-- content -->
