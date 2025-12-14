@@ -14,7 +14,6 @@ class Assembler {
     #statements = [];
     
     #origin = 0;
-    #variablesSize = 0;
     
     #constants = new Map();
     #variables = new Map();
@@ -168,7 +167,8 @@ class Assembler {
         address += CPU.instructionSize;  // buffer of 1 empty instruction
         
         for (let v of this.#variables.values()) {
-            v.address += address;
+            v.address = address;
+            address += v.size;
         }
         
         let dataText = "";
@@ -256,23 +256,18 @@ class Assembler {
                         throw new AssemblerError(tokens.length > 3 ? "too many values for reservation" : "reservation needs a number of characters");
                     }
                     let size = Assembler._getIntValue(tokens[2]);
-                    let variable = {name: tokens[0], value: "".padEnd(size, "0"), address: this.#variablesSize};
+                    let variable = {name: tokens[0], value: "0", size: size};
                     this.#variables.set(tokens[0], variable);
                     statementInfo.variable = variable;
-                    this.#variablesSize += size;
                     break;
                 default:
                     let varSize = Assembler.#DEF_TYPES.get(second);
                     if (isValid(varSize)) {
-                        let value = this._getVariableValue(varSize, tokens);
-                        let variable = {name: tokens[0], value: value, address: this.#variablesSize};
+                        let variable = {name: tokens[0], tokens: tokens, size: varSize};
                         this.#variables.set(tokens[0], variable);
                         statementInfo.variable = variable;
-                        this.#variablesSize += value.length;
                     } else {
-                        if (first == Assembler.#DEF_ORIGIN) {
-                            this.#origin = Assembler._getIntValue(tokens[1]);
-                        } else {
+                        if (!this._parseDirective(first, tokens)) {
                             statementInfo.instruction = this._parseInstruction(tokens);
                         }
                     }
@@ -295,9 +290,14 @@ class Assembler {
     _onSecondPass(statementInfo) {
         if (statementInfo.variable) {
             statementInfo.memoryAddress = statementInfo.variable.address;
-            if (statementInfo.variable.value) {
-                return statementInfo.variable.value.toString();
+            if (isValid(statementInfo.variable.tokens)) {
+                statementInfo.variable.value = this._getVariableValue(statementInfo.variable.size,
+                    statementInfo.variable.tokens);
             }
+            if (statementInfo.variable.size == 1) {
+                statementInfo.variable.size = statementInfo.variable.value.length;
+            }
+            return padOrCutString(statementInfo.variable.value.toString(), statementInfo.variable.size, '0');
         }
         
         if (statementInfo.instruction) {
@@ -335,6 +335,15 @@ class Assembler {
                 base.push(t);
             }
         }
+    }
+    
+    _parseDirective(identifier, tokens) {
+        switch(identifier) {
+            case Assembler.#DEF_ORIGIN:
+                this.#origin = Assembler._getIntValue(tokens[1]);
+                return true;
+        }
+        return false;
     }
     
     _parseInstruction(tokens) {
@@ -422,7 +431,7 @@ class Assembler {
     _getVariableValue(varSize, tokens) {
         let value = "";
         for (let i = 2; i < tokens.length; i++) {
-            let v = Assembler._getValue(tokens[i]);
+            let v = this._getValueFromToken(tokens[i]);
             if (typeof(v) == "number") {
                 value += varSize == 1 ? String.fromCodePoint(v) : padOrCutNumber(v, varSize);
             } else if (typeof(v) == "string") {
@@ -435,6 +444,37 @@ class Assembler {
         return padWithHaltOrCut(value, padChars);
     }
     
+    _getValueFromToken(token) {
+        if (Assembler.#STR_MARKS.includes(token[0])) {
+            return Assembler._getStringValue(token);
+        }
+        
+        let constant = this.#constants.get(token);
+        if (isValid(constant)) {
+            return constant.value;
+        }
+        
+        let referenced = this._getReference(token);
+        if (referenced != null) {
+            let variable = this.#variables.get(referenced);
+            if (isValid(variable)) {
+                return variable.value;
+            }
+        } else {
+            let variable = this.#variables.get(token);
+            if (isValid(variable)) {
+                return variable.address;
+            }
+        }
+        
+        let label = this.#labels.get(token);
+        if (isValid(label)) {
+            return label.address;
+        }
+        
+        return Assembler._getIntValue(token);
+    }
+    
     _getOperandInfo(operand) {
         if (!isValid(operand)) {
             return null;
@@ -444,7 +484,8 @@ class Assembler {
             return {suffix: "V", value: Assembler._getOperandValue(operand)};
         }
         
-        if (operand.length > 2 && operand[0] == '[' && operand[operand.length - 1] == ']') {
+        let referenced = this._getReference(operand);
+        if (referenced != null) {
             let referenced = operand.slice(1, -1);
             
             let constant = this.#constants.get(referenced);
@@ -463,6 +504,13 @@ class Assembler {
             let operandData = this._getOperandData(operand);
             return {suffix: operandData.isRegister ? "R" : "V", value: operandData.value};
         }
+    }
+    
+    _getReference(value) {
+        if (value.length > 2 && value[0] == '[' && value[value.length - 1] == ']') {
+            return value.slice(1, -1);
+        }
+        return null;
     }
     
     _getOperandData(operand) {
