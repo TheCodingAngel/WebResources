@@ -39,7 +39,7 @@ class Assembler {
     //static #DEF_SECTION = ["SECTION", "SEGMENT"]; // both are equivalent
     //static #DEF_EXPORT = "GLOBAL";
     static #DEF_ORIGIN = "ORG";
-    static #DEF_CONST = "EQU";  // Hex: 0x1F, Oct: 0q17, Bin: 0b1010_1100
+    static #DEF_CONST = "EQU";  // Examples: Hex - 0x1F; Oct - 0q17; Bin - 0b1010_1100
     static #DEF_CURRENT_ADDRESS = "$";
     
     // Each type allows multitude of comma separated values
@@ -79,8 +79,9 @@ class Assembler {
         
         let assembler = new Assembler(io.getPunchReader(), memory, instructions);
         if (assembler.parseSourceStatements()) {
-            assembler.generateCode();
-            alert("Assembling Successful");
+            if (assembler.generateCode()) {
+                alert("Assembling Successful");
+            }
         }
     }
     
@@ -173,17 +174,34 @@ class Assembler {
         let dataText = "";
         let codeText = "";
         for (let statementInfo of this.#statements) {
-            if (statementInfo.variable) {
-                dataText += this._onSecondPass(statementInfo);
-            } else if (statementInfo.instruction) {
-                codeText += this._onSecondPass(statementInfo);
-            } else {
-                this._onSecondPass(statementInfo);
+            try
+            {
+                if (statementInfo.variable) {
+                    dataText += this._onSecondPass(statementInfo);
+                } else if (statementInfo.instruction) {
+                    codeText += this._onSecondPass(statementInfo);
+                } else {
+                    this._onSecondPass(statementInfo);
+                }
+            } catch(err) {
+                if (err instanceof AssemblerError) {
+                    alert(`Error on line ${statementInfo.lineIndex}: ${err.message}:\n${statementInfo.expression.join(", ")}`);
+                    console.log(`Error on line ${statementInfo.lineIndex} - ${err.message}: ${statementInfo.expression.join(", ")}`);
+                    this._selectSourceLine(statementInfo.start, statementInfo.end);
+                    if (err.stack) {
+                        console.log(err.stack);
+                    }
+                    return false;
+                } else {
+                    throw err;
+                }
             }
         }
         
         this.#memory.onLoadTextAtStartAddress(codeText +
-            padOrCutString("", CPU.instructionSize, "0") + dataText);
+            padOrCutString("", CPU.instructionSize, Instructions.INVALID_OPCODE) + dataText);
+        
+        return true;
     }
     
     _isNewLine(ch) {
@@ -231,13 +249,13 @@ class Assembler {
                     if (tokens.length != 3) {
                         throw new AssemblerError(tokens.length > 3 ? "too many values for constant" : "constant needs a value");
                     }
-                    this.#constants.set(tokens[0], {name: tokens[0], value: this._getValue(tokens[2])});
+                    this.#constants.set(tokens[0], {name: tokens[0], value: Assembler._getValue(tokens[2])});
                     break;
                 case Assembler.#DEF_RESERVE:
                     if (tokens.length != 3) {
                         throw new AssemblerError(tokens.length > 3 ? "too many values for reservation" : "reservation needs a number of characters");
                     }
-                    let size = this._getIntValue(tokens[2]);
+                    let size = Assembler._getIntValue(tokens[2]);
                     let variable = {name: tokens[0], value: "".padEnd(size, "0"), address: this.#variablesSize};
                     this.#variables.set(tokens[0], variable);
                     statementInfo.variable = variable;
@@ -253,7 +271,7 @@ class Assembler {
                         this.#variablesSize += value.length;
                     } else {
                         if (first == Assembler.#DEF_ORIGIN) {
-                            this.#origin = this._getIntValue(tokens[1]);
+                            this.#origin = Assembler._getIntValue(tokens[1]);
                         } else {
                             statementInfo.instruction = this._parseInstruction(tokens);
                         }
@@ -332,15 +350,15 @@ class Assembler {
         return res;
     }
     
-    _getValue(str) {
-        if (Assembler.#STR_MARKS.includes(str[0])) {
+    static _getValue(str) {
+        if (this.#STR_MARKS.includes(str[0])) {
             return this._getStringValue(str);
         }
         
         return this._getIntValue(str);
     }
     
-    _getIntValue(str) {
+    static _getIntValue(str) {
         let value = parseIntOrNull(str); // converts correctly hexadecimals that start with "0x"
         if (value != null) {
             return value;
@@ -362,10 +380,10 @@ class Assembler {
             return value;
         }
         
-        throw new AssemblerError(`invalid value "${str}"`);
+        throw new AssemblerError(`invalid value (${str})`);
     }
     
-    _getStringValue(str) {
+    static _getStringValue(str) {
         if (str.length < 2) {
             throw new AssemblerError(`invalid string value (${str})`);
         }
@@ -404,7 +422,7 @@ class Assembler {
     _getVariableValue(varSize, tokens) {
         let value = "";
         for (let i = 2; i < tokens.length; i++) {
-            let v = this._getValue(tokens[i]);
+            let v = Assembler._getValue(tokens[i]);
             if (typeof(v) == "number") {
                 value += varSize == 1 ? String.fromCodePoint(v) : padOrCutNumber(v, varSize);
             } else if (typeof(v) == "string") {
@@ -468,11 +486,12 @@ class Assembler {
         return {isRegister: false, value: Assembler._getOperandValue(operand)};
     }
     
-    static _getOperandValue(value) {
+    static _getOperandValue(operand) {
+        let value = this._getValue(operand);
         if (typeof(value) == "number") {
             return padOrCutNumber(value, CPU.registerSize);
         }
-        return padOrCutString(value.toString(), CPU.registerSize, '0');
+        return padOrCutString(value, CPU.registerSize, '0');
     }
     
     _selectStatement(statementInfo) {

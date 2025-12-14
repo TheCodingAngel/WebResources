@@ -14,6 +14,7 @@ class Instructions {
     #cpu;
     #emulator;
     
+    static INVALID_OPCODE = '&';
     static IRET_OPCODE = ':';
     
     #all = new Map([
