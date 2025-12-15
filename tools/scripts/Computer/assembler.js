@@ -331,39 +331,35 @@ class Assembler {
         let result = [];
         let parameters = statement.split(",");
         
+        let notAdded = this._addNonEmptyTokens(result, parameters[0].split(" "), expectedTokens);
+        let followingToken = notAdded.join(" ").trim();
+        
         if (parameters.length > 1) {
-            this._addParameters(result, parameters, expectedTokens);
+            // Note - we want to keep the empty parameters
+            result.push(followingToken); // this is the first parameter
+            for (let i = 1; i < parameters.length; i++) {
+                result.push(parameters[i].trim());
+            }
         } else {
-            let notAdded = this._addNonEmptyTokens(result, parameters[0].split(" "), expectedTokens);
-            let value = notAdded.join(" ").trim();
-            if (value.length > 0) {
-                result.push(value);
+            if (followingToken.length > 0) {
+                result.push(followingToken);
             }
         }
         
         return result;
     }
     
-    _addParameters(base, parameters, expectedTokens) {
-        // Note - we want to keep the empty parameters
-        let notAdded = this._addNonEmptyTokens(base, parameters[0].split(" "), expectedTokens);
-        base.push(notAdded.join(" ").trim()); // first parameter
-        for (let i = 1; i < parameters.length; i++) {
-            base.push(parameters[i].trim());
-        }
-    }
-    
-    _addNonEmptyTokens(base, tokens, expectedTokens = -1) {
+    _addNonEmptyTokens(base, tokens, maxTokens = -1) {
         let index = 0;
         for (let t of tokens) {
             let trimmedToken = t.trim();
             if (trimmedToken.length > 0) {
-                if (expectedTokens == 0) {
+                if (maxTokens == 0) {
                     return tokens.slice(index);
                 }
                 base.push(trimmedToken);
-                if (expectedTokens > 0) {
-                    expectedTokens--;
+                if (maxTokens > 0) {
+                    maxTokens--;
                 }
             }
             index++;
