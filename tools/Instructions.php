@@ -217,9 +217,10 @@ the instructions here have things from
     <p>
     Scan String (or Find) searches for characters from the second operand in a string identified by the first operand.<br><br>
     ECX contains the length of the string.<br>
-    When the instruction finishes ECX is set to the index of the first found character.<br><br>
-    <a name="jmp">The first character</a> of the second operand determines how many characters should be used in the search.<br>
-    It could be 1, 2 or 3.
+    When the instruction finishes, ECX is set to the index of the first character that is one of the characters in the second operand.<br><br>
+    The first character of the second operand (the most significant character) determines how many characters should be used in the search.
+    It could be 1, 2 or 3 and the characters start from the last (or the least significant) one.<br><br>
+    <a name="jmp">When none</a> of the characters is found the IsOverflown flag is set (and ECX is set to 0).
     </p>
     <br><hr><br>
     

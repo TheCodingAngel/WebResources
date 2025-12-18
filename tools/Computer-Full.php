@@ -294,28 +294,28 @@ $page = new Page('..');
                 </thead>
                 <tbody id="REGS_GENERAL" class="table_round">
                   <tr id="eaxRow">
-                    <td id="eax" class="memory-address"><span title="Universal Register A">EAX</span></td>
+                    <td id="eax" class="memory-address"><span title="General Purpose Register A">EAX</span></td>
                     <td class="memory-cell">0</td>
                     <td class="memory-cell">0</td>
                     <td class="memory-cell">0</td>
                     <td class="memory-cell">0</td>
                   </tr>
                   <tr id="ebxRow">
-                    <td id="ebx" class="memory-address"><span title="Universal Register B">EBX</span></td>
+                    <td id="ebx" class="memory-address"><span title="General Purpose Register B">EBX</span></td>
                     <td class="memory-cell">0</td>
                     <td class="memory-cell">0</td>
                     <td class="memory-cell">0</td>
                     <td class="memory-cell">0</td>
                   </tr>
                   <tr id="ecxRow">
-                    <td id="ecx" class="memory-address"><span title="Counter Register">ECX</span></td>
+                    <td id="ecx" class="memory-address"><span title="General Purpose Register C (Counter)">ECX</span></td>
                     <td class="memory-cell">0</td>
                     <td class="memory-cell">0</td>
                     <td class="memory-cell">0</td>
                     <td class="memory-cell">0</td>
                   </tr>
                   <tr id="idtRow">
-                    <td id="idt" class="memory-address"><span title="Interrupt Descriptor Table Register">IDTR</span></td>
+                    <td id="idtr" class="memory-address"><span title="Interrupt Descriptor Table Register">IDTR</span></td>
                     <td class="memory-cell">0</td>
                     <td class="memory-cell">0</td>
                     <td class="memory-cell">0</td>

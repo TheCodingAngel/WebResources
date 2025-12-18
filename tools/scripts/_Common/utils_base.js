@@ -23,6 +23,29 @@ class Keys {
         return key == "Enter";
     }
     
+    static isLeft(key) {
+        return key == "ArrowLeft";
+    }
+    
+    static isRight(key) {
+        return key == "ArrowRight";
+    }
+    
+    static isUp(key) {
+        return key == "ArrowUp";
+    }
+    
+    static isDown(key) {
+        return key == "ArrowDown";
+    }
+    
+    static isHome(key) {
+        return key == "Home";
+    }
+    static isEnd(key) {
+        return key == "End";
+    }
+    
     // Note - the event flags that are used here are set on keydown 
     static isHotKeyCombination(e) {
         return e.ctrlKey || e.altKey || e.shiftKey || e.metaKey;

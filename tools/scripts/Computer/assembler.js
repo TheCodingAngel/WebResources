@@ -14,6 +14,7 @@ class Assembler {
     #statements = [];
     
     #origin = 0;
+    #variablesSize = 0;
     
     #constants = new Map();
     #variables = new Map();
@@ -166,12 +167,7 @@ class Assembler {
         
         // Padding between code (instructions) and data
         let paddingCharacters = padOrCutString("", CPU.instructionSize, Instructions.INVALID_OPCODE);
-        address += paddingCharacters.length;
-        
-        for (let v of this.#variables.values()) {
-            v.address = address;
-            address += v.size;
-        }
+        this.#variablesSize = address + paddingCharacters.length;
         
         let codeText = "";
         let dataText = "";
@@ -187,8 +183,8 @@ class Assembler {
                 }
             } catch(err) {
                 if (err instanceof AssemblerError) {
-                    alert(`Error on line ${statementInfo.lineIndex}: ${err.message}:\n${statementInfo.expression.join(", ")}`);
-                    console.log(`Error on line ${statementInfo.lineIndex} - ${err.message}: ${statementInfo.expression.join(", ")}`);
+                    alert(`Error on line ${statementInfo.lineIndex}: ${err.message}:\n[${statementInfo.expression.join(", ")}]`);
+                    console.log(`Error on line ${statementInfo.lineIndex} - ${err.message}: [${statementInfo.expression.join(", ")}]`);
                     this._selectSourceLine(statementInfo.start, statementInfo.end);
                     if (err.stack) {
                         console.log(err.stack);
@@ -212,8 +208,7 @@ class Assembler {
     _onNextStatement(lineIndex, start, end, text) {
         try
         {
-            let withoutComment = text.split(";")[0];
-            let statementInfo = this._onFirstPass(lineIndex, start, end, withoutComment.trim());
+            let statementInfo = this._onFirstPass(lineIndex, start, end, text.trim());
             if (isValid(statementInfo)) {
                 this.#statements.push(statementInfo);
             }
@@ -234,7 +229,7 @@ class Assembler {
     }
     
     _onFirstPass(lineIndex, start, end, statement) {
-        let tokens = this._getTrimmedTokens(statement, 1);
+        let tokens = this._getTrimmedTokens(statement, -1);
         if (tokens.length <= 0) {
             return null;
         }
@@ -247,15 +242,9 @@ class Assembler {
             let definition = second[0].toUpperCase();
             switch(definition) {
                 case Assembler.#DEF_CONST:
-                    if (second.length > 1) {
-                        tokens = this._getTrimmedTokens(statement, 2);
-                    }
                     this.#constants.set(tokens[0], {name: tokens[0], value: this._getConstantValue(tokens)});
                     break;
                 case Assembler.#DEF_RESERVE:
-                    if (second.length > 1) {
-                        tokens = this._getTrimmedTokens(statement, 2);
-                    }
                     if (tokens.length != 3) {
                         throw new AssemblerError(tokens.length > 3 ? "too many values for reservation" : "reservation needs a number of characters");
                     }
@@ -267,9 +256,6 @@ class Assembler {
                 default:
                     let varSize = Assembler.#DEF_TYPES.get(definition);
                     if (isValid(varSize)) {
-                        if (second.length > 1) {
-                            tokens = this._getTrimmedTokens(statement, 2);
-                        }
                         let variable = {name: tokens[0], tokens: tokens, size: varSize};
                         this.#variables.set(tokens[0], variable);
                         statementInfo.variable = variable;
@@ -298,6 +284,7 @@ class Assembler {
     
     _onSecondPass(statementInfo) {
         if (statementInfo.variable) {
+            statementInfo.variable.address = this.#variablesSize;
             statementInfo.memoryAddress = statementInfo.variable.address;
             if (isValid(statementInfo.variable.tokens)) {
                 statementInfo.variable.value = this._getVariableValue(statementInfo.variable.size,
@@ -306,6 +293,7 @@ class Assembler {
             if (statementInfo.variable.size == 1) {
                 statementInfo.variable.size = statementInfo.variable.value.length;
             }
+            this.#variablesSize += statementInfo.variable.size;
             return padOrCutString(statementInfo.variable.value.toString(), statementInfo.variable.size, '0');
         }
         
@@ -328,43 +316,125 @@ class Assembler {
     }
     
     _getTrimmedTokens(statement, expectedTokens) {
-        let result = [];
-        let parameters = statement.split(",");
+        let tokens = [];
         
-        let notAdded = this._addNonEmptyTokens(result, parameters[0].split(" "), expectedTokens);
-        let followingToken = notAdded.join(" ").trim();
+        let commentStart = -1;
+        let tokenStart = -1;
+        let stringStart = null;
+        let brackets = [];
         
-        if (parameters.length > 1) {
-            // Note - we want to keep the empty parameters
-            result.push(followingToken); // this is the first parameter
-            for (let i = 1; i < parameters.length; i++) {
-                result.push(parameters[i].trim());
+        for (let i = 0; i < statement.length; i++) {
+            let ch = statement[i];
+            switch(ch) {
+                case ' ':
+                    if (stringStart == null && brackets.length == 0 && tokenStart >= 0) {
+                        tokens.push(statement.substring(tokenStart, i));
+                        tokenStart = -1;
+                    }
+                    break;
+                case ',':
+                    if (stringStart == null) {
+                        if (brackets.length > 0) {
+                            throw new AssemblerError(`not allowed character inside brackets: ${ch}`);
+                        }
+                        if (tokenStart >= 0) {
+                            tokens.push(statement.substring(tokenStart, i));
+                            tokenStart = -1;
+                        }
+                    }
+                    break;
+                case '"':
+                case "'":
+                    if (stringStart == null) {
+                        if (tokenStart < 0) {
+                            tokenStart = i;
+                        } else {
+                            throw new AssemblerError(`tokens cannot contain character ${ch}`);
+                        }
+                        stringStart = ch;
+                    } else if (stringStart == ch) {
+                        stringStart = null;
+                        i++;
+                        tokens.push(statement.substring(tokenStart, i));
+                        tokenStart = -1;
+                    }
+                    break;
+                case "\\":
+                    if (stringStart == null) {
+                        throw new AssemblerError(`unexpected character ${ch}`);
+                    }
+                    i++; // handle escape sequences in strings by ignoring the next character
+                    break;
+                case '[':
+                case "(":
+                    if (stringStart == null) {
+                        if (brackets.length == 0) {
+                            if (tokenStart < 0) {
+                                tokenStart = i;
+                            } else {
+                                throw new AssemblerError(`tokens cannot contain character ${ch}`);
+                            }
+                            
+                        }
+                        brackets.push(ch);
+                    }
+                    break;
+                case ']':
+                case ")":
+                    if (stringStart == null) {
+                        if (brackets.length == 0) {
+                            throw new AssemblerError(`closing bracket without opening one: ${ch}`);
+                        } else {
+                            let openBracket = brackets.pop(ch);
+                            let closeBracket = openBracket == '[' ? ']' : ')';
+                            if (closeBracket != ch) {
+                                throw new AssemblerError(`closing bracket is ${ch} while the last opening one is ${openBracket}`);
+                            }
+                            if (brackets.length == 0) {
+                                i++;
+                                tokens.push(statement.substring(tokenStart, i));
+                                tokenStart = -1;
+                            }
+                        }
+                    }
+                    break;
+                case ';':
+                    if (stringStart == null) {
+                        if (brackets.length == 0 && tokenStart >= 0) {
+                            tokens.push(statement.substring(tokenStart, i));
+                            tokenStart = -1;
+                        }
+                        commentStart = i;
+                    }
+                    break;
+                default:
+                    if (tokenStart < 0) {
+                        tokenStart = i;
+                    }
+                    break;
             }
-        } else {
-            if (followingToken.length > 0) {
-                result.push(followingToken);
+            
+            if (commentStart >= 0) {
+                // tokens.push(statement.substring(commentStart));
+                break;
+            }
+            if (expectedTokens >= 0 && tokens.length >= expectedTokens) {
+                break;
             }
         }
         
-        return result;
-    }
-    
-    _addNonEmptyTokens(base, tokens, maxTokens = -1) {
-        let index = 0;
-        for (let t of tokens) {
-            let trimmedToken = t.trim();
-            if (trimmedToken.length > 0) {
-                if (maxTokens == 0) {
-                    return tokens.slice(index);
-                }
-                base.push(trimmedToken);
-                if (maxTokens > 0) {
-                    maxTokens--;
-                }
-            }
-            index++;
+        if (stringStart != null) {
+            throw new AssemblerError(`the string that started with ${stringStart} is not closed`);
         }
-        return tokens.slice(index);
+        if (brackets.length > 0) {
+            throw new AssemblerError(`the following brackets are not closed: ${brackets.toString()}`);
+        }
+        
+        if (tokenStart >= 0) {
+            tokens.push(statement.substring(tokenStart));
+        }
+        
+        return tokens;
     }
     
     _parseDirective(identifier, tokens) {

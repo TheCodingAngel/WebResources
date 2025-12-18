@@ -314,22 +314,23 @@ class Instructions {
     }
 
     _find(opcode, suffix, a, b) {
-        let valueType = this._getValueType("find", opcode, suffix, 'R');
-        let valuesInfo = this._getValuesInfo(valueType, null, a, b, Instructions.ForceCharCount.None);
+        let valueTypePair = this._getValueTypePair("compare", opcode, suffix, ['R', 'V']);
+        let valuesInfo = this._getValuesInfo(valueTypePair[0], valueTypePair[1], a, b, Instructions.ForceCharCount.None);
 
-        let count = parseInt(b[0]);
+        let searchPattern = valuesInfo.getValue(valueTypePair[1], b, ValuesInfo.IndirectionType.None, false);
+        let count = parseInt(searchPattern[0]);
         let chars = []
         if (count) {
             for (let i = 0; i < count; i++) {
-                chars.push(b[b.length - i - 1]);
+                chars.push(searchPattern[searchPattern.length - i - 1]);
             }
         } else {
-            throw new InstructionError(`Incorrect characters value (${b}) used in "find" - the first character can be 1, 2 or 3.`);
+            throw new InstructionError(`Incorrect characters value (${searchPattern}) used in "find" - the first character can be 1, 2 or 3.`);
         }
 
-        let valueStr = valuesInfo.getValue(valueType, a, ValuesInfo.IndirectionType.MemoryAndRegisters);
+        let valueStr = valuesInfo.getValue(valueTypePair[0], a, ValuesInfo.IndirectionType.MemoryAndRegisters);
         for (let i = 0; i < valuesInfo.getCharacterCount(); i++){
-            if (chars.some(ch => ch == valueStr.charAt(i))) {
+            if (chars.includes(valueStr.charAt(i))) {
                 this.#cpu.setFlags(false, false, false);
                 if (valuesInfo.isUsingCustomCounter()) {
                     this.#cpu.setCustomCounter(i);

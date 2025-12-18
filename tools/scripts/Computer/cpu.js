@@ -60,7 +60,7 @@ class CPU {
         ["eax", {value: CPU.#registerDefaultStrValue}],
         ["ebx", {value: CPU.#registerDefaultStrValue}],
         ["ecx", {value: CPU.#registerDefaultStrValue}],
-        ["idt", {value: CPU.#invalidPointerValue}],
+        ["idtr", {value: CPU.#invalidPointerValue}],
     ]);
     
     static registersInfo = new Map([
@@ -71,7 +71,7 @@ class CPU {
         ['4', {registerId: "esp", hasSubRegisters: false}],
         ['5', {registerId: "ebp", hasSubRegisters: false}],
         ['6', {registerId: CPU.#codeSegmentId, hasSubRegisters: false}],
-        ['7', {registerId: "idt", hasSubRegisters: false}],
+        ['7', {registerId: "idtr", hasSubRegisters: false}],
     ]);
 
     #flags = CPU.FlagsMask.None;
@@ -122,7 +122,7 @@ class CPU {
         this.setRegisterValueById(CPU.#codeSegmentId, CPU.#invalidPointerValue);
         this.setInstructionPointer(CPU.#defaultPointerValue);
         
-        this.setRegisterValueById("idt", CPU.#invalidPointerValue);
+        this.setRegisterValueById("idtr", CPU.#invalidPointerValue);
         this.setRegisterValueById("esp", CPU.#invalidPointerValue);
         this.setRegisterValueById("ebp", CPU.#invalidPointerValue);
         
@@ -311,7 +311,7 @@ class CPU {
     }
     
     getIDT() {
-        return parseIntOrMinusOne(this.getRegisterValueById("idt"));
+        return parseIntOrMinusOne(this.getRegisterValueById("idtr"));
     }
     
     getIDTSize() {

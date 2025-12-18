@@ -224,7 +224,6 @@ class IO {
             return ' ';
         }
         if (Keys.isBackspace(key)) {
-            //return '\u2190';  // ←
             return '\u25c4';  // ◄
         }
         if (Keys.isDelete(key)) {
@@ -233,7 +232,26 @@ class IO {
         //if (Keys.isEscape(key)) {
         //    return '\u02df';  // ˟
         //}
-
+        
+        if (Keys.isLeft(key)) {
+            return '\u2190';  // ←
+        }
+        if (Keys.isRight(key)) {
+            return '\u2192';  // →
+        }
+        if (Keys.isUp(key)) {
+            return '\u2191';  // ↑
+        }
+        if (Keys.isDown(key)) {
+            return '\u2193';  // ↓
+        }
+        if (Keys.isHome(key)) {
+            return '\u21B6';  // ↶
+        }
+        if (Keys.isEnd(key)) {
+            return '\u21B7';  // ↷
+        }
+        
         // Control characters contain only letters and numbers
         if (key.length > 1 && /[a-zA-Z0-9]/.test(key)) {
             return null;
