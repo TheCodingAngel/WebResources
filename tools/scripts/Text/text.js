@@ -45,6 +45,7 @@ class TextApi {
         {language: "Shrug string", text: "¯\\_(ツ)_/¯"},
         {language: "Music", text: "𝄞𝄢𝄰♩♪♫♬𝅗𝆋𝅘𝆇𝅝𝅗𝅥𝆱𝅘𝅥𝆲𝅘𝅥𝅮𝅘𝅥𝅯𝅘𝅥𝅰𝅘𝅥𝅱𝅘𝅥𝅲𝆔𝆕"},
         {language: "Zalgo", text: "Z͑ͫ̓ͪ̂ͫ̽͏̴̙̤̞͉͚̯̞̠͍A̴̵̜̰͔ͫ͗͢L̠ͨͧͩ͘G̴̻͈͍͔̹̑͗̎̅͛́Ǫ̵̹̻̝̳͂̌̌͘!͖̬̰̙̗̿̋ͥͥ̂ͣ̐́́͜͞"},
+        //{language: "Zalgo", text: "͑ͫ̓ͪ̂ͫ̽͏̴̙̤̞͉͚̯̞̠͍Z̴̵̜̰͔ͫ͗͢A̠ͨͧͩ͘L̴̻͈͍͔̹̑͗̎̅͛́G̵̨̹̻̝̳͂̌̌͘O͖̬̰̙̗̿̋ͥͥ̂ͣ̐́́͜͞!"},
     ];
     
     constructor(elementStringsId, glyphsId, modifiersId, textFieldId, codePointTreeId, radioButtonIds,
