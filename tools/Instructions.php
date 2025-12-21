@@ -196,7 +196,7 @@ the instructions here have things from
     </p>
     <p>
     Compare the 2 operands.
-    Flags are set as if <a href="#sub">subtract</a> is used.
+    Flags are set as if <a href="#sub">subtract</a> is used (but no result is set into registers or memory).
     </p>
     <br><hr><br>
     
@@ -204,8 +204,8 @@ the instructions here have things from
     <h4>C - CMPS</h4>
     </p>
     <p>
-    Compare Strings identified by the 2 operands.<br><br>
-    Flags are set as if <a href="#sub">subtract</a> is used on each corresponding characters.<br><br>
+    Compare Strings identified by addresses given by the 2 operands.<br><br>
+    Flags are set as if <a href="#sub">subtract</a> is used on each corresponding characters (but no result is set into registers or memory).<br><br>
     <a name="scas">ECX contains</a> the length of the strings.<br>
     When the instruction finishes ECX is set to the index of the first non equal character.
     </p>
@@ -220,7 +220,7 @@ the instructions here have things from
     When the instruction finishes, ECX is set to the index of the first character that is one of the characters in the second operand.<br><br>
     The first character of the second operand (the most significant character) determines how many characters should be used in the search.
     It could be 1, 2 or 3 and the characters start from the last (or the least significant) one.<br><br>
-    <a name="jmp">When none</a> of the characters is found the IsOverflown flag is set (and ECX is set to 0).
+    <a name="jmp">When none</a> of the characters is found the <strong>"Is Overflown"</strong> flag is set (and ECX is set to 0).
     </p>
     <br><hr><br>
     
@@ -238,7 +238,8 @@ the instructions here have things from
     </p>
     <p>
     Jump if Equal to an address from the first operand.<br><br>
-    <a name="jne">The condition</a> is to have both "Is Negative" and "Is Positive" flags set to 0 (or false).<br><br>
+    <a name="jne">The condition</a> is to have both <strong>"Is Negative"</strong> and
+    <strong>"Is Positive"</strong> flags set to 0 (or false).<br><br>
     No second operand.
     </p>
     <br><hr><br>
@@ -248,7 +249,8 @@ the instructions here have things from
     </p>
     <p>
     Jump if Not Equal to an address from the first operand.<br><br>
-    <a name="jl">The condition</a> is to have either "Is Negative" or "Is Positive" flags set to 1 (or true).<br><br>
+    <a name="jl">The condition</a> is to have either <strong>"Is Negative"</strong> or
+    <strong>"Is Positive"</strong> flags set to 1 (or true).<br><br>
     No second operand.
     </p>
     <br><hr><br>
@@ -258,7 +260,7 @@ the instructions here have things from
     </p>
     <p>
     Jump if Less to an address from the first operand.<br><br>
-    <a name="jg">The condition</a> is to have the "Is Negative" flag set to 1 (or true).<br><br>
+    <a name="jg">The condition</a> is to have the <strong>"Is Negative"</strong> flag set to 1 (or true).<br><br>
     No second operand.
     </p>
     <br><hr><br>
@@ -268,7 +270,7 @@ the instructions here have things from
     </p>
     <p>
     Jump if Greater to an address from the first operand.<br><br>
-    <a name="jle">The condition</a> is to have the "Is Positive" flag set to 1 (or true).<br><br>
+    <a name="jle">The condition</a> is to have the <strong>"Is Positive"</strong> flag set to 1 (or true).<br><br>
     No second operand.
     </p>
     <br><hr><br>
@@ -278,7 +280,7 @@ the instructions here have things from
     </p>
     <p>
     Jump if Less or Equal to an address from the first operand.<br><br>
-    <a name="jge">The condition</a> is to have the "Is Positive" flag set to 0 (or false).<br><br>
+    <a name="jge">The condition</a> is to have the <strong>"Is Positive"</strong> flag set to 0 (or false).<br><br>
     No second operand.
     </p>
     <br><hr><br>
@@ -288,7 +290,7 @@ the instructions here have things from
     </p>
     <p>
     Jump if Greater or Equal to an address from the first operand.<br><br>
-    <a name="jo">The condition</a> is to have the "Is Negative" flag set to 0 (or false).<br><br>
+    <a name="jo">The condition</a> is to have the <strong>"Is Negative"</strong> flag set to 0 (or false).<br><br>
     No second operand.
     </p>
     <br><hr><br>
@@ -298,7 +300,7 @@ the instructions here have things from
     </p>
     <p>
     Jump if Overflown to an address from the first operand.<br><br>
-    <a name="int">The condition</a> is to have the "Is Overflown" flag set to 1 (or true).<br><br>
+    <a name="int">The condition</a> is to have the <strong>"Is Overflown"</strong> flag set to 1 (or true).<br><br>
     No second operand.
     </p>
     <br><hr><br>
@@ -416,7 +418,10 @@ the instructions here have things from
     Add the value identified by the second operand
     to a value at an address or a register identified by the first operand.<br><br>
     <a name="sub">The first</a> operand determines where the result is stored.<br><br>
-    The flags for positive and negative result are affected appropriately.
+    The <strong>"Is Negative"</strong> and <strong>"Is Positive"</strong> flags are set appropriately.
+    Both flags are set to 1 (or true) to indicate an error (such as using a negative value for an address).<br><br>
+    The <strong>"Is Overflown"</strong> flag is set to 1 (true) if the result value has more digits
+    than the number of characters allowed for it (4 for a register and the value of ECX for pointers / addresses).
     </p>
     <br><hr><br>
     
@@ -427,7 +432,10 @@ the instructions here have things from
     Subtract the value identified by the second operand
     from a value at an address or a register identified by the first operand.<br><br>
     <a name="mul">The first</a> operand determines where the result is stored.<br><br>
-    The flags for positive and negative result are affected appropriately.
+    The <strong>"Is Negative"</strong> and <strong>"Is Positive"</strong> flags are set appropriately.
+    Both flags are set to 1 (or true) to indicate an error (such as using a negative value for an address).<br><br>
+    The <strong>"Is Overflown"</strong> flag is set to 1 (true) if the result value has more digits
+    than the number of characters allowed for it (4 for a register and the value of ECX for pointers / addresses).
     </p>
     <br><hr><br>
     
@@ -438,7 +446,10 @@ the instructions here have things from
     Multiply the value identified by the second operand,
     by a value at an address or a register identified by the first operand.<br><br>
     <a name="div">The first</a> operand determines where the result is stored.<br><br>
-    The flags for positive and negative result are affected appropriately.
+    The <strong>"Is Negative"</strong> and <strong>"Is Positive"</strong> flags are set appropriately.
+    Both flags are set to 1 (or true) to indicate an error (such as using a negative value for an address).<br><br>
+    The <strong>"Is Overflown"</strong> flag is set to 1 (true) if the result value has more digits
+    than the number of characters allowed for it (4 for a register and the value of ECX for pointers / addresses).
     </p>
     <br><hr><br>
     
@@ -449,7 +460,9 @@ the instructions here have things from
     Integer division of the value at an address or a register identified by the first operand, by
     the value identified by the second operand.<br><br>
     <a name="mod">The first</a> operand determines where the result is stored.<br><br>
-    The flags for positive and negative result are affected appropriately.
+    The <strong>"Is Negative"</strong> and <strong>"Is Positive"</strong> flags are set appropriately.
+    Both flags are set to 1 (or true) to indicate an error (such as using a negative value for an address).<br><br>
+    Note - dividing by zero generates an error (interrupt 0).
     </p>
     <br><hr><br>
     
@@ -460,7 +473,8 @@ the instructions here have things from
     Modulo (the remainder after an integer division) of the value at an address or a register identified by the first operand, by
     the value identified by the second operand.<br><br>
     <a name="inc">The first</a> operand determines where the result is stored.<br><br>
-    The flags for positive and negative result are affected appropriately.
+    The <strong>"Is Negative"</strong> and <strong>"Is Positive"</strong> flags are set appropriately.
+    Both flags are set to 1 (or true) to indicate an error (such as using a negative value for an address).
     </p>
     <br><hr><br>
     
@@ -469,7 +483,11 @@ the instructions here have things from
     </p>
     <p>
     Increment (add 1) to a value at an address or a register identified by the first operand.<br>
-    The second operand is not used.
+    The second operand is not used.<br><br>
+    The <strong>"Is Negative"</strong> and <strong>"Is Positive"</strong> flags are set appropriately.
+    Both flags are set to 1 (or true) to indicate an error (such as using a negative value for an address).<br><br>
+    The <strong>"Is Overflown"</strong> flag is set to 1 (true) if the result value has more digits
+    than the number of characters allowed for it (4 for a register and the value of ECX for pointers / addresses).
     </p>
     <br><hr><br>
     
@@ -478,7 +496,11 @@ the instructions here have things from
     </p>
     <p>
     Decrement (subtract 1) from a value at an address or a register identified by the first operand.<br>
-    The second operand is not used.
+    The second operand is not used.<br><br>
+    The <strong>"Is Negative"</strong> and <strong>"Is Positive"</strong> flags are set appropriately.
+    Both flags are set to 1 (or true) to indicate an error (such as using a negative value for an address).<br><br>
+    The <strong>"Is Overflown"</strong> flag is set to 1 (true) if the result value has more digits
+    than the number of characters allowed for it (4 for a register and the value of ECX for pointers / addresses).
     </p>
     <br><hr><br>
     
@@ -494,7 +516,7 @@ the instructions here have things from
     </ul>
     <br>
     <br>
-    The <strong>"Is Overflown"</strong> flag is set if not all characters could be read.
+    The <strong>"Is Overflown"</strong> flag is set to 1 (true) if not all characters could be read.
     </p>
     <br><hr><br>
     
@@ -509,7 +531,7 @@ the instructions here have things from
     <li>Port 2 is the Teleprinter (an input and output device).</li>
     </ul>
     <br>
-    The <strong>"Is Overflown"</strong> flag is set if not all characters could be sent.
+    The <strong>"Is Overflown"</strong> flag is set to 1 (true) if not all characters could be sent.
     </p>
 </div>
 
