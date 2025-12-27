@@ -188,7 +188,7 @@ $page = new Page('..');
       <div id="cpuSection" class="section-cpu flex-stretch-ortogonal bg_slight cpu_area">
         <div id="cpuHeader" class="cpu-header flex-row flex-stretch-ortogonal link_style">
           <h3 class="section-header flex-pos-ortogonal-center">CPU (<a href="https://en.wikipedia.org/wiki/I386">~i386</a>):</h3>
-          <a id="instructionReference" href="Instructions.php" class="instruction-reference flex-space-left">Instructions reference</a>
+          <a id="instructionReference" href="Instructions" class="instruction-reference flex-space-left">Instructions reference</a>
           <button class="button button_style" onclick="cpu.reset()">Reset</button>
         </div>
         <div id="operationsPanel" class="operations-panel flex-row cpu_align">

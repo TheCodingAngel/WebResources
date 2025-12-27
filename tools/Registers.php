@@ -50,7 +50,7 @@ $page = new Page('..');
 
 <div class="introduction">
 <h1 class="section-header flex-pos-ortogonal-center">CPU Registers for
-my <a href="Computer.php">simple</a> and <a href="Computer-Full.php">full</a> emulators<br>
+my <a href="Computer">simple</a> and <a href="Computer-Full">full</a> emulators<br>
 (a mixture of <a href="https://en.wikipedia.org/wiki/I386">Intel 386</a> and
 <a href="http://feb-patrimoine.com/english/rca_computers.htm">RCA-301</a>).</h1>
 <br>
@@ -74,7 +74,7 @@ my <a href="Computer.php">simple</a> and <a href="Computer-Full.php">full</a> em
         <tr>
           <td>EIP</td>
           <td>0004</td>
-          <td>Instruction Pointer - address of the first character of the next <a href="Instructions.php">instruction</a>.</td>
+          <td>Instruction Pointer - address of the first character of the next <a href="Instructions">instruction</a>.</td>
         </tr>
         <tr>
           <td>EAX</td>

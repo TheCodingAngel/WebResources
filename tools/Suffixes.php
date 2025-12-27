@@ -50,14 +50,14 @@ $page = new Page('..');
 
 <div class="introduction">
 <h1 class="section-header flex-pos-ortogonal-center">Instruction Suffixes for
-my <a href="Computer.php">simple</a> and <a href="Computer-Full.php">full</a> emulators<br>
+my <a href="Computer">simple</a> and <a href="Computer-Full">full</a> emulators<br>
 (a mixture of <a href="https://en.wikipedia.org/wiki/I386">Intel 386</a> and
 <a href="http://www.feb-patrimoine.com/projet/gamma30/rca_301.htm">RCA-301</a>).</h1>
 <br>
 </div>
 
 <div id="registers" class="section section-content">
-  <p>Note - space is the default suffix and its meaning depends on the <a href="Instructions.php">instruction</a>.</p>
+  <p>Note - space is the default suffix and its meaning depends on the <a href="Instructions">instruction</a>.</p>
 </div>
 
 <div id="registers" class="section flex-column">
@@ -75,11 +75,11 @@ my <a href="Computer.php">simple</a> and <a href="Computer-Full.php">full</a> em
       <tbody>
         <tr>
           <td>R</td>
-          <td>The operand contains a <a href="Registers.php">register identifier</a> and the register contains the value.</td>
+          <td>The operand contains a <a href="Registers">register identifier</a> and the register contains the value.</td>
         </tr>
         <tr>
           <td>A</td>
-          <td>The operand contains a <a href="Registers.php">register identifier</a> and the register contains the memory address where the value is.</td>
+          <td>The operand contains a <a href="Registers">register identifier</a> and the register contains the memory address where the value is.</td>
         </tr>
         <tr>
           <td>V</td>

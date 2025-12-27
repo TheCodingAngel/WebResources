@@ -50,7 +50,7 @@ $page = new Page('..');
 
 <div class="introduction">
 <h1 class="section-header flex-pos-ortogonal-center">The instructions for
-my <a href="Computer.php">simple</a> and <a href="Computer-Full.php">full</a> emulators<br>
+my <a href="Computer">simple</a> and <a href="Computer-Full">full</a> emulators<br>
 (a mixture of <a href="https://en.wikipedia.org/wiki/I386">Intel 386</a> and
 <a href="https://jnorthr.wordpress.com/2013/02/02/my-first-computer/">RCA-301</a>).</h1>
 <br>
@@ -112,7 +112,7 @@ my <a href="Computer.php">simple</a> and <a href="Computer-Full.php">full</a> em
 An instruction consists of 10 characters no matter how many operands it requires:
 <ul>
 <li>1 character - operation code (opcode)</li>
-<li>1 character - <a href="Suffixes.php">suffix</a></li>
+<li>1 character - <a href="Suffixes">suffix</a></li>
 <li>4 characters - first operand</li>
 <li>4 characters - second operand</li>
 </ul>
@@ -120,17 +120,17 @@ An instruction consists of 10 characters no matter how many operands it requires
 <br>
 
 <p>
-Depending on the <a href="Suffixes.php">suffix</a> the operands may be treated as values,
-<a href="Registers.php">register identifiers</a> or memory addresses.
+Depending on the <a href="Suffixes">suffix</a> the operands may be treated as values,
+<a href="Registers">register identifiers</a> or memory addresses.
 </p>
 <br>
 
 <p>
 The amount of characters that are handled by an instruction is:
 <ul>
-<li>in the <a href="Registers.php">counter register</a> (ECX) for <a href="Suffixes.php">addresses or pointers</a>;<br>
+<li>in the <a href="Registers">counter register</a> (ECX) for <a href="Suffixes">addresses or pointers</a>;<br>
 if ECX has zero or an invalid number then a default value of 4 is used;</li>
-<li>the register size for <a href="Registers.php">register identifiers</a>;</li>
+<li>the register size for <a href="Registers">register identifiers</a>;</li>
 <li>4 characters for values (which is the size of an operand)</li>
 </ul>
 </p>
@@ -145,7 +145,7 @@ Big endian is used for ordering the digits of a multidigit decimal number.
 <p>
 The first line of each description is: <strong>[opcode] - [mnemonic]</strong>.<br>
 <a name="nop">The opcodes</a> use always capital letters.<br>
-The mnemonics are <a href="Computer-Full.php">used by the Assembly</a> and both capital and small letters are valid.<br>
+The mnemonics are <a href="Computer-Full">used by the Assembly</a> and both capital and small letters are valid.<br>
 Even though similar to the
 <a href="https://edge.edx.org/c4x/BITSPilani/EEE231/asset/8086_family_Users_Manual_1_.pdf">x86 instruction set</a>
 the instructions here have things from
@@ -417,10 +417,10 @@ the instructions here have things from
     <p>
     Add the value identified by the second operand
     to a value at an address or a register identified by the first operand.<br><br>
-    <a name="sub">The first</a> operand determines where the result is stored.<br><br>
+    The first operand determines where the result is stored.<br><br>
     The <strong>"Is Negative"</strong> and <strong>"Is Positive"</strong> flags are set appropriately.
     Both flags are set to 1 (or true) to indicate an error (such as using a negative value for an address).<br><br>
-    The <strong>"Is Overflown"</strong> flag is set to 1 (true) if the result value has more digits
+    <a name="sub">The</a> <strong>"Is Overflown"</strong> flag is set to 1 (true) if the result value has more digits
     than the number of characters allowed for it (4 for a register and the value of ECX for pointers / addresses).
     </p>
     <br><hr><br>
