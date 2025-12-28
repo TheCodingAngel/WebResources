@@ -8,8 +8,8 @@ class Wizard extends WizardBase {
             new WizardActionOpacity(["instructionReference"]),
             new WizardActionOpacity(["registersSection", "controlSection"]),
             new WizardActionOpacity(["teleprinterSection"]),
-            new WizardActionLayout(["memoryScrolling"]),
-            new WizardActionLayout(["memoryEditing"]),
+            new WizardActionOpacity(["memoryScrolling"]),
+            new WizardActionOpacity(["memoryEditing"]),
             new WizardActionLayout(["punchReaderWrap", "resizerInput"]),
             new WizardActionLayout(["siteHeader", "pageHeader", "pageFooter"]),
             
