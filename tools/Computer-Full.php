@@ -188,7 +188,8 @@ $page = new Page('..');
       <div id="cpuSection" class="section-cpu flex-stretch-ortogonal bg_slight cpu_area">
         <div id="cpuHeader" class="cpu-header flex-row flex-stretch-ortogonal link_style">
           <h3 class="section-header flex-pos-ortogonal-center">CPU (<a href="https://en.wikipedia.org/wiki/I386">~i386</a>):</h3>
-          <a id="instructionReference" href="Instructions" class="instruction-reference flex-space-left">Instructions reference</a>
+          <?php $page->printInternalLink("Instructions reference", "Instructions", "instructionReference", "instruction-reference flex-space-left"); ?>
+
           <button class="button button_style" onclick="cpu.reset()">Reset</button>
         </div>
         <div id="operationsPanel" class="operations-panel flex-row cpu_align">
@@ -249,7 +250,7 @@ $page = new Page('..');
               <table id="registersPointers" class="clear-table table_inner">
                 <thead>
                   <tr>
-                    <th class="table-header" role="columnheader" colspan="5"><a href="Registers" class="hyper-link">Pointers</a></th>
+                    <th class="table-header" role="columnheader" colspan="5"><?php $page->printInternalLink("Pointers", "Registers", null, "hyper-link"); ?></th>
                   </tr>
                 </thead>
                 <tbody id="REGS_POINTERS">
@@ -289,7 +290,7 @@ $page = new Page('..');
               <table id="registersGeneral" class="clear-table table_inner">
                 <thead>
                   <tr>
-                    <th class="table-header" role="columnheader" colspan="5"><a href="Registers" class="hyper-link">Registers</a></th>
+                    <th class="table-header" role="columnheader" colspan="5"><?php $page->printInternalLink("Registers", "Registers", null, "hyper-link"); ?></th>
                   </tr>
                 </thead>
                 <tbody id="REGS_GENERAL" class="table_round">

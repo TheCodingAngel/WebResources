@@ -84,6 +84,18 @@ class Page
         print($this->getCssLink($pathRelativeToPage . $fontsFileName) . "\n");
     }
     
+    public function printInternalLink($text, $ref, $id = null, $class = null)
+    {
+        $link = is_null($id) ? "<a" : "<a id=\"{$id}\"";
+        $extension = $this->isOffline() ? '.html' : '';
+        $link .= " href=\"{$ref}{$extension}\"";
+        if (!is_null($class))
+        {
+            $link .= " class=\"{$class}\"";
+        }
+        print($link . ">{$text}</a>");
+    }
+    
     public function printImagePath($imageFileName)
     {
         $baseDir = $this->isOffline() ?

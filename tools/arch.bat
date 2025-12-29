@@ -49,12 +49,57 @@ for %%s in (%SCR_Common%) do (
 )
 
 
+set "FN_Instructions=Instructions"
+echo %FN_Instructions%.zip
+%PHP% %FN_Instructions%.php offline > %FN_Instructions%.html
+%ARCH% --exclude-vcs ^
+  -acf "arch\%FN_Instructions%.zip" ^
+  "%FN_Instructions%.html" ^
+  "scripts\_Common\base.css" ^
+  "scripts\_Common\fonts_local.css" ^
+  "scripts\_Common\responsive.css" ^
+  "scripts\_Common\style.css" ^
+  "scripts\Computer\documentation.css" ^
+  "fonts\*.*" ^
+  "images\*.*"
+
+set "FN_Registers=Registers"
+echo %FN_Registers%.zip
+%PHP% %FN_Registers%.php offline > %FN_Registers%.html
+%ARCH% --exclude-vcs ^
+  -acf "arch\%FN_Registers%.zip" ^
+  "%FN_Registers%.html" ^
+  "scripts\_Common\base.css" ^
+  "scripts\_Common\fonts_local.css" ^
+  "scripts\_Common\responsive.css" ^
+  "scripts\_Common\style.css" ^
+  "scripts\Computer\documentation.css" ^
+  "fonts\*.*" ^
+  "images\*.*"
+
+set "FN_Suffixes=Suffixes"
+echo %FN_Suffixes%.zip
+%PHP% %FN_Suffixes%.php offline > %FN_Suffixes%.html
+%ARCH% --exclude-vcs ^
+  -acf "arch\%FN_Suffixes%.zip" ^
+  "%FN_Suffixes%.html" ^
+  "scripts\_Common\base.css" ^
+  "scripts\_Common\fonts_local.css" ^
+  "scripts\_Common\responsive.css" ^
+  "scripts\_Common\style.css" ^
+  "scripts\Computer\documentation.css" ^
+  "fonts\*.*" ^
+  "images\*.*"
+
 set "FN_Computer=Computer"
 echo %FN_Computer%.zip
 %PHP% %FN_Computer%.php offline > %FN_Computer%.html
 %ARCH% --exclude-vcs --exclude "wizard_full.js" --exclude "assembler.js" --exclude "*_demo.*" ^
   -acf "arch\%FN_Computer%.zip" ^
   "%FN_Computer%.html" ^
+  "%FN_Instructions%.html" ^
+  "%FN_Registers%.html" ^
+  "%FN_Suffixes%.html" ^
   "scripts\_Common\base.css" ^
   "scripts\_Common\fonts_local.css" ^
   "scripts\_Common\responsive.css" ^
@@ -72,6 +117,9 @@ echo %FN_Computer_FULL%.zip
 %ARCH% --exclude-vcs --exclude "wizard.js" --exclude "*_demo.*" ^
   -acf "arch\%FN_Computer_FULL%.zip" ^
   "%FN_Computer_FULL%.html" ^
+  "%FN_Instructions%.html" ^
+  "%FN_Registers%.html" ^
+  "%FN_Suffixes%.html" ^
   "scripts\_Common\base.css" ^
   "scripts\_Common\fonts_local.css" ^
   "scripts\_Common\responsive.css" ^
@@ -163,13 +211,15 @@ set "FN_TOOLS=Tools"
 echo %FN_TOOLS%.zip
 %ARCH% --exclude-vcs --exclude "*_demo.*" --exclude "fonts.css" ^
   -acf "arch\%FN_TOOLS%.zip" ^
+  "%FN_Instructions%.html" "%FN_Registers%.html" "%FN_Suffixes%.html" ^
   "%FN_Computer%.html" "%FN_Computer_FULL%.html" "%FN_CHARS%.html" ^
   "%FN_EXTENDED_ASCII%.html" "%FN_CODEPOINTS%.html" "%FN_TEXT%.html" ^
   "scripts\*.*" "data\*.*" "fonts\*.*" "images\*.*"
 
 
 
-for %%a in (%FN_Computer% %FN_Computer_FULL% %FN_CHARS% ^
+for %%a in (%FN_Instructions% %FN_Registers% %FN_Suffixes% ^
+            %FN_Computer% %FN_Computer_FULL% %FN_CHARS% ^
             %FN_EXTENDED_ASCII% %FN_CODEPOINTS% %FN_TEXT%) do (
     del /F %%a.html
 )
