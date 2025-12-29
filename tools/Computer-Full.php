@@ -249,33 +249,33 @@ $page = new Page('..');
               <table id="registersPointers" class="clear-table table_inner">
                 <thead>
                   <tr>
-                    <th class="table-header" role="columnheader" colspan="5">Pointers</th>
+                    <th class="table-header" role="columnheader" colspan="5"><a href="Registers" class="hyper-link">Pointers</a></th>
                   </tr>
                 </thead>
                 <tbody id="REGS_POINTERS">
                   <tr id="eipRow">
-                    <td id="eip" class="memory-address"><span title="Instruction Pointer">EIP</span></td>
+                    <td id="eip" class="memory-address"><span title="Instruction Pointer: 0004">EIP</span></td>
                     <td class="memory-cell">0</td>
                     <td class="memory-cell">0</td>
                     <td class="memory-cell">0</td>
                     <td class="memory-cell">0</td>
                   </tr>
                   <tr id="espRow">
-                    <td id="esp" class="memory-address"><span title="Stack Pointer">ESP</span></td>
+                    <td id="esp" class="memory-address"><span title="Stack Pointer: 0044">ESP</span></td>
                     <td class="memory-cell">0</td>
                     <td class="memory-cell">0</td>
                     <td class="memory-cell">0</td>
                     <td class="memory-cell">0</td>
                   </tr>
                   <tr id="ebpRow">
-                    <td id="ebp" class="memory-address"><span title="Base Pointer">EBP</span></td>
+                    <td id="ebp" class="memory-address"><span title="Base Pointer: 0054">EBP</span></td>
                     <td class="memory-cell">0</td>
                     <td class="memory-cell">0</td>
                     <td class="memory-cell">0</td>
                     <td class="memory-cell">0</td>
                   </tr>
                   <tr id="csRow">
-                    <td id="cs" class="memory-address"><span title="Code Segment">CS</span></td>
+                    <td id="cs" class="memory-address"><span title="Code Segment: 0064">CS</span></td>
                     <td class="memory-cell">0</td>
                     <td class="memory-cell">0</td>
                     <td class="memory-cell">0</td>
@@ -289,33 +289,33 @@ $page = new Page('..');
               <table id="registersGeneral" class="clear-table table_inner">
                 <thead>
                   <tr>
-                    <th class="table-header" role="columnheader" colspan="5">Registers</th>
+                    <th class="table-header" role="columnheader" colspan="5"><a href="Registers" class="hyper-link">Registers</a></th>
                   </tr>
                 </thead>
                 <tbody id="REGS_GENERAL" class="table_round">
                   <tr id="eaxRow">
-                    <td id="eax" class="memory-address"><span title="General Purpose Register A">EAX</span></td>
+                    <td id="eax" class="memory-address"><span title="Accumulator A (General Purpose): 0014">EAX</span></td>
                     <td class="memory-cell">0</td>
                     <td class="memory-cell">0</td>
                     <td class="memory-cell">0</td>
                     <td class="memory-cell">0</td>
                   </tr>
                   <tr id="ebxRow">
-                    <td id="ebx" class="memory-address"><span title="General Purpose Register B">EBX</span></td>
+                    <td id="ebx" class="memory-address"><span title="Accumulator B (General Purpose): 0024">EBX</span></td>
                     <td class="memory-cell">0</td>
                     <td class="memory-cell">0</td>
                     <td class="memory-cell">0</td>
                     <td class="memory-cell">0</td>
                   </tr>
                   <tr id="ecxRow">
-                    <td id="ecx" class="memory-address"><span title="General Purpose Register C (Counter)">ECX</span></td>
+                    <td id="ecx" class="memory-address"><span title="Accumulator C (Counter): 0034">ECX</span></td>
                     <td class="memory-cell">0</td>
                     <td class="memory-cell">0</td>
                     <td class="memory-cell">0</td>
                     <td class="memory-cell">0</td>
                   </tr>
                   <tr id="idtRow">
-                    <td id="idtr" class="memory-address"><span title="Interrupt Descriptor Table Register">IDTR</span></td>
+                    <td id="idtr" class="memory-address"><span title="Interrupt Descriptor Table Register: 0074">IDTR</span></td>
                     <td class="memory-cell">0</td>
                     <td class="memory-cell">0</td>
                     <td class="memory-cell">0</td>

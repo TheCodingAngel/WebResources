@@ -284,3 +284,14 @@
   position: absolute;
 }
 
+/* Less fancy than applying .link_style to a parent of the link */
+.hyper-link {
+  color: white;
+  text-decoration: none;
+  transition: all 0.3s ease-in-out;
+}
+.hyper-link:hover {
+  text-decoration: underline;
+  transition: all 0.3s ease-in-out;
+}
+
