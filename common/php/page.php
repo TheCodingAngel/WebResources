@@ -137,16 +137,30 @@ class Page
         print($this->hamburger);
     }
     
-    public function printBreadcrumb($pageName)
+    public function printBreadcrumb($pageName, $parentText = null)
     {
         $offset = '  ';
         $baseOffset = $offset . $offset;
+        $isIndex = !isset($pageName) || $pageName == '';
+        
         print($baseOffset . '<ul class="charecter_breadcrumb breadcrumb link_style">' . "\n");
-        print($baseOffset . $offset . '<li><a href="https://thecodingangel.org/">Root</a></li>' . "\n");
-        print($baseOffset . $offset . '<li>»</li>' . "\n");
-        print($baseOffset . $offset . '<li><a href="https://thecodingangel.org/tools/">Tools</a></li>' . "\n");
-        print($baseOffset . $offset . '<li>»</li>' . "\n");
-        print($baseOffset . $offset . '<li><h1 class="title">' . $pageName . '</h1></li>' . "\n");
+        
+        if ($isIndex && is_null($parentText)) {
+            print($baseOffset . $offset . '<li><h1 class="title">Root</h1></li>' . "\n");
+        } else {
+            print($baseOffset . $offset . '<li><a href="/">Root</a></li>' . "\n");
+        }
+        
+        if (!is_null($parentText)) {
+            print($baseOffset . $offset . '<li>»</li>' . "\n");
+            print($baseOffset . $offset . '<li><a href="' . $this->uriFolder . '">' . $parentText . '</a></li>' . "\n");
+        }
+        
+        if (!$isIndex) {
+            print($baseOffset . $offset . '<li>»</li>' . "\n");
+            print($baseOffset . $offset . '<li><h1 class="title">' . $pageName . '</h1></li>' . "\n");
+        }
+        
         print($baseOffset . '</ul>' . "\n");
     }
     

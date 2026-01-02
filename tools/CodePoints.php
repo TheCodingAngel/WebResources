@@ -61,7 +61,7 @@ $page = new Page('..');
 <div id="pageHeader" class="page-header flex-row flex-stretch-ortogonal navdirection">
   <div class="containertop">
 
-<?php $page->printBreadcrumb('Code Points'); ?>
+<?php $page->printBreadcrumb('Code Points', 'Tools'); ?>
 
     <div class="flex-stretch-center-children">
     </div>

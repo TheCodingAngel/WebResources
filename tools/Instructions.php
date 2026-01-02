@@ -31,7 +31,7 @@ $page = new Page('..');
 <div id="pageHeader" class="page-header flex-row flex-stretch-ortogonal navdirection">
   <div class="containertop">
 
-<?php $page->printBreadcrumb('Instructions'); ?>
+<?php $page->printBreadcrumb('Instructions', 'Tools'); ?>
 
     <div class="flex-stretch-center-children">
     </div>
