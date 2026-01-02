@@ -148,12 +148,12 @@ class Page
         if ($isIndex && is_null($parentText)) {
             print($baseOffset . $offset . '<li><h1 class="title">Root</h1></li>' . "\n");
         } else {
-            print($baseOffset . $offset . '<li><a href="/">Root</a></li>' . "\n");
+            print($baseOffset . $offset . '<li><a href="https://TheCodingAngel.org/">Root</a></li>' . "\n");
         }
         
         if (!is_null($parentText)) {
             print($baseOffset . $offset . '<li>»</li>' . "\n");
-            print($baseOffset . $offset . '<li><a href="' . $this->uriFolder . '">' . $parentText . '</a></li>' . "\n");
+            print($baseOffset . $offset . '<li><a href="https://TheCodingAngel.org' . $this->uriFolder . '">' . $parentText . '</a></li>' . "\n");
         }
         
         if (!$isIndex) {
