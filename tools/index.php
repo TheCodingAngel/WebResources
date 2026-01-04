@@ -54,8 +54,8 @@ $page = new Page('..');
 
 <div id="tools" class="section flex-column">
   <div class="gallery flex-pos-ortogonal-center">
-    <a href="Computer"><img src="/res/images/thumbnails/tools/emulator-simple-small.jpg"></img></a>
-    <a href="Computer-Full"><img src="/res/images/thumbnails/tools/emulator-full-small.jpg"></img></a>
+    <a href="Computer"><img src="/res/images/thumbnails/tools/emulator-simple.jpg"></img></a>
+    <a href="Computer-Full"><img src="/res/images/thumbnails/tools/emulator-full.jpg"></img></a>
     <div class="link_style">
       <p class="introduction">
         <strong>Documentation:</strong>
@@ -64,11 +64,11 @@ $page = new Page('..');
         <a href="Registers">Registers</a>
       </p>
     </div>
-    <div></div>
-    <a href="Characters"><img src="/res/images/thumbnails/tools/numbers-characters-small.jpg"></img></a>
-    <a href="ExtendedASCII"><img src="/res/images/thumbnails/tools/extended-ASCII-small.jpg"></img></a>
-    <a href="CodePoints"><img src="/res/images/thumbnails/tools/codepoints-small.jpg"></img></a>
-    <a href="Text"><img src="/res/images/thumbnails/tools/graphemes-small.jpg"></img></a>
+    <div><!-- second (empty) column next to the previous "Documentation" column --></div>
+    <a href="Characters"><img src="/res/images/thumbnails/tools/numbers-characters.jpg"></img></a>
+    <a href="ExtendedASCII"><img src="/res/images/thumbnails/tools/extended-ASCII.jpg"></img></a>
+    <a href="CodePoints"><img src="/res/images/thumbnails/tools/codepoints.jpg"></img></a>
+    <a href="Text"><img src="/res/images/thumbnails/tools/graphemes.jpg"></img></a>
   </div>
 </div>
 
