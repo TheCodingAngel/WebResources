@@ -22,10 +22,7 @@ body {
 
 
 .introduction {
-  margin-left: var(--margin-xs);
-  margin-right: var(--margin-xs);
-  margin-top: var(--margin-xs);
-  margin-bottom: var(--margin-xs);
+  margin: var(--margin-xs);
 }
 
 .introduction h1 {
@@ -43,6 +40,21 @@ body {
 
 .text-small {
   font-size: 10px;
+}
+
+.gallery {
+  margin: var(--margin-xs);
+  display: grid;
+  grid-template-columns: 1fr;
+  grid-column-gap: var(--margin-xs);
+}
+.gallery a {
+  margin: var(--margin-xs);
+}
+@media only screen and (min-width: 980px) {
+  .gallery {
+    grid-template-columns: 1fr 1fr;
+  }
 }
 
 .section-content {

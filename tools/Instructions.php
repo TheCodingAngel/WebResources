@@ -15,7 +15,7 @@ $page = new Page('..');
   <?php $page->printCommonCss('base.css'); ?>
   <?php $page->printFontsCss(); ?>
   
-  <link type="text/css" rel="stylesheet" href="scripts/Computer/documentation.css">
+  <?php $page->printCommonCss('document.css'); ?>
   <?php $page->printCommonCss('style.css'); ?>
   <?php $page->printCommonCss('responsive.css'); ?>
 </head>
