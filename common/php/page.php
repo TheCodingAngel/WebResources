@@ -153,7 +153,10 @@ class Page
         
         if (!is_null($parentText)) {
             print($baseOffset . $offset . '<li>»</li>' . "\n");
-            print($baseOffset . $offset . '<li><a href="https://TheCodingAngel.org' . $this->uriFolder . '">' . $parentText . '</a></li>' . "\n");
+            //$parentDir = $this->isOffline() ? '/' . strtolower($parentText) . '/' : $this->getLastDirName($this->uriFolder);
+            $parentDir = '/' . strtolower($parentText) . '/';
+            $parentLink = '<li><a href="https://TheCodingAngel.org' . $parentDir . '">' . $parentText . '</a></li>';
+            print($baseOffset . $offset . $parentLink . "\n");
         }
         
         if (!$isIndex) {
@@ -193,6 +196,15 @@ class Page
     private function getCssLink($cssFileName)
     {
         return "<link type=\"text/css\" rel=\"stylesheet\" href=\"{$cssFileName}\" />";
+    }
+    
+    private function getLastDirName($path)
+    {
+        if (strlen($path) <= 1) {
+            return $path;
+        }
+        $pos = strrpos($path, '/', -2);
+        return $pos === false ? $path : substr($path, $pos);
     }
 }
 
