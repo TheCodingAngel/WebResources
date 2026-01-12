@@ -43,7 +43,7 @@ for %%i in (%IMG_Files%) do (
 copy /Y ..\favicon.ico images > NUL 2>&1
 
 
-set SCR_Common=base.css responsive.css style.css
+set SCR_Common=base.css responsive.css style.css document.css
 for %%s in (%SCR_Common%) do (
   copy /Y ..\common\scripts\%%s scripts\_Common\ > NUL 2>&1
 )
@@ -59,7 +59,7 @@ echo %FN_Instructions%.zip
   "scripts\_Common\fonts_local.css" ^
   "scripts\_Common\responsive.css" ^
   "scripts\_Common\style.css" ^
-  "scripts\Computer\documentation.css" ^
+  "scripts\_Common\document.css" ^
   "fonts\*.*" ^
   "images\*.*"
 
@@ -73,7 +73,7 @@ echo %FN_Registers%.zip
   "scripts\_Common\fonts_local.css" ^
   "scripts\_Common\responsive.css" ^
   "scripts\_Common\style.css" ^
-  "scripts\Computer\documentation.css" ^
+  "scripts\_Common\document.css" ^
   "fonts\*.*" ^
   "images\*.*"
 
@@ -87,7 +87,7 @@ echo %FN_Suffixes%.zip
   "scripts\_Common\fonts_local.css" ^
   "scripts\_Common\responsive.css" ^
   "scripts\_Common\style.css" ^
-  "scripts\Computer\documentation.css" ^
+  "scripts\_Common\document.css" ^
   "fonts\*.*" ^
   "images\*.*"
 
@@ -225,9 +225,9 @@ for %%a in (%FN_Instructions% %FN_Registers% %FN_Suffixes% ^
 )
 
 rd /S /Q images
-del /F scripts\_Common\base.css > NUL 2>&1
-del /F scripts\_Common\responsive.css > NUL 2>&1
-del /F scripts\_Common\style.css > NUL 2>&1
+for %%s in (%SCR_Common%) do (
+  del /F scripts\_Common\%%s > NUL 2>&1
+)
 
 popd
 

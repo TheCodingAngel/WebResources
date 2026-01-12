@@ -51,6 +51,9 @@ body {
 .gallery a {
   margin: var(--margin-xs);
 }
+.gallery a:hover {
+  scale: 1.05;
+}
 @media only screen and (min-width: 980px) {
   .gallery {
     grid-template-columns: 1fr 1fr;

@@ -36,9 +36,8 @@ $page = new Page('.');
 <div id="pageContent" class="page-content">
 
 <div class="introduction">
-<h1 class="section-header flex-pos-ortogonal-center">Why are these free
-  <a href="https://thecodingangel.org/tools/">Tools</a> and
-  <a href="https://www.youtube.com/@thecodingangel/videos">Videos</a> here?</h1>
+<h1 class="section-header flex-pos-ortogonal-center">Why are these
+  <a href="https://thecodingangel.org/tools/">Free Tools</a> here?</h1>
 </div>
 
 <p><br></p>
