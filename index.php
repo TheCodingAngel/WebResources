@@ -60,8 +60,8 @@ $page = new Page('.');
 
 <div id="tools" class="section flex-column">
   <div class="gallery flex-pos-ortogonal-center">
-    <a href="Computer"><img src="/res/images/thumbnails/tools/emulator-simple.jpg"></img></a>
-    <a href="Computer-Full"><img src="/res/images/thumbnails/tools/emulator-full.jpg"></img></a>
+    <a href="Computer"><img src="./res/images/thumbnails/emulator-simple.jpg"></img></a>
+    <a href="Computer-Full"><img src="./res/images/thumbnails/emulator-full.jpg"></img></a>
     <div class="link_style">
       <p class="introduction">
         <strong>Documentation:</strong>
@@ -71,10 +71,10 @@ $page = new Page('.');
       </p>
     </div>
     <div><!-- second (empty) column next to the previous "Documentation" column --></div>
-    <a href="Characters"><img src="/res/images/thumbnails/tools/numbers-characters.jpg"></img></a>
-    <a href="ExtendedASCII"><img src="/res/images/thumbnails/tools/extended-ASCII.jpg"></img></a>
-    <a href="CodePoints"><img src="/res/images/thumbnails/tools/codepoints.jpg"></img></a>
-    <a href="Text"><img src="/res/images/thumbnails/tools/graphemes.jpg"></img></a>
+    <a href="Characters"><img src="./res/images/thumbnails/numbers-characters.jpg"></img></a>
+    <a href="ExtendedASCII"><img src="./res/images/thumbnails/extended-ASCII.jpg"></img></a>
+    <a href="CodePoints"><img src="./res/images/thumbnails/codepoints.jpg"></img></a>
+    <a href="Text"><img src="./res/images/thumbnails/graphemes.jpg"></img></a>
   </div>
 </div>
 
