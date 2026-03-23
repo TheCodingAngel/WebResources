@@ -384,11 +384,18 @@ function parseIntOrNull(str, radix = 10) {
 }
 
 function padOrCutNumber(number, charCount) {
-    if (number >= 0) {
-        return padOrCutString(number.toString(10), charCount, '0');
+    if (charCount <= 0) {
+        return "";
     }
-    number = -number;
-    return "-" + padOrCutString(number.toString(10), charCount - 1, '0');
+    
+    let str = Math.abs(number).toString(10);
+    
+    if (number < 0) {
+        charCount -= 1;
+    }
+    let res = str.length < charCount ? str.padStart(charCount, '0') : str.substr(-charCount);
+    
+    return number < 0 ? "-" + res : res;
 }
 
 function padOrCutString(str, characterCount, fill = ' ') {
