@@ -208,7 +208,7 @@ $page = new Page('..');
                 <thead>
                   <tr>
                     <th class="table-header" role="columnheader" scope="column"><span title="Not Used" class="">X</span></th>
-                    <th class="table-header" role="columnheader" scope="column"><span title="Not Used" class="">X</span></th>
+                    <th class="table-header" role="columnheader" scope="column"><span title="Is Interactive Debugging" class="">I</span></th>
                     <th class="table-header" role="columnheader" scope="column"><span title="Is Step by Step" class="">S</span></th>
                     <th class="table-header" role="columnheader" scope="column"><span title="Is Negative Direction" class="">D</span></th>
                   </tr>
@@ -216,7 +216,7 @@ $page = new Page('..');
                 <tbody id="ECONTROL" class="table_body">
                   <tr>
                     <td>X</td>
-                    <td>X</td>
+                    <td id="c4" class="memory-cell">0</td>
                     <td id="c2" class="memory-cell">0</td>
                     <td id="c1" class="memory-cell">0</td>
                   </tr>

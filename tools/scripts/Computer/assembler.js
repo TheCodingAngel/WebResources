@@ -6,6 +6,8 @@ class AssemblerError extends Error {
     }
 }
 
+var assembler = null;
+
 class Assembler {
     #input;
     #memory;
@@ -77,11 +79,24 @@ class Assembler {
             this.#mnemonics = instructions.getMnemonics();
         }
         
-        let assembler = new Assembler(io.getPunchReader(), memory, instructions);
+        if (isValid(assembler)) {
+            assembler.clear();
+        } else {
+            assembler = new Assembler(window.io.getPunchReader(), window.memory, window.instructions);
+        }
+        
         if (assembler.parseSourceStatements()) {
             if (assembler.generateCode()) {
                 alert("Assembling Successful");
+                window.cpu.debugUpdate();
             }
+        }
+    }
+    
+    selectSourceStatement(address) {
+        if (isValid(address)) {
+            let statementInfo = this._findStatement(address);
+            this._selectStatement(statementInfo);
         }
     }
     
@@ -93,6 +108,9 @@ class Assembler {
     
     clear() {
         this.#statements.splice(0);
+        
+        this.#origin = 0;
+        this.#variablesSize = 0;
         
         this.#constants.clear();
         this.#variables.clear();
@@ -185,7 +203,7 @@ class Assembler {
                 if (err instanceof AssemblerError) {
                     alert(`Error on line ${statementInfo.lineIndex}: ${err.message}:\n[${statementInfo.expression.join(", ")}]`);
                     console.log(`Error on line ${statementInfo.lineIndex} - ${err.message}: [${statementInfo.expression.join(", ")}]`);
-                    this._selectSourceLine(statementInfo.start, statementInfo.end);
+                    this._selectSourceRange(statementInfo.start, statementInfo.end);
                     if (err.stack) {
                         console.log(err.stack);
                     }
@@ -217,7 +235,7 @@ class Assembler {
             if (err instanceof AssemblerError) {
                 alert(`Error on line ${lineIndex}: ${err.message}:\n${text}`);
                 console.log(`Error on line ${lineIndex} - ${err.message}: ${text}`);
-                this._selectSourceLine(start, end);
+                this._selectSourceRange(start, end);
                 if (err.stack) {
                     console.log(err.stack);
                 }
@@ -669,12 +687,26 @@ class Assembler {
     
     _selectStatement(statementInfo) {
         if (isValid(statementInfo)) {
-            this._selectSourceLine(statementInfo.start, statementInfo.end);
+            this._selectSourceRange(statementInfo.start, statementInfo.end);
         }
     }
     
-    _selectSourceLine(start, end) {
+    _selectSourceRange(start, end) {
         this.#input.focus();
         this.#input.setSelectionRange(start, end);
+    }
+    
+    _findStatement(address) {
+        // No binary search - this.#statements is not sorted by address (the variables are before the instructions)
+        
+        //let index = binarySearch(this.#statements, address, (addr, item) => addr - item.memoryAddress);
+        //return index < 0 ? null : this.#statements[index];
+        
+        for (let statementInfo of this.#statements) {
+            if (statementInfo.memoryAddress === address) {
+                return statementInfo;
+            }
+        }
+        return null;
     }
 }

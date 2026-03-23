@@ -39,7 +39,8 @@ class CPU {
         None: 0x00,
         NegativeDirection: 0x01,
         StepByStep: 0x02,
-        All: 0x03
+        InteractiveDebugging: 0x04,
+        All: 0x07
     }
     
     // Multiply by 4 to get the address offset
@@ -117,7 +118,7 @@ class CPU {
     
     reset() {
         this.setFlags(false, false, false);
-        this.setControl(false, false);
+        this.setControl(false, false, false);
         
         this.setRegisterValueById(CPU.#codeSegmentId, CPU.#invalidPointerValue);
         this.setInstructionPointer(CPU.#defaultPointerValue);
@@ -146,6 +147,12 @@ class CPU {
 
     setInstructionPointer(newAddress) {
         this.setRegisterValueById(CPU.#instructionPointerId, newAddress);
+    }
+    
+    debugUpdate() {
+        if (this.isControlSet(CPU.ControlMask.InteractiveDebugging)) {
+            this._onDebugUpdate();
+        }
     }
 
     setAutoScrollToNextInstruction(autoScroll) {
@@ -199,7 +206,8 @@ class CPU {
         
         let control = parseIntOrZero(strValues.slice(-2));
         this.setControl(isMaskSet(control, CPU.ControlMask.All, CPU.ControlMask.NegativeDirection),
-                        isMaskSet(control, CPU.ControlMask.All, CPU.ControlMask.StepByStep));
+                        isMaskSet(control, CPU.ControlMask.All, CPU.ControlMask.StepByStep),
+                        isMaskSet(control, CPU.ControlMask.All, CPU.ControlMask.InteractiveDebugging));
     }
 
     setFlags(isPositive, isNegative, isOverflown) {
@@ -212,9 +220,13 @@ class CPU {
         return isMaskSet(this.#flags, CPU.FlagsMask.All, flagsMask);
     }
 
-    setControl(isNegativeDirection, isStepByStep) {
+    setControl(isNegativeDirection, isStepByStep, isInteractiveDebugging) {
         this.#control = this._setMask(this.#control, CPU.#PopupType.Control, CPU.ControlMask.NegativeDirection, isNegativeDirection);
         this.#control = this._setMask(this.#control, CPU.#PopupType.Control, CPU.ControlMask.StepByStep, isStepByStep);
+        this.#control = this._setMask(this.#control, CPU.#PopupType.Control, CPU.ControlMask.InteractiveDebugging, isInteractiveDebugging);
+        if (isInteractiveDebugging) {
+            this._onDebugUpdate();
+        }
     }
 
     isControlSet(controlMask) {
@@ -455,6 +467,9 @@ class CPU {
             let oldAddress = this.#registers.get(CPU.#instructionPointerId).value;
             this.#memory.markAddresses(this.logicalToPhysicalAddress(oldAddress), CPU.instructionSize, Memory.markType.NextInstruction, false);
             this.#memory.markAddresses(this.logicalToPhysicalAddress(value), CPU.instructionSize, Memory.markType.NextInstruction, true);
+            if (this.isControlSet(CPU.ControlMask.InteractiveDebugging)) {
+                this._onDebugUpdate(value);
+            }
         }
         
         if (registerId == CPU.#codeSegmentId) {
@@ -473,6 +488,19 @@ class CPU {
             (registerId == CPU.#instructionPointerId || registerId == CPU.#codeSegmentId)) {
             this._scrollInstructionIntoView();
         }
+    }
+    
+    _onDebugUpdate(address = null) {
+        // A page may not include the assembler script which means its global variable may not be defined.
+        // Note - the global variable is not null only if an actual assembling was done.
+        if (!isValid(window.assembler)) {
+            return;
+        }
+        
+        if (!isValid(address)) {
+            address = this.getInstructionPointer();
+        }
+        window.assembler.selectSourceStatement(address);
     }
     
     _updateRegisterView(rowElement, stringValue) {
@@ -515,7 +543,11 @@ class CPU {
             switch (popupType) {
                 case CPU.#PopupType.Control:
                     this._setCellFlag(cell, isSet);
-                    this.#control = setMask(this.#control, CPU.ControlMask.All, parseIntOrZero(cell.id.substring(1)), isSet);
+                    let specificMask = parseIntOrZero(cell.id.substring(1));
+                    this.#control = setMask(this.#control, CPU.ControlMask.All, specificMask, isSet);
+                    if (specificMask == CPU.ControlMask.InteractiveDebugging && isSet) {
+                        this._onDebugUpdate();
+                    }
                     break;
                 case CPU.#PopupType.Flags:
                     this._setCellFlag(cell, isSet);
@@ -538,7 +570,9 @@ class CPU {
     }
 
     _setCellFlag(cell, isSet) {
-        cell.childNodes[0].nodeValue = isSet ? "1" : "0";
+        if (isValid(cell)) {
+            cell.childNodes[0].nodeValue = isSet ? "1" : "0";
+        }
     }
 
     _isGeneralPurposeRegister(registerId) {
