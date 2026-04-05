@@ -596,6 +596,10 @@ button.button_style:hover {
   margin-right: 0;
 }
 
+.toolbar-horizontal a {
+  cursor: pointer;
+}
+
 .link_style a {
   color: #5350b1;
   text-decoration: none;

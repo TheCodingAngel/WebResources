@@ -134,14 +134,16 @@ my <?php $page->printInternalLink("simple", "Computer"); ?> and <?php $page->pri
           <td>ESP</td>
           <td>0044</td>
           <td>Stack Pointer - auto-changing address of the head of the stack:<br>
-            - <a href="Instructions#push">PUSH</a> decrements it before writing data at the address in it;<br>
-            - <a href="Instructions#pop">POP</a> increments it back.
+            - <?php $page->printInternalLink("PUSH", "Instructions", null, "push"); ?> decrements it before writing data at the address in it;<br>
+            - <?php $page->printInternalLink("POP", "Instructions", null, "pop"); ?> increments it back.
           <br><br>
           Return addresses from subroutines are automatically pushed in the stack and popped from it
-          (by the <a href="Instructions#call">CALL</a> and <a href="Instructions#ret">RET</a> instructions).
+          (by the <?php $page->printInternalLink("CALL", "Instructions", null, "call"); ?> and
+          <?php $page->printInternalLink("RET", "Instructions", null, "ret"); ?> instructions).
           <br><br>
-          Registers are automatically saved and restored when handling interrupts
-          (by the <a href="Instructions#int">INT</a> and <a href="Instructions#iret">IRET</a> instructions).
+          All registers are automatically saved and restored when handling interrupts
+          (by the <?php $page->printInternalLink("INT", "Instructions", null, "int"); ?> and
+          <?php $page->printInternalLink("IRET", "Instructions", null, "iret"); ?> instructions).
           <br><br>
           Initially, marks the end of a <strong>process</strong> (after loading a program from a storage into the memory).</td>
         </tr>

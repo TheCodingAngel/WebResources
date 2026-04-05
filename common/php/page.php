@@ -84,10 +84,20 @@ class Page
         print($this->getCssLink($pathRelativeToPage . $fontsFileName) . "\n");
     }
     
-    public function printInternalLink($text, $ref, $id = null, $class = null)
+    public function printInternalLink($text, $ref, $query = null, $fragment = null, $id = null, $class = null)
     {
         $link = is_null($id) ? "<a" : "<a id=\"{$id}\"";
+        
         $extension = $this->isOffline() ? '.html' : '';
+        if (!is_null($query))
+        {
+            $extension .= "?{$query}";
+        }
+        if (!is_null($fragment))
+        {
+            $extension .= "#{$fragment}";
+        }
+        
         $link .= " href=\"{$ref}{$extension}\"";
         if (!is_null($class))
         {

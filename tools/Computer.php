@@ -60,7 +60,7 @@ $page = new Page('..');
     </div>
     <div class="toolbar-horizontal">
       <!--
-      <a href="#" onclick="io.onShowConfigurationDialog()">
+      <a onclick="io.onShowConfigurationDialog()">
         <svg width="24" height="24" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
           <title>I/O Configuration</title>
           <path d="M192,320H320V192H192Zm32-96h64v64H224Z" class="ci-primary"/>
@@ -194,7 +194,7 @@ $page = new Page('..');
       <div id="cpuSection" class="section-cpu flex-stretch-ortogonal bg_slight cpu_area">
         <div id="cpuHeader" class="cpu-header flex-row flex-stretch-ortogonal link_style">
           <h3 class="section-header flex-pos-ortogonal-center">CPU (<a href="https://en.wikipedia.org/wiki/I386">~i386</a>):</h3>
-          <?php $page->printInternalLink("Instructions reference", "Instructions", "instructionReference", "instruction-reference flex-space-left"); ?>
+          <?php $page->printInternalLink("Instructions reference", "Instructions", null, null, "instructionReference", "instruction-reference flex-space-left"); ?>
 
           <button class="button button_style" onclick="cpu.reset()">Reset</button>
         </div>
@@ -256,7 +256,7 @@ $page = new Page('..');
               <table id="registersPointers" class="clear-table table_inner">
                 <thead>
                   <tr>
-                    <th class="table-header" role="columnheader" colspan="5"><?php $page->printInternalLink("Pointers", "Registers", null, "hyper-link"); ?></th>
+                    <th class="table-header" role="columnheader" colspan="5"><?php $page->printInternalLink("Pointers", "Registers", null, null, null, "hyper-link"); ?></th>
                   </tr>
                 </thead>
                 <tbody id="REGS_POINTERS">
@@ -296,7 +296,7 @@ $page = new Page('..');
               <table id="registersGeneral" class="clear-table table_inner">
                 <thead>
                   <tr>
-                    <th class="table-header" role="columnheader" colspan="5"><?php $page->printInternalLink("Registers", "Registers", null, "hyper-link"); ?></th>
+                    <th class="table-header" role="columnheader" colspan="5"><?php $page->printInternalLink("Registers", "Registers", null, null, null, "hyper-link"); ?></th>
                   </tr>
                 </thead>
                 <tbody id="REGS_GENERAL" class="table_round">
