@@ -13,13 +13,17 @@ class Memory {
     #selectedAddressEnd = -1;
     #columnCount = 10;
     #rowCount = 1000;
+    
+    #memoryReadCallback = null;
+    #memorySetCallback = null;
+    #memoryClearCallback = null;
 
     static markType = {
         NoMark: 0x00,
         Selected: 0x01,
         NextInstruction: 0x02,
-        Value: 0x04,
-        Label: 0x08,
+        DescriptorTable: 0x04,
+        MmioBuffer: 0x08,
         All: 0x0f
     };
 
@@ -165,6 +169,12 @@ class Memory {
         this.#addressEndInput.value = this.#selectedAddressEnd;
     }
     
+    setMemoryMappingCallbacks(memoryReadCallback, memorySetCallback, memoryClearCallback) {
+        this.#memoryReadCallback = memoryReadCallback;
+        this.#memorySetCallback = memorySetCallback;
+        this.#memoryClearCallback = memoryClearCallback;
+    }
+    
     getCapacity() {
         return this.#rowCount * this.#columnCount;
     }
@@ -279,10 +289,10 @@ class Memory {
         return "";
     }
 
-    setTextAtAddress(addressStart, text) {
+    setTextAtAddress(addressStart, text, setReadOnlyCells = false) {
         let startCell = document.getElementById("ma" + addressStart);
         if (startCell) {
-            this._setCells(startCell, text);
+            this._setCells(startCell, text, setReadOnlyCells);
         }
     }
 
@@ -290,6 +300,13 @@ class Memory {
         let startCell = document.getElementById("ma" + addressStart);
         if (startCell) {
             this._markCells(startCell, count, markType, isOn);
+        }
+    }
+    
+    setReadOnlyCells(addressStart, count, isReadOnly) {
+        let startCell = document.getElementById("ma" + addressStart);
+        if (startCell) {
+            this._setReadOnlyCells(startCell, count, isReadOnly);
         }
     }
 
@@ -339,35 +356,55 @@ class Memory {
 
     _markCells(startCell, count, markType, isOn) {
         let context = {markType:markType, isOn:isOn};
-        this._forEachCell(startCell, count, context, (cell, context) => {
-            memory._markOneCell(cell, context);
+        this._forEachCell(startCell, count, context, (cell, ctx) => {
+            memory._markOneCell(cell, ctx);
+        });
+    }
+    
+    _setReadOnlyCells(startCell, count, isReadOnly) {
+        let context = {isReadOnly:isReadOnly};
+        this._forEachCell(startCell, count, context, (cell, ctx) => {
+            if (ctx.isReadOnly) {
+                cell.dataset.readonly = "1";
+            } else {
+                delete cell.dataset.readonly;
+            }
         });
     }
 
-    _setCells(startCell, text) {
+    _setCells(startCell, text, setReadOnlyCells = false) {
         let context = {text:text, index:0};
-        this._forEachCell(startCell, text.length, context, (cell, context) => {
-            let textNode = cell.childNodes[0];
-            textNode.nodeValue = Memory._getValueFromCharacter(context.text[context.index]);
-            context.index++;
+        this._forEachCell(startCell, text.length, context, (cell, ctx) => {
+            if (setReadOnlyCells || !("readonly" in cell.dataset)) {
+                let textNode = cell.childNodes[0];
+                textNode.nodeValue = Memory._getValueFromCharacter(ctx.text[ctx.index]);
+                ctx.index++;
+            }
         });
+        this.#memorySetCallback(parseIntOrNull(startCell.id.substring(2)), text);
+        return context.index;
     }
 
     _zeroCells(startCell, count) {
         let context = {index:0};
-        this._forEachCell(startCell, count, context, (cell, context) => {
-            let textNode = cell.childNodes[0];
-            textNode.nodeValue = "0";
-            context.index++;
+        this._forEachCell(startCell, count, context, (cell, ctx) => {
+            if (!("readonly" in cell.dataset)) {
+                let textNode = cell.childNodes[0];
+                textNode.nodeValue = "0";
+                ctx.index++;
+            }
         });
+        this.#memoryClearCallback(parseIntOrNull(startCell.id.substring(2)), count);
+        return context.index;
     }
 
     _getText(startCell, count) {
         let context = {text:""};
-        this._forEachCell(startCell, count, context, (cell, context) => {
+        this._forEachCell(startCell, count, context, (cell, ctx) => {
             let textNode = cell.childNodes[0];
-            context.text += Memory._getCharacterFromValue(textNode.nodeValue);
+            ctx.text += Memory._getCharacterFromValue(textNode.nodeValue);
         });
+        this.#memoryReadCallback(parseIntOrNull(startCell.id.substring(2)), context.text);
         return context.text;
     }
 
@@ -376,6 +413,7 @@ class Memory {
         if ("mark" in cell.dataset) {
             cellMark = parseIntOrZero(cell.dataset.mark, 10);
         }
+        
         if (context.isOn) {
             cellMark = cellMark | context.markType;
         } else {

@@ -59,6 +59,15 @@ $page = new Page('..');
     <div class="flex-stretch-center-children">
     </div>
     <div class="toolbar-horizontal">
+      <!--
+      <a href="#" onclick="io.onShowConfigurationDialog()">
+        <svg width="24" height="24" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+          <title>I/O Configuration</title>
+          <path d="M192,320H320V192H192Zm32-96h64v64H224Z" class="ci-primary"/>
+          <path d="M32,288v32h72v88h88v72h32V408h64v72h32V408h88V320h72V288H408V224h72V192H408V104H320V32H288v72H224V32H192v72H104v88H32v32h72v64ZM136,136H376V376H136Z" class="ci-primary"/>
+        </svg>
+      </a>
+      -->
       <a class="how_use_svg" href="https://thecodingangel.com/blog/post/computers-do-not-work-with-zeroes-and-ones-but">
         <svg width="27" height="27" viewBox="0 0 27 27" xmlns="http://www.w3.org/2000/svg">
           <title>How to use</title>
@@ -68,7 +77,7 @@ $page = new Page('..');
       <!--
       <a href="#" onclick="memory.saveToFile()">
         <svg width="24" height="24" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512">
-          <title>Download Offline Copy</title>
+          <title>Download Offline Copy (Open Computer.html)</title>
           <path d="M64 0C28.7 0 0 28.7 0 64L0 448c0 35.3 28.7 64 64 64l256 0c35.3 0 64-28.7 64-64l0-288-128 0c-17.7 0-32-14.3-32-32L224 0 64 0zM256 0l0 128 128 0L256 0zM216 232l0 102.1 31-31c9.4-9.4 24.6-9.4 33.9 0s9.4 24.6 0 33.9l-72 72c-9.4 9.4-24.6 9.4-33.9 0l-72-72c-9.4-9.4-9.4-24.6 0-33.9s24.6-9.4 33.9 0l31 31L168 232c0-13.3 10.7-24 24-24s24 10.7 24 24z"/>
         </svg>
       </a>
@@ -190,12 +199,12 @@ $page = new Page('..');
           <button class="button button_style" onclick="cpu.reset()">Reset</button>
         </div>
         <div id="operationsPanel" class="operations-panel flex-row cpu_align">
-          <button id="runExecution" class="button button_style" onclick="emulator.run();">Run (Alt+G)</button>
+          <button id="runExecution" class="button button_style" onclick="emulator.run();">Run (Alt+R)</button>
           <button id="cancelExecution" class="button button_style" style="display:none" onclick="emulator.cancel();">Cancel (Alt+C)</button>
           <label for="executionInterval" class="label flex-pos-ortogonal-center">Delay</label>
           <input type="number" inputmode="numeric" class="numedit flex-pos-ortogonal-center" id="executionInterval" min="0" max="5000" maxlength="4" size="4">
           <label for="executionInterval" class="label flex-pos-ortogonal-center">ms</label>
-          <button class="button button_style flex-space-left" onclick="emulator.step();">Step (Alt+P)</button>
+          <button class="button button_style flex-space-left" onclick="emulator.step();">Step (Alt+X)</button>
         </div>
 
         <section>

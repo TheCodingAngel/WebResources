@@ -114,6 +114,27 @@ my <?php $page->printInternalLink("simple", "Computer"); ?> and <?php $page->pri
 
 <div class="introduction text-area">
 
+<div class="panel-background">
+<p>
+Keyboard shortcuts supported by the emulators (there are also buttons in the CPU panels for the first 3 operations):<br><br>
+<ul>
+<li><strong><u>R</u></strong>un (<strong>Alt + R</strong>) - run using Delay between each instruction;<br>
+Delay of 0 <strong>blocks the page and cannot be stopped by the user</strong>.<br><br></li>
+<li><strong><u>C</u></strong>ancel Running (<strong>Alt + C</strong>) - stop the automatic execution initiated by the previous operation.<br><br></li>
+<li>E<strong><u>x</u></strong>ecute (<strong>Alt + X</strong>) - execute one "Step" depending on the "Is Step by Step" flag:<br>
+<ul>
+<li>if "Is Step by Step" is <strong>true</strong> then <strong>Step In</strong> is performed</li>
+<li>if "Is Step by Step" is <strong>false</strong> then <strong>Step Over</strong> is performed</li>
+</ul>
+<br></li>
+<li>Step <strong><u>I</u></strong>n (<strong>Alt + I</strong>) - enter inside subroutines and interrupts.<br><br></li>
+<li>Ste<strong><u>p</u></strong> Over (<strong>Alt + P</strong>) - execute subroutines and interrupts as one single step.<br><br></li>
+<li>Step <strong><u>O</u></strong>ut (<strong>Alt + O</strong>) get outside a subroutine or an interrupt (must be inside one of them to work).</li>
+</ul>
+</p>
+</div>
+<br>
+
 <p>
 An instruction consists of 10 characters no matter how many operands it requires:
 <ul>
@@ -317,11 +338,13 @@ the instructions here have things from
     <p>
     Execute an interrupt (also called a "trap").<br>
     The first operand is the interrupt mumber.<br><br>
-    The registers are pushed in the stack (so ESP's value should allow for 36 characters to be pushed).<br>
     If IDTR has a valid value and (IDTR + interrupt mumber * 4) contains a valid address
     a jump to that address is performed.<br>
-    <a name="hlt">Otherwise</a> a default handler for the interrupt is executed.<br><br>
-    Allowed suffixes are the default value of space and its equivalent - 'V'.<br>
+    Otherwise a default handler for the interrupt is executed.<br>
+    Note - address of zero is <strong>not</strong> valid for custom interrupt handlers (just like non-numeric values).<br><br>
+    Before jumping to a custom handler all registers are pushed in the stack
+    (so <?php $page->printInternalLink("ESP", "Registers"); ?>'s value should allow for 36 characters to be pushed).<br><br>
+    <a name="hlt">Allowed</a> suffixes are the default value of space and its equivalent - 'V'.<br>
     No second operand.
     </p>
     <br><hr><br>
@@ -352,11 +375,12 @@ the instructions here have things from
     <h4>: - IRET</h4>
     </p>
     <p>
-    Return from an interrupt.<br><br>
+    Return from a custom interrupt handler.<br><br>
     Register values are restored from the stack which includes the Instruction Pointer (EIP) and
     the Code Segment (CS).<br>
-    <a name="clgi">So, the 36 characters</a> pointed by ESP determine from where the execution will continue
-    as well as the "context" - the values of all registers (including the flag registers).
+    <a name="clgi">So, the 36 characters</a> pointed by <?php $page->printInternalLink("ESP", "Registers"); ?> determine from where the execution will continue
+    as well as the "context" - the values of all registers (including the flag registers).<br><br>
+    The suffix and the operands are ignored.
     </p>
     <br><hr><br>
     
@@ -382,7 +406,7 @@ the instructions here have things from
     </p>
     <p>
     Call a sub-routine (aka a procedure or a function).<br><br>
-    Similar to <a href="#jmp">jmp</a> but first pushes in the stack a "return" address
+    Similar to <a href="#jmp">jmp</a> but first <a href="#push">pushes</a> in the stack a "return" address
     which is the address of the instruction that follows the <strong>CALL</strong> instruction.<br><br>
     <a name="ret">The</a> <a href="#ret">RET</a> instruction pops the "return" address from the stack and jumps there.<br><br>
     The first operand contains the address of the sub-routine and the second is not used (so - just like <a href="#jmp">JMP</a>).
@@ -393,26 +417,32 @@ the instructions here have things from
     <h4>; - RET</h4>
     </p>
     <p>
-    Pop a "return" address from the stack and jump there.<br>
+    <a href="#pop">Pop</a> a "return" address from the stack and jump there.<br>
     <a name="push">Used to return</a> from a sub-routine (aka a procedure or a function) called with <a href="#call">CALL</a>.<br>
     No operands are used.
     </p>
     <br><hr><br>
     
     <p>
-    <h4><a name="pop">( - PUSH</a></h4>
+    <h4>( - PUSH</h4>
     </p>
     <p>
-    Push a value identified by the first operand to the stack.<br>
+    Push a value identified by the first operand to the stack.<br><br>
+    Decrements the <?php $page->printInternalLink("ESP (Stack Pointer)", "Registers"); ?> register with the size of the data
+    before writing the data at the address in ESP.<br><br>
+    <a name="pop">This</a> means that after the <strong>PUSH</strong> instruction ESP points to the data that is pushed
+    and the last character of the data is right before the previous value of ESP.<br><br>
     The second operand is not used.
     </p>
     <br><hr><br>
     
     <p>
-    <h4><a name="add">) - POP</a></h4>
+    <h4>) - POP</h4>
     </p>
     <p>
-    Pop a value from the stack into an address or a register identified by the first operand.<br>
+    Pop a value from the stack into an address or a register identified by the first operand.<br><br>
+    <a name="add">After</a> collecting the value, the <?php $page->printInternalLink("ESP (Stack Pointer)", "Registers"); ?> register is incremented
+    with the size of the data.<br><br>
     The second operand is not used.
     </p>
     <br><hr><br>

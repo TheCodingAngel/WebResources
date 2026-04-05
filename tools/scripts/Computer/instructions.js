@@ -130,11 +130,11 @@ class Instructions {
     }
     
     _halt(opcode, suffix, a, b) {
-        return this.#emulator.executeInterrupt(CPU.Interrupts.Halt);
+        return this.#emulator.executeInterrupt(IO.Interrupts.Halt);
     }
     
     _breakpoint(opcode, suffix, a, b) {
-        return this.#emulator.executeInterrupt(CPU.Interrupts.Breakpoint);
+        return this.#emulator.executeInterrupt(IO.Interrupts.Breakpoint);
     }
     
     _int(opcode, suffix, a, b) {
@@ -450,7 +450,7 @@ class Instructions {
             return Math.floor(valueA / valueB);
         });
         if (!Number.isFinite(res)) {
-            return this.#emulator.executeError(CPU.Interrupts.DivideByZero);
+            return this.#emulator.executeError(IO.Interrupts.DivideByZero);
         }
     }
 
@@ -517,7 +517,7 @@ class Instructions {
 
         let value = valuesInfo.getValue(valueTypePair[1], b, ValuesInfo.IndirectionType.None);
         let charsNotWritten = this.#io.writeToPort(port, value, valuesInfo.getCharacterCount());
-        if (charsNotWritten == null) {
+        if (!isValid(charsNotWritten)) {
             throw new InstructionError("Device not found on port " + port);
         } else if (charsNotWritten < 0) {
             throw new InstructionError("Output not supported for the device on port " + port);

@@ -60,6 +60,10 @@ body {
   }
 }
 
+.panel-background {
+  background-color: var(--panel-bg);
+}
+
 .section-content {
   padding: var(--margin-xs);
   max-width: 40rem;

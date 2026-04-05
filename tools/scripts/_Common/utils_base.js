@@ -400,7 +400,7 @@ function padOrCutNumber(number, charCount) {
 
 function padOrCutString(str, characterCount, fill = ' ') {
     if (str.length >= characterCount) {
-        return str.substring(0, characterCount);
+        return str.substr(0, characterCount);
     }
     return str.padStart(characterCount, fill);
 }

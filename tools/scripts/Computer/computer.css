@@ -38,6 +38,27 @@ body {
   align-self: center;
 }
 
+.dma-registers {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  grid-column-gap: var(--margin-xs);
+}
+
+.dma-registers input {
+  width: 4rem;
+}
+
+.io_config_popup .button_style {
+  width: fit-content;
+  margin-top: var(--margin-xs);
+}
+
+.io_config_popup input[readonly] {
+  background-color: rgb(230, 230, 230);
+  border: none;
+  outline: none;
+}
+
 .disable-wrap {
   white-space: pre;
   overflow-wrap: normal;

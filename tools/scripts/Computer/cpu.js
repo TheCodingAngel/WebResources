@@ -2,7 +2,6 @@ var cpu;
 
 class CPU {
     #memory;
-    #io;
 
     #registersElement;
     #registerPointersElement;
@@ -20,6 +19,7 @@ class CPU {
     static #invalidPointerValue = -1;
     static #instructionPointerId = "eip";
     static #codeSegmentId = "cs";
+    static #IdtrId = "idtr";
 
     static #PopupType = {
         Register: 0,
@@ -43,15 +43,6 @@ class CPU {
         All: 0x07
     }
     
-    // Multiply by 4 to get the address offset
-    static Interrupts = {
-        DivideByZero: 0,
-        InvalidOpcode: 1,
-        Halt: 2,
-        Breakpoint: 3,
-        Teleprinter: 4,
-    }
-
     #registers = new Map([
         [CPU.#instructionPointerId, {value: CPU.#defaultPointerValue}],
         ["esp", {value: CPU.#invalidPointerValue}],
@@ -61,7 +52,7 @@ class CPU {
         ["eax", {value: CPU.#registerDefaultStrValue}],
         ["ebx", {value: CPU.#registerDefaultStrValue}],
         ["ecx", {value: CPU.#registerDefaultStrValue}],
-        ["idtr", {value: CPU.#invalidPointerValue}],
+        [CPU.#IdtrId, {value: CPU.#invalidPointerValue}],
     ]);
     
     static registersInfo = new Map([
@@ -72,15 +63,14 @@ class CPU {
         ['4', {registerId: "esp", hasSubRegisters: false}],
         ['5', {registerId: "ebp", hasSubRegisters: false}],
         ['6', {registerId: CPU.#codeSegmentId, hasSubRegisters: false}],
-        ['7', {registerId: "idtr", hasSubRegisters: false}],
+        ['7', {registerId: CPU.#IdtrId, hasSubRegisters: false}],
     ]);
 
     #flags = CPU.FlagsMask.None;
     #control = CPU.ControlMask.None;
 
-    constructor(memory, io, registersElement, registerPointersElement, controlElement, flagsElement, autoScrollToNextInstruction){
+    constructor(memory, registersElement, registerPointersElement, controlElement, flagsElement, autoScrollToNextInstruction){
         this.#memory = memory;
-        this.#io = io;
         this.#registersElement = registersElement;
         this.#registerPointersElement = registerPointersElement;
         this.#controlElement = controlElement;
@@ -123,7 +113,7 @@ class CPU {
         this.setRegisterValueById(CPU.#codeSegmentId, CPU.#invalidPointerValue);
         this.setInstructionPointer(CPU.#defaultPointerValue);
         
-        this.setRegisterValueById("idtr", CPU.#invalidPointerValue);
+        this.setRegisterValueById(CPU.#IdtrId, CPU.#invalidPointerValue);
         this.setRegisterValueById("esp", CPU.#invalidPointerValue);
         this.setRegisterValueById("ebp", CPU.#invalidPointerValue);
         
@@ -323,11 +313,11 @@ class CPU {
     }
     
     getIDT() {
-        return parseIntOrMinusOne(this.getRegisterValueById("idtr"));
+        return parseIntOrMinusOne(this.getRegisterValueById(CPU.#IdtrId));
     }
     
     getIDTSize() {
-        return getPropertiesCount(CPU.Interrupts) * CPU.registerSize;
+        return getPropertiesCount(IO.Interrupts) * CPU.registerSize;
     }
     
     setInterruptData(eax, ebx, ecx) {
@@ -477,6 +467,10 @@ class CPU {
             this.#memory.markAddresses(this.logicalToPhysicalAddress(address), CPU.instructionSize, Memory.markType.NextInstruction, false);
             this.#registers.get(registerId).value = value;
             this.#memory.markAddresses(this.logicalToPhysicalAddress(address), CPU.instructionSize, Memory.markType.NextInstruction, true);
+        } else if (registerId == CPU.#IdtrId) {
+            this.#memory.markAddresses(this.getIDT(), this.getIDTSize(), Memory.markType.DescriptorTable, false);
+            this.#registers.get(registerId).value = value;
+            this.#memory.markAddresses(this.getIDT(), this.getIDTSize(), Memory.markType.DescriptorTable, true);
         } else {
             this.#registers.get(registerId).value = value;
         }
@@ -491,7 +485,7 @@ class CPU {
     }
     
     _onDebugUpdate(address = null) {
-        // A page may not include the assembler script which means its global variable may not be defined.
+        // A page may not include the assembler script which means the "assembler" global variable may not be defined.
         // Note - the global variable is not null only if an actual assembling was done.
         if (!isValid(window.assembler)) {
             return;

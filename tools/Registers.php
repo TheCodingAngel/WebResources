@@ -52,7 +52,7 @@ $page = new Page('..');
   </div>
 </div>
 
-<div id="pageContent" class="page-content status-registers">
+<div id="pageContent" class="page-content">
 
 <div class="introduction">
 <h1 class="section-header flex-pos-ortogonal-center">CPU Registers for
@@ -85,23 +85,65 @@ my <?php $page->printInternalLink("simple", "Computer"); ?> and <?php $page->pri
         <tr>
           <td>EAX</td>
           <td>0014</td>
-          <td>Accumulator A - data.</td>
+          <td>Accumulator A - data.
+            <table cellpadding="5" cellspacing="5">
+              <thead>
+                <tr><th>Sub-part</th><th>Identifier</th><th>Description</th></tr>
+              </thead>
+              <tbody>
+                <tr><td>AL</td><td>0011</td><td>The lowest (the rightmost) character</td></tr>
+                <tr><td>AH</td><td>0012</td><td>The second character from right to left</td></tr>
+                <tr><td>AX</td><td>0013</td><td>Lowest (rightmost) 2 characters (= AH + AL)</td></tr>
+              </tbody>
+            </table>
+          </td>
         </tr>
         <tr>
           <td>EBX</td>
           <td>0024</td>
-          <td>Accumulator B - data.</td>
+          <td>Accumulator B - data.
+            <table cellpadding="5" cellspacing="5">
+              <thead>
+                <tr><th>Sub-part</th><th>Identifier</th><th>Description</th></tr>
+              </thead>
+              <tbody>
+                <tr><td>BL</td><td>0021</td><td>The lowest (the rightmost) character</td></tr>
+                <tr><td>BH</td><td>0022</td><td>The second character from right to left</td></tr>
+                <tr><td>BX</td><td>0023</td><td>Lowest (rightmost) 2 characters (= BH + BL)</td></tr>
+              </tbody>
+            </table>
+          </td>
         </tr>
         <tr>
           <td>ECX</td>
           <td>0034</td>
-          <td>Accumulator C - counter.</td>
+          <td>Accumulator C - counter.
+            <table cellpadding="5" cellspacing="5">
+              <thead>
+                <tr><th>Sub-part</th><th>Identifier</th><th>Description</th></tr>
+              </thead>
+              <tbody>
+                <tr><td>CL</td><td>0031</td><td>The lowest (the rightmost) character</td></tr>
+                <tr><td>CH</td><td>0032</td><td>The second character from right to left</td></tr>
+                <tr><td>CX</td><td>0033</td><td>Lowest (rightmost) 2 characters (= CH + CL)</td></tr>
+              </tbody>
+            </table>
+          </td>
         </tr>
         <tr>
           <td>ESP</td>
           <td>0044</td>
-          <td>Stack Pointer - auto-decrementing address of the head of the stack.<br>
-          End of the executable form of a program (i.e. end of a process).</td>
+          <td>Stack Pointer - auto-changing address of the head of the stack:<br>
+            - <a href="Instructions#push">PUSH</a> decrements it before writing data at the address in it;<br>
+            - <a href="Instructions#pop">POP</a> increments it back.
+          <br><br>
+          Return addresses from subroutines are automatically pushed in the stack and popped from it
+          (by the <a href="Instructions#call">CALL</a> and <a href="Instructions#ret">RET</a> instructions).
+          <br><br>
+          Registers are automatically saved and restored when handling interrupts
+          (by the <a href="Instructions#int">INT</a> and <a href="Instructions#iret">IRET</a> instructions).
+          <br><br>
+          Initially, marks the end of a <strong>process</strong> (after loading a program from a storage into the memory).</td>
         </tr>
         <tr>
           <td>EBP</td>
@@ -111,22 +153,25 @@ my <?php $page->printInternalLink("simple", "Computer"); ?> and <?php $page->pri
         <tr>
           <td>CS</td>
           <td>0064</td>
-          <td>Code Segment - start of the executable form of a program (i.e. start of a process).<br>
+          <td>Code Segment - start of the executable form of a program (i.e. start of a <strong>process</strong>).<br>
           Its value (if non-negative) is automatically added by the CPU when extracting values from any address
           (only <strong>IDTR</strong> is excluded).</td>
         </tr>
         <tr>
           <td>IDTR</td>
           <td>0074</td>
-          <td>Interrupt Description Table Register - the address of a table with 5 elements (4 characters each ⇒ 20 characters in total):
-            <div>
+          <td>Interrupt Description Table Register - the <strong>physical</strong> address of a table with 7 elements (4 characters each ⇒ 28 characters in total):
+            <div><br>
             <ol start="0">
               <li>the address of a handler for "division by zero" (fault);</li>
               <li>the address of a handler for "invalid opcode" (fault);</li>
               <li>the address of a handler for "halt";</li>
               <li>the address of a handler for "breakpoint";</li>
               <li>the address of a handler for hardware interrupts from the Teleprinter.</li>
+              <li>the address of a handler for end of data copy by the DMA device.</li>
+              <li>the address of a handler for a custom interrupt (API).</li>
             </ol>
+            <br>Note - only non-zero values are accepted as valid addresses.
             </div>
           </td>
         </tr>

@@ -75,6 +75,22 @@ textarea {
   white-space: nowrap;
 }
 
+.checkbox_simple {
+  display: flex;
+  flex-flow: row nowrap;
+  align-items: flex-start;
+  margin-top: 2px;
+}
+
+.checkbox_simple input[type=checkbox] {
+  accent-color: #6f79b0;
+  cursor: pointer;
+}
+
+.checkbox_simple label {
+  cursor: pointer;
+}
+
 .checkbox_style {
   margin-left: 0px;
   cursor: pointer;
@@ -290,13 +306,14 @@ button.button_style:hover {
   border-bottom: 1px solid #dddddd;
 }
 .table_middle tbody tr .memory-cell:hover {
-  background-color: rgba(83, 80, 177, 0.2);
+  background-color: rgb(235, 235, 235);
 }
+
 .table_middle tbody tr .memory-cell[data-mark="1"] {
-  background-color: #e4e4f2;
+  background-color: rgb(228, 228, 242);
 }
 .table_middle tbody tr .memory-cell[data-mark="1"]:hover {
-  background-color: rgba(83, 80, 177, 0.3);
+  background-color: rgb(210, 212, 235);
 }
 .table_middle tbody tr .memory-cell[data-mark="2"] {
   color: rgb(255, 255, 255);
@@ -309,6 +326,90 @@ button.button_style:hover {
   background: rgb(255, 121, 121);
   color: rgb(255, 255, 255);
 }
+.table_middle tbody tr .memory-cell[data-mark="3"]:hover {
+  background: rgb(235, 101, 101);
+}
+
+.table_middle tbody tr .memory-cell[data-mark="4"] {
+  background: rgb(248, 238, 166);
+}
+.table_middle tbody tr .memory-cell[data-mark="4"]:hover {
+  background: rgb(242, 221, 77);
+}
+.table_middle tbody tr .memory-cell[data-mark="5"] {
+  background: rgb(202, 204, 147);
+}
+.table_middle tbody tr .memory-cell[data-mark="5"]:hover {
+  background: rgb(188, 190, 118);
+}
+.table_middle tbody tr .memory-cell[data-mark="6"] {
+  background: rgb(235, 78, 2);
+  color: rgb(255, 255, 255);
+}
+.table_middle tbody tr .memory-cell[data-mark="6"]:hover {
+  background: rgb(252, 88, 9);
+}
+.table_middle tbody tr .memory-cell[data-mark="7"] {
+  background: rgb(189, 132, 110);
+  color: rgb(255, 255, 255);
+}
+.table_middle tbody tr .memory-cell[data-mark="7"]:hover {
+  background: rgb(206, 112, 44);
+}
+
+.table_middle tbody tr .memory-cell[data-mark="8"] {
+  background: rgb(140, 253, 253);
+}
+.table_middle tbody tr .memory-cell[data-mark="8"]:hover {
+  background: rgb(103, 253, 255);
+}
+.table_middle tbody tr .memory-cell[data-mark="9"] {
+  background: rgb(182, 228, 232);
+}
+.table_middle tbody tr .memory-cell[data-mark="9"]:hover {
+  background: rgb(168, 223, 227);
+}
+.table_middle tbody tr .memory-cell[data-mark="10"] {
+  background: rgb(184, 0, 195);
+  color: rgb(255, 255, 255);
+}
+.table_middle tbody tr .memory-cell[data-mark="10"]:hover {
+  background: rgb(189, 0, 211);
+}
+.table_middle tbody tr .memory-cell[data-mark="11"] {
+  background: rgb(146, 63, 147);
+  color: rgb(255, 255, 255);
+}
+.table_middle tbody tr .memory-cell[data-mark="11"]:hover {
+  background: rgb(162, 70, 164);
+}
+.table_middle tbody tr .memory-cell[data-mark="12"] {
+  background: rgb(147, 254, 173);
+}
+.table_middle tbody tr .memory-cell[data-mark="12"]:hover {
+  background: rgb(105, 253, 142);
+}
+.table_middle tbody tr .memory-cell[data-mark="13"] {
+  background: rgb(192, 222, 202);
+}
+.table_middle tbody tr .memory-cell[data-mark="13"]:hover {
+  background: rgb(167, 210, 181);
+}
+.table_middle tbody tr .memory-cell[data-mark="14"] {
+  background: rgb(106, 142, 0);
+  color: rgb(255, 255, 255);
+}
+.table_middle tbody tr .memory-cell[data-mark="14"]:hover {
+  background: rgb(124, 166, 0);
+}
+.table_middle tbody tr .memory-cell[data-mark="15"] {
+  background: rgb(108, 127, 60);
+  color: rgb(255, 255, 255);
+}
+.table_middle tbody tr .memory-cell[data-mark="15"]:hover {
+  background: rgb(117, 138, 65);
+}
+
 
 #eipRow .memory-cell {
   color: rgb(255, 255, 255);
@@ -689,6 +790,7 @@ button.button_style:hover {
     opacity: 0.5;
   }
 }
+.io_config_popup,
 .memory_popup,
 .cpu_popup,
 .character_popup {
@@ -705,6 +807,7 @@ button.button_style:hover {
   z-index: -5;
   transition: all 0.3s ease-in-out;
 }
+.io_config_popup .bg_card,
 .memory_popup .bg_card,
 .cpu_popup .bg_card,
 .character_popup .bg_card {
@@ -714,11 +817,10 @@ button.button_style:hover {
   left: 0;
   top: 0;
 }
-.memory_popup.activemp, .memory_popup.activecpup,
-.cpu_popup.activemp,
-.cpu_popup.activecpup,
-.character_popup.activemp,
-.character_popup.activecpup {
+.io_config_popup.activeic, .io_config_popup.activemp, .io_config_popup.activecpup,
+.memory_popup.activeic, .memory_popup.activemp, .memory_popup.activecpup,
+.cpu_popup.activeic, .cpu_popup.activemp, .cpu_popup.activecpup,
+.character_popup.activeic, .character_popup.activemp, .character_popup.activecpup {
   z-index: 190;
   opacity: 1;
   visibility: visible;
@@ -730,17 +832,17 @@ button.button_style:hover {
   transform: scale(1);
   transition: all 0.3s ease-in-out;
 }
-.memory_popup.activemp .mp_card, .memory_popup.activecpup .mp_card,
-.cpu_popup.activemp .mp_card,
-.cpu_popup.activecpup .mp_card,
-.character_popup.activemp .mp_card,
-.character_popup.activecpup .mp_card {
+.io_config_popup.activeic .mp_card, .io_config_popup.activemp .mp_card, .io_config_popup.activecpup .mp_card,
+.memory_popup.activeic .mp_card, .memory_popup.activemp .mp_card, .memory_popup.activecpup .mp_card,
+.cpu_popup.activeic .mp_card, .cpu_popup.activemp .mp_card, .cpu_popup.activecpup .mp_card,
+.character_popup.activeic .mp_card, .character_popup.activemp .mp_card, .character_popup.activecpup .mp_card {
   -webkit-transform: translate(-50%, -50%) scale(1);
   -moz-transform: translate(-50%, -50%) scale(1);
   -ms-transform: translate(-50%, -50%) scale(1);
   transform: translate(-50%, -50%) scale(1);
   transition: all 0.3s ease-in-out;
 }
+.io_config_popup .mp_card,
 .memory_popup .mp_card,
 .cpu_popup .mp_card,
 .character_popup .mp_card {
@@ -748,7 +850,7 @@ button.button_style:hover {
   border-radius: 10px;
   padding: 40px 15px 30px 20px;
   max-width: 560px;
-  max-height: 380px;
+  max-height: 400px;
   height: calc(100% - 30px);
   width: calc(100% - 20px);
   box-shadow: inset 0 0 8px #5350b1;
@@ -763,6 +865,7 @@ button.button_style:hover {
   z-index: 95;
   transition: all 0.3s ease-in-out;
 }
+.io_config_popup .mp_card ul,
 .memory_popup .mp_card ul,
 .cpu_popup .mp_card ul,
 .character_popup .mp_card ul {
@@ -774,32 +877,38 @@ button.button_style:hover {
   max-height: 350px;
   height: 100%;
 }
+.io_config_popup .mp_card ul li,
 .memory_popup .mp_card ul li,
 .cpu_popup .mp_card ul li,
 .character_popup .mp_card ul li {
   list-style: none;
 }
+.io_config_popup .mp_card ul li span,
 .memory_popup .mp_card ul li span,
 .cpu_popup .mp_card ul li span,
 .character_popup .mp_card ul li span {
   font-size: 16px;
 }
+.io_config_popup .mp_card ul li span:first-child,
 .memory_popup .mp_card ul li span:first-child,
 .cpu_popup .mp_card ul li span:first-child,
 .character_popup .mp_card ul li span:first-child {
   font-weight: 600;
 }
+.io_config_popup .mp_card ul li .memory_cells,
 .memory_popup .mp_card ul li .memory_cells,
 .cpu_popup .mp_card ul li .memory_cells,
 .character_popup .mp_card ul li .memory_cells {
   padding-top: 10px;
 }
+.io_config_popup .mp_card ul li .memory_cells p,
 .memory_popup .mp_card ul li .memory_cells p,
 .cpu_popup .mp_card ul li .memory_cells p,
 .character_popup .mp_card ul li .memory_cells p {
   display: block;
   margin-bottom: 5px;
 }
+.io_config_popup .mp_card .clos_btn,
 .memory_popup .mp_card .clos_btn,
 .cpu_popup .mp_card .clos_btn,
 .character_popup .mp_card .clos_btn {
@@ -808,6 +917,7 @@ button.button_style:hover {
   right: 15px;
   cursor: pointer;
 }
+.io_config_popup .mp_card .clos_btn img,
 .memory_popup .mp_card .clos_btn img,
 .cpu_popup .mp_card .clos_btn img,
 .character_popup .mp_card .clos_btn img {

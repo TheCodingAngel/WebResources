@@ -13,18 +13,19 @@ function init() {
     let magneticTape = document.getElementById("magneticTape");
     memory = new Memory(addressStartElement, addressEndElement, memoryPanel, memoryData, magneticTape, editMemoryByRows.checked);
 
-    let punchReader = document.getElementById("punchReader");
-    let ignoreSingleNewLinesCheckbox = document.getElementById("punchReaderIgnoreSingleNewLinesCheckbox");
-    let printer = document.getElementById('printer');
-    let teleprinter = document.getElementById('teleprinter');
-    io = new IO(memory, punchReader, ignoreSingleNewLinesCheckbox, printer, teleprinter);
-
     let registersElement = document.getElementById("REGS_GENERAL");
     let registerPointersElement = document.getElementById("REGS_POINTERS");
     let controlElement = document.getElementById("ECONTROL");
     let flagsElement = document.getElementById("EFLAGS");
     let autoScrollElement = document.getElementById("autoScrollMemory");
-    cpu = new CPU(memory, io, registersElement, registerPointersElement, controlElement, flagsElement, autoScrollElement.checked);
+    cpu = new CPU(memory, registersElement, registerPointersElement, controlElement, flagsElement, autoScrollElement.checked);
+
+    let punchReader = document.getElementById("punchReader");
+    let ignoreSingleNewLinesCheckbox = document.getElementById("punchReaderIgnoreSingleNewLinesCheckbox");
+    let printer = document.getElementById('printer');
+    let teleprinter = document.getElementById('teleprinter');
+    io = new IO(memory, cpu, punchReader, ignoreSingleNewLinesCheckbox, printer, teleprinter);
+    memory.setMemoryMappingCallbacks(io.onMemoryRead.bind(io), io.onMemorySet.bind(io), io.onMemoryClear.bind(io));
 
     let executionIntervalElement = document.getElementById("executionInterval");
     let runExecutionButon = document.getElementById("runExecution");
@@ -60,6 +61,11 @@ function init() {
                     emulator.cancel();
                 }
                 break;
+            case 'X':
+                if (e.altKey) {
+                    emulator.step();
+                }
+                break;
             case 'P':
                 if (e.altKey) {
                     emulator.stepOver();
@@ -80,7 +86,7 @@ function init() {
 
     document.onkeyup = function (e) {
         switch(e.key.toUpperCase()) {
-            case 'G':
+            case 'R':
                 if (e.altKey) {
                     emulator.run();
                 }

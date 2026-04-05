@@ -60,6 +60,13 @@ $page = new Page('..');
     <div class="flex-stretch-center-children">
     </div>
     <div class="toolbar-horizontal">
+      <a href="#" onclick="io.onShowConfigurationDialog()">
+        <svg width="24" height="24" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+          <title>I/O Configuration</title>
+          <path d="M192,320H320V192H192Zm32-96h64v64H224Z" class="ci-primary"/>
+          <path d="M32,288v32h72v88h88v72h32V408h64v72h32V408h88V320h72V288H408V224h72V192H408V104H320V32H288v72H224V32H192v72H104v88H32v32h72v64ZM136,136H376V376H136Z" class="ci-primary"/>
+        </svg>
+      </a>
       <a class="how_use_svg" href="https://thecodingangel.com/blog/post/computers-do-not-work-with-zeroes-and-ones-but">
         <svg width="27" height="27" viewBox="0 0 27 27" xmlns="http://www.w3.org/2000/svg">
           <title>How to use</title>
@@ -69,7 +76,7 @@ $page = new Page('..');
       <!--
       <a href="#" onclick="memory.saveToFile()">
         <svg width="24" height="24" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512">
-          <title>Download Offline Copy</title>
+          <title>Download Offline Copy (Open Computer-Full.html)</title>
           <path d="M64 0C28.7 0 0 28.7 0 64L0 448c0 35.3 28.7 64 64 64l256 0c35.3 0 64-28.7 64-64l0-288-128 0c-17.7 0-32-14.3-32-32L224 0 64 0zM256 0l0 128 128 0L256 0zM216 232l0 102.1 31-31c9.4-9.4 24.6-9.4 33.9 0s9.4 24.6 0 33.9l-72 72c-9.4 9.4-24.6 9.4-33.9 0l-72-72c-9.4-9.4-9.4-24.6 0-33.9s24.6-9.4 33.9 0l31 31L168 232c0-13.3 10.7-24 24-24s24 10.7 24 24z"/>
         </svg>
       </a>
@@ -193,12 +200,12 @@ $page = new Page('..');
           <button class="button button_style" onclick="cpu.reset()">Reset</button>
         </div>
         <div id="operationsPanel" class="operations-panel flex-row cpu_align">
-          <button id="runExecution" class="button button_style" onclick="emulator.run();">Run (Alt+G)</button>
+          <button id="runExecution" class="button button_style" onclick="emulator.run();">Run (Alt+R)</button>
           <button id="cancelExecution" class="button button_style" style="display:none" onclick="emulator.cancel();">Cancel (Alt+C)</button>
           <label for="executionInterval" class="label flex-pos-ortogonal-center">Delay</label>
           <input type="number" inputmode="numeric" class="numedit flex-pos-ortogonal-center" id="executionInterval" min="0" max="5000" maxlength="4" size="4">
           <label for="executionInterval" class="label flex-pos-ortogonal-center">ms</label>
-          <button class="button button_style flex-space-left" onclick="emulator.step();">Step (Alt+P)</button>
+          <button class="button button_style flex-space-left" onclick="emulator.step();">Step (Alt+X)</button>
         </div>
 
         <section>
@@ -359,6 +366,114 @@ $page = new Page('..');
 <?php $page->printBottom(); ?>
 
 </main>
+
+<!-- io configuration  -->
+<div class="io_config_popup">
+  <div class="bg_card"
+       onclick="document.querySelector('.io_config_popup').classList.remove('activeic')">
+  </div>
+  <div class="mp_card">
+    <div class="clos_btn"
+         onclick="document.querySelector('.io_config_popup').classList.remove('activeic')">
+      <img src="<?php $page->printImagePath('close.png'); ?>" />
+    </div>
+    <hr>
+    <div class="flex-column">
+      <label class="label flex-pos-ortogonal-center"><strong>Printer</strong> (port 0) - Output buffer with 10 characters:</label>
+      <div class="flex-column">
+        <div class="checkbox_simple">
+          <input type="checkbox" class="checkbox flex-pos-ortogonal-center" id="enablePrinterMMIO">
+          <label for="enablePrinterMMIO" class="label flex-pos-ortogonal-center">Enable Memory Mapping for Write</label>
+        </div>
+        <div class="flex-row">
+          <label for="printerStartAddress" class="label flex-pos-ortogonal-center">Start address:</label>
+          <input type="number" inputmode="numeric" class="numedit flex-pos-ortogonal-center" id="printerStartAddress" min="0" max="9990" maxlength="4" size="5">
+          <label for="printerStartAddress" class="label flex-pos-ortogonal-center"> - </label>
+          <input type="text" id="printerEndAddress" class="numedit flex-pos-ortogonal-center" readonly maxlength="4" size="5">
+        </div>
+      </div>
+    </div>
+    <br><hr>
+    <div class="flex-column">
+      <label class="label flex-pos-ortogonal-center"><strong>Teleprinter</strong> (port 2) - Input and Output buffers with 10 characters:</label>
+      <div class="flex-row flex-stretch-ortogonal">
+        <div class="flex-column">
+          <div class="checkbox_simple">
+            <input type="checkbox" class="checkbox flex-pos-ortogonal-center" id="enableTeleprinterInputMMIO">
+            <label for="enableTeleprinterInputMMIO" class="label flex-pos-ortogonal-center">Enable Memory Mapping for Read</label>
+          </div>
+          <div class="flex-row">
+            <label for="teleprinterInputStartAddress" class="label flex-pos-ortogonal-center">Start address:</label>
+            <input type="number" inputmode="numeric" class="numedit flex-pos-ortogonal-center" id="teleprinterInputStartAddress" min="0" max="9990" maxlength="4" size="5">
+            <label for="teleprinterInputStartAddress" class="label flex-pos-ortogonal-center"> - </label>
+            <input type="text" id="teleprinterInputEndAddress" class="numedit flex-pos-ortogonal-center" readonly maxlength="4" size="5">
+          </div>
+        </div>
+        <div class="flex-column flex-space-left">
+          <div class="checkbox_simple">
+            <input type="checkbox" class="checkbox flex-pos-ortogonal-center" id="enableTeleprinterOuputMMIO">
+            <label for="enableTeleprinterOuputMMIO" class="label flex-pos-ortogonal-center">Enable Memory Mapping for Write</label>
+          </div>
+          <div class="flex-row">
+            <label for="teleprinterOutputStartAddress" class="label flex-pos-ortogonal-center">Start address:</label>
+            <input type="number" inputmode="numeric" class="numedit flex-pos-ortogonal-center" id="teleprinterOutputStartAddress" min="0" max="9990" maxlength="4" size="5">
+            <label for="teleprinterOutputStartAddress" class="label flex-pos-ortogonal-center"> - </label>
+            <input type="text" id="teleprinterOutputEndAddress" class="numedit flex-pos-ortogonal-center" readonly maxlength="4" size="5">
+          </div>
+        </div>
+      </div>
+    </div>
+    <br><hr>
+    <div class="flex-column">
+      <label class="label flex-pos-ortogonal-center "><strong>Direct Memory Access</strong> - a List of 4 registers (4 characters each):</label>
+      <div class="flex-column">
+        <div class="checkbox_simple">
+          <input type="checkbox" class="checkbox flex-pos-ortogonal-center" id="enableDmaMMIO">
+          <label for="enableDmaMMIO" class="label flex-pos-ortogonal-center">Enable Memory Mapping for Read and Write of the 4 registers;</label>
+        </div>
+        <label class="label flex-pos-ortogonal-center flex-space-left">Note - <strong>Source</strong> and <strong>Destination</strong> contain either Memory or Port Addresses:</label>
+        <div class="dma-registers">
+          <label for="dmaStartAddress" class="label flex-pos-ortogonal-center">Start address:</label>
+          <input type="number" inputmode="numeric" class="numedit flex-pos-ortogonal-center" id="dmaStartAddress" min="0" max="9990" maxlength="4" size="5">
+          <label class="label flex-pos-ortogonal-center">The first character of</label>
+          <label for="dmaControlStartAddress" class="label flex-pos-ortogonal-center">Control (port 3):</label>
+          <div class="flex-row">
+            <input type="text" id="dmaControlStartAddress" class="numedit flex-pos-ortogonal-center" readonly maxlength="4" size="5">
+            <label class="label flex-pos-ortogonal-center"> - </label>
+            <input type="text" id="dmaControlEndAddress" class="numedit flex-pos-ortogonal-center" readonly maxlength="4" size="5">
+          </div>
+          <label class="label flex-pos-ortogonal-center"><strong>Control</strong> is for <strong>Src</strong>,</label>
+          <label for="dmaSourceStartAddress" class="label flex-pos-ortogonal-center">Source (port 4):</label>
+          <div class="flex-row">
+            <input type="text" id="dmaSourceStartAddress" class="numedit flex-pos-ortogonal-center" readonly maxlength="4" size="5">
+            <label class="label flex-pos-ortogonal-center"> - </label>
+            <input type="text" id="dmaSourceEndAddress" class="numedit flex-pos-ortogonal-center" readonly maxlength="4" size="5">
+          </div>
+          <label class="label flex-pos-ortogonal-center">the second - for <strong>Dest</strong>:</label>
+          <label for="dmaDestinationStartAddress" class="label flex-pos-ortogonal-center">Destination (port 5):</label>
+          <div class="flex-row">
+            <input type="text" id="dmaDestinationStartAddress" class="numedit flex-pos-ortogonal-center" readonly maxlength="4" size="5">
+            <label class="label flex-pos-ortogonal-center"> - </label>
+            <input type="text" id="dmaDestinationEndAddress" class="numedit flex-pos-ortogonal-center" readonly maxlength="4" size="5">
+          </div>
+          <label class="label flex-pos-ortogonal-center">- 'M' means Memory I/O</label>
+          <label for="dmaCountStartAddress" class="label flex-pos-ortogonal-center">Count (port 6):</label>
+          <div class="flex-row">
+            <input type="text" id="dmaCountStartAddress" class="numedit flex-pos-ortogonal-center" readonly maxlength="4" size="5">
+            <label class="label flex-pos-ortogonal-center"> - </label>
+            <input type="text" id="dmaCountEndAddress" class="numedit flex-pos-ortogonal-center" readonly maxlength="4" size="5">
+          </div>
+          <label class="label flex-pos-ortogonal-center">- 'P' means Port I/O</label>
+        </div>
+      </div>
+    </div>
+    <div class="flex-row">
+      <button id="btnIoConfigOK" class="button button_style">OK</button>
+      <button id="btnIoConfigCancel" class="button button_style flex-space-left">Cancel</button>
+    </div>
+  </div>
+</div>
+<!-- end io configuration  -->
 
 <!-- memory popup  -->
 <div class="memory_popup">

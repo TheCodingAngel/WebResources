@@ -27,13 +27,9 @@ class Emulator {
     #stepOutAtCount = 0;
     #returnFromInterruptToNext = [];
     
-    #ioBufferCapacity = 80;
     #lastBreakpointAddress = -1;
     
-    #nonFailingInterrupts = [CPU.Interrupts.Halt, CPU.Interrupts.Breakpoint];
-    #hardwareInterrupts = new Map([
-        [CPU.Interrupts.Teleprinter, {port: 2, queue: []}],
-    ]);
+    #nonFailingInterrupts = [IO.Interrupts.Halt, IO.Interrupts.Breakpoint];
     
     
     constructor(memory, io, cpu, buttonRun, buttonCancel, executionIntervalElement) {
@@ -78,7 +74,7 @@ class Emulator {
         try {
             this.#buttonRun.disabled = true;
             while(this.#currentExecution != Emulator.ExecutionMode.Stopped) {
-                this.executeInstruction(this.#cpu.getNextInstruction());
+                this._executeInstruction(this.#cpu.getNextInstruction());
             }
         } catch(err) {
             if (err instanceof InstructionError) {
@@ -155,7 +151,7 @@ class Emulator {
 
     stepIn() {
         try {
-            this.executeInstruction(this.#cpu.getNextInstruction());
+            this._executeInstruction(this.#cpu.getNextInstruction());
         } catch(err) {
             if (err instanceof InstructionError) {
                 alert("Instruction Error: " + err.message);
@@ -182,39 +178,6 @@ class Emulator {
             delay = Emulator.#defaultExecutionInterval;
         }
         this._runInteractive(delay, Emulator.ExecutionMode.SteppingOut);
-    }
-    
-    executeInstruction(characters) {
-        if (typeof(characters) != "string") {
-            throw new InstructionError("Invalid instruction data");
-        }
-        if (characters.length != CPU.instructionSize) {
-            throw new InstructionError(`Instructions must have ${CPU.instructionSize} characters but the next one is with ${characters.length}. Maybe EIP has incorrect value?`);
-        }
-        
-        let nextInstructionAddress = this.#executeInstructionCallback(characters);
-        
-        if (typeof(nextInstructionAddress) == "undefined" || nextInstructionAddress === null) {
-            this.#cpu.incrementInstructionPointer();
-        } else if (typeof(nextInstructionAddress) == "number") {
-            this.#cpu.setInstructionPointer(nextInstructionAddress);
-        } else {
-            throw new InstructionError("Incorrect result for instruction with opcode " + opcode);
-        }
-        
-        if (characters[0] != Instructions.IRET_OPCODE) {
-            for (let [interrupt, portData] of this.#hardwareInterrupts) {
-                let handlerAddress = this._checkHardwareInterrupt(interrupt, portData);
-                if (handlerAddress != null) {
-                    this.#cpu.setInstructionPointer(handlerAddress);
-                    return;
-                }
-            }
-        }
-        
-        if (this.#currentExecution == Emulator.ExecutionMode.SteppingOut && this.#steppedInCount <= this.#stepOutAtCount) {
-            this.cancel();
-        }
     }
     
     pushValue(value) {
@@ -296,113 +259,77 @@ class Emulator {
         return result;
     }
     
+    _executeInstruction(characters) {
+        if (typeof(characters) != "string") {
+            throw new InstructionError("Invalid instruction data");
+        }
+        if (characters.length != CPU.instructionSize) {
+            throw new InstructionError(`Instructions must have ${CPU.instructionSize} characters but the next one is with ${characters.length}. Maybe EIP has incorrect value?`);
+        }
+        
+        this.#io.onFlush();
+        let nextInstructionAddress = this.#executeInstructionCallback(characters);
+        
+        if (typeof(nextInstructionAddress) == "undefined" || nextInstructionAddress === null) {
+            this.#cpu.incrementInstructionPointer();
+        } else if (typeof(nextInstructionAddress) == "number") {
+            this.#cpu.setInstructionPointer(nextInstructionAddress);
+        } else {
+            throw new InstructionError("Incorrect result for instruction with opcode " + opcode);
+        }
+        
+        if (characters[0] != Instructions.IRET_OPCODE) {
+            let pendingInterrupt = this.#io.getPendingHardwareInterrupt();
+            if (isValid(pendingInterrupt)) {
+                this.#returnFromInterruptToNext.push(false);
+                this._prepareCustomInterruptHandler(pendingInterrupt.getInterruptNumber(), false);
+                let handlerAddress = pendingInterrupt.prepare()
+                this.#cpu.setInstructionPointer(handlerAddress);
+                return;
+            }
+        }
+        
+        if (this.#currentExecution == Emulator.ExecutionMode.SteppingOut && this.#steppedInCount <= this.#stepOutAtCount) {
+            this.cancel();
+        }
+    }
+    
     _executeInterrupt(interruptNumber, ignoreErrors) {
         ignoreErrors = ignoreErrors || this.#nonFailingInterrupts.includes(interruptNumber);
         
-        let returnToNext = this._isTrap(interruptNumber);
+        let returnToNextInstruction = IO.canContinueAfterTrap(interruptNumber);
         
-        let handlerAddress = this._getValidInterruptHandler(interruptNumber, ignoreErrors);
-        if (this._isDefaultInterrupt(handlerAddress, interruptNumber)) {
+        let handlerAddress = this.#io.getValidInterruptHandler(interruptNumber, ignoreErrors);
+        if (this.#io.isDefaultInterrupt(handlerAddress, interruptNumber)) {
             this._defaultInterruptHandler(interruptNumber);
             
             let result = this.#cpu.getInstructionPointer();
-            if (returnToNext) {
+            if (returnToNextInstruction) {
                 result += CPU.instructionSize;
             }
             return result;
         }
         
-        this.#returnFromInterruptToNext.push(returnToNext);
-        this._customInterruptHandler(interruptNumber, ignoreErrors);
+        this.#returnFromInterruptToNext.push(returnToNextInstruction);
+        this._prepareCustomInterruptHandler(interruptNumber, ignoreErrors);
         return handlerAddress;
-    }
-    
-    _isTrap(interruptNumber) {
-        return [CPU.Interrupts.Teleprinter].includes(interruptNumber);
-    }
-    
-    _checkHardwareInterrupt(interruptNumber, portData) {
-        let handlerAddress = this._getValidInterruptHandler(interruptNumber, true);
-        if (this._isDefaultInterrupt(handlerAddress, interruptNumber)) {
-            return null;
-        }
-        
-        if (this.#io.isMoreDataOnPort(portData.port)) {
-            let data = this.#io.readFromPort(portData.port, this.#ioBufferCapacity);
-            for (let ch of data) {
-                portData.queue.push(ch);
-            }
-        }
-        
-        if (portData.queue.length > 0) {
-            let nonHandled = portData.queue.splice(CPU.registerSize, Infinity);
-            let characters = portData.queue.join("");
-            this.#returnFromInterruptToNext.push(false);
-            this._customInterruptHandler(interruptNumber, false);
-            this.#cpu.setInterruptData(characters, null, characters.length);
-            portData.queue = nonHandled;
-            return handlerAddress;
-        }
-        
-        return null;
-    }
-    
-    _getValidInterruptHandler(interruptNumber, ignoreErrors) {
-        let memoryCapacity = this.#memory.getCapacity();
-        
-        let idt = this.#cpu.getIDT();
-        if (idt < 0) {
-            return null;
-        }
-        
-        let maxIdtValue = memoryCapacity - this.#cpu.getIDTSize();
-        if (idt > maxIdtValue) {
-            if (ignoreErrors) {
-                return null;
-            } else {
-                throw new InstructionError(`Not enough space for the Interrupt Description Table: IDT is ${idt} while it cannot be bigger then ${maxIdtValue}.`);
-            }
-        }
-        
-        let interruptDescriptor = this._getInterruptDescriptor(idt, interruptNumber);
-        let handlerAddress = parseIntOrNull(interruptDescriptor);
-        if (handlerAddress == null) {
-            if (ignoreErrors) {
-                return null;
-            } else {
-                throw new InstructionError(`Incorrect address in the Interrupt Description Table for interrupt ${interruptNumber}: "${interruptDescriptor}".`);
-            }
-        }
-        
-        return handlerAddress;
-    }
-    
-    _isDefaultInterrupt(handlerAddress, interruptNumber) {
-        // Address 0 is the same as the default values so it is not allowed
-        // to be the address of a custom interrupt handler.
-        let isAddressIncorrect = handlerAddress == null || handlerAddress == 0;
-        return isAddressIncorrect || this.#cpu.getCurrentInterrupt() == interruptNumber;
-    }
-    
-    _getInterruptDescriptor(idt, interruptNumber) {
-        return this.#memory.getTextAtAddress(idt + interruptNumber * CPU.registerSize, CPU.registerSize);
     }
     
     _defaultInterruptHandler(interruptNumber) {
         switch(interruptNumber) {
-            case CPU.Interrupts.DivideByZero:
+            case IO.Interrupts.DivideByZero:
                 this.cancel();
                 alert("Division by Zero:\nSystem halted");
                 break;
-            case CPU.Interrupts.InvalidOpcode:
+            case IO.Interrupts.InvalidOpcode:
                 this.cancel();
                 alert("Invalid opcode:\nSystem halted");
                 break;
-            case CPU.Interrupts.Halt:
+            case IO.Interrupts.Halt:
                 this.cancel();
                 alert("Reached the end of execution:\nSystem halted");
                 break;
-            case CPU.Interrupts.Breakpoint:
+            case IO.Interrupts.Breakpoint:
                 let currentAddr = this.#cpu.getInstructionPointer();
                 currentAddr = this.#cpu.logicalToPhysicalAddress(currentAddr);
                 
@@ -416,14 +343,18 @@ class Emulator {
                     alert("Reached a breakpoint");
                 }
                 break;
-            case CPU.Interrupts.Teleprinter:
+            case IO.Interrupts.Teleprinter:
+                break;
+            case IO.Interrupts.DmaFinished:
+                break;
+            case IO.Interrupts.Custom:
                 break;
             default:
                 throw new InstructionError(`Incorrect interrupt number: ${interruptNumber}.`);
         }
     }
     
-    _customInterruptHandler(interruptNumber, ignoreErrors) {
+    _prepareCustomInterruptHandler(interruptNumber, ignoreErrors) {
         this.#steppedInCount++;
         
         let registers = this.#cpu.getAllRegisters();

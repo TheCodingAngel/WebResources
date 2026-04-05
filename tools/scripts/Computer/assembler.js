@@ -122,9 +122,9 @@ class Assembler {
     }
     
     parseSourceStatements() {
-        //let lines = this.#input.value.split(/\r\n|\r|\n/g);
+        //let lines = this.#input.getFullText().split(/\r\n|\r|\n/g);
         
-        let src = this.#input.value;
+        let src = this.#input.getFullText();
         if (src.length <= 0) {
             return;
         }
@@ -688,12 +688,17 @@ class Assembler {
     _selectStatement(statementInfo) {
         if (isValid(statementInfo)) {
             this._selectSourceRange(statementInfo.start, statementInfo.end);
+        } else {
+            this._clearSourceRange();
         }
     }
     
     _selectSourceRange(start, end) {
-        this.#input.focus();
-        this.#input.setSelectionRange(start, end);
+        this.#input.selectRange(start, end);
+    }
+    
+    _clearSourceRange() {
+        this.#input.clearRange();
     }
     
     _findStatement(address) {

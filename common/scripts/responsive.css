@@ -420,6 +420,7 @@
     max-width: 100%;
   }
 
+  .io_config_popup .mp_card,
   .memory_popup .mp_card,
   .cpu_popup .mp_card,
   .character_popup .mp_card {

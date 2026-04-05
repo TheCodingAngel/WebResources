@@ -28,6 +28,75 @@ class PopupCenter {
     }
 }
 
+class ReaderBuffer {
+    #value;
+    #position;
+
+    constructor(value = "") {
+        this.reset(value);
+    }
+
+    reset(value = "") {
+        this.#value = value ? value : "";
+        this.#position = 0;
+    }
+
+    resetIfChanged(newValue = "") {
+        if (newValue != this.#value) {
+            this.reset(newValue);
+        }
+    }
+
+    read(maxCharCount) {
+        if (maxCharCount <= 0) {
+            return "";
+        }
+
+        let oldPosition = this.#position;
+        this.#position = Math.min(this.#position + maxCharCount, this.#value.length);
+        return this.#value.substring(oldPosition, this.#position);
+    }
+    
+    hasData() {
+        return this.#position >= 0 && this.#position < this.#value.length;
+    }
+}
+
+class CircularBuffer {
+    #capacity;
+    #value;
+
+    constructor(capacity, value = "") {
+        // allow usage of non initialized or null parameters
+        this.#capacity = capacity ? capacity : 0;
+        this.reset(value);
+    }
+
+    reset(value = "") {
+        this.#value = value ? value : "";
+    }
+
+    append(value) {
+        let newValue = this.#value + (value ? value : "");
+        this.#value = this.#capacity ? newValue.substring(newValue.length - this.#capacity) : newValue;
+    }
+
+    read(maxCharCount) {
+        if (maxCharCount <= 0) {
+            return "";
+        }
+
+        let end = Math.min(maxCharCount, this.#value.length);
+        let res = this.#value.substring(0, end);
+        this.#value = this.#value.substring(end);
+        return res;
+    }
+    
+    hasData() {
+        return this.#value.length > 0;
+    }
+}
+
 function padWithHaltOrCut(str, characterCount) {
     // '.' is the halt instruction
     return padOrCutString(str, characterCount, '.');
