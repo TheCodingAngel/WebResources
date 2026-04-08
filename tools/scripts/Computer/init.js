@@ -25,7 +25,7 @@ function init() {
     let printer = document.getElementById('printer');
     let teleprinter = document.getElementById('teleprinter');
     io = new IO(memory, cpu, punchReader, ignoreSingleNewLinesCheckbox, printer, teleprinter);
-    memory.setMemoryMappingCallbacks(io.onMemoryRead.bind(io), io.onMemorySet.bind(io), io.onMemoryClear.bind(io));
+    memory.setMemoryMappingCallbacks(io.onMemoryRead.bind(io), io.onMemoryChanged.bind(io), io.onMemoryZeroed.bind(io));
 
     let executionIntervalElement = document.getElementById("executionInterval");
     let runExecutionButon = document.getElementById("runExecution");

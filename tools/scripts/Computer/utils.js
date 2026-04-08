@@ -92,8 +92,16 @@ class CircularBuffer {
         return res;
     }
     
+    remove(indexStart, indexAfterEnd) {
+        this.#value = this.#value.substring(0, indexStart) + this.#value.substring(indexAfterEnd);
+    }
+    
     hasData() {
         return this.#value.length > 0;
+    }
+    
+    getEntireData() {
+        return this.#value;
     }
 }
 

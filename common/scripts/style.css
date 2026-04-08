@@ -410,6 +410,10 @@ button.button_style:hover {
   background: rgb(117, 138, 65);
 }
 
+.table_middle tbody tr .memory-cell[data-readonly="1"] {
+  color: rgb(250, 0, 0);
+}
+
 
 #eipRow .memory-cell {
   color: rgb(255, 255, 255);

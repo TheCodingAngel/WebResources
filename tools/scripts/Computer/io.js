@@ -4,7 +4,6 @@ class IO {
     #memory;
     #cpu;
     
-    #isUpdatingMappedMemory;
     #memoryMapping;
 
     #printer;
@@ -83,9 +82,8 @@ class IO {
         this.#devices.set(IO.Ports.CardReader, this.#punchReader);
         this.#devices.set(IO.Ports.Teleprinter, this.#teleprinter);
         
-        this.#dmaController = new DmaController();
+        this.#dmaController = new DmaController(memory);
         
-        this.#isUpdatingMappedMemory = false;
         this.#memoryMapping = new MemoryMapping(memory, this.#printer, this.#teleprinter, this.#dmaController);
         
         this.#ignoreSingleNewLines = !ignoreSingleNewLinesCheckbox || ignoreSingleNewLinesCheckbox.checked;
@@ -100,28 +98,21 @@ class IO {
     }
     
     onMemoryRead(startAddress, value) {
-        if (!isValid(startAddress)) {
-            return;
+        if (isValid(startAddress)) {
+            this.#memoryMapping.onMemoryRead(startAddress, value);
         }
-        this.#memoryMapping.onMemoryRead(startAddress, value);
     }
     
-    onMemorySet(startAddress, value) {
-        if (this.#isUpdatingMappedMemory || !isValid(startAddress)) {
-            return;
+    onMemoryChanged(startAddress, value) {
+        if (isValid(startAddress)) {
+            this.#memoryMapping.onMemoryChanged(startAddress, value);
         }
-        this.#isUpdatingMappedMemory = true;
-        this.#memoryMapping.onMemorySet(startAddress, value);
-        this.#isUpdatingMappedMemory = false;
     }
     
-    onMemoryClear(startAddress, count) {
-        if (this.#isUpdatingMappedMemory || !isValid(startAddress)) {
-            return;
+    onMemoryZeroed(startAddress, count) {
+        if (isValid(startAddress)) {
+            this.#memoryMapping.onMemoryZeroed(startAddress, value);
         }
-        this.#isUpdatingMappedMemory = true;
-        this.#memoryMapping.onMemoryClear(startAddress, value);
-        this.#isUpdatingMappedMemory = false;
     }
     
     onShowConfigurationDialog() {
@@ -130,7 +121,12 @@ class IO {
     
     onLoadTextAtStartAddress() {
         if (!this.#ignoreSingleNewLines) {
-            this.#memory.onLoadTextAtStartAddress(this.#punchReader.getFullText());
+            try {
+                this.#memoryMapping.DisableMemoryNotifications();
+                this.#memory.onLoadTextAtStartAddress(this.#punchReader.getFullText());
+            } finally {
+                this.#memoryMapping.EnableMemoryNotifications();
+            }
             return;
         }
         
@@ -141,7 +137,13 @@ class IO {
                 lines[i] = "\n";
             }
         }
-        this.#memory.onLoadTextAtStartAddress(lines.join(""));
+        
+        try {
+            this.#memoryMapping.DisableMemoryNotifications();
+            this.#memory.onLoadTextAtStartAddress(lines.join(""));
+        } finally {
+            this.#memoryMapping.EnableMemoryNotifications();
+        }
     }
     
     getPunchReader() {
@@ -157,8 +159,13 @@ class IO {
     }
 
     onPrintTextAtSelectedAddresses() {
-        let text = this.#memory.onGetTextAtSelectedAddresses();
-        this.#printer.write(text, text.length);
+        try {
+            this.#memoryMapping.DisableMemoryNotifications();
+            let text = this.#memory.onGetTextAtSelectedAddresses();
+            this.#printer.write(text, text.length);
+        } finally {
+            this.#memoryMapping.EnableMemoryNotifications();
+        }
     }
 
     onClearPrintedText() {
@@ -221,7 +228,12 @@ class IO {
     }
     
     _getInterruptDescriptor(idt, interruptNumber) {
-        return this.#memory.getTextAtAddress(idt + interruptNumber * CPU.registerSize, CPU.registerSize);
+        try {
+            this.#memoryMapping.DisableMemoryNotifications();
+            return this.#memory.getTextAtAddress(idt + interruptNumber * CPU.registerSize, CPU.registerSize);
+        } finally {
+            this.#memoryMapping.EnableMemoryNotifications();
+        }
     }
 
     readFromPort(port, maxCharCount) {
@@ -285,11 +297,13 @@ class MemoryMapping {
     #dialog;
     #memory;
     
+    #ignoreMemoryNotifications;
     #memoryBuffers = [];
     
     constructor(memory, printer, teleprinter, dmaController) {
         this.#dialog = document.querySelector('.io_config_popup');
         this.#memory = memory;
+        this.#ignoreMemoryNotifications = 0;
         
         if (!isValid(this.#dialog)) {
             return;
@@ -303,7 +317,7 @@ class MemoryMapping {
         this.#memoryBuffers = [
             {
                 device: printer,
-                isInputBuffer: false,
+                isReadOnly: false,
                 enableMmio: document.getElementById('enablePrinterMMIO'),
                 capacity: Printer.memoryBufferCapacity,
                 startAddress: document.getElementById('printerStartAddress'),
@@ -311,7 +325,7 @@ class MemoryMapping {
             },
             {
                 device: teleprinter,
-                isInputBuffer: true,
+                isReadOnly: true,
                 enableMmio: document.getElementById('enableTeleprinterInputMMIO'),
                 capacity: Teleprinter.inputCapacity,
                 startAddress: document.getElementById('teleprinterInputStartAddress'),
@@ -319,7 +333,7 @@ class MemoryMapping {
             },
             {
                 device: teleprinter,
-                isInputBuffer: false,
+                isReadOnly: false,
                 enableMmio: document.getElementById('enableTeleprinterOuputMMIO'),
                 capacity: Teleprinter.printCapacity,
                 startAddress: document.getElementById('teleprinterOutputStartAddress'),
@@ -327,7 +341,7 @@ class MemoryMapping {
             },
             {
                 device: dmaController,
-                isInputBuffer: false,
+                isReadOnly: false,
                 enableMmio: document.getElementById('enableDmaMMIO'),
                 capacity: DmaController.bufferCapacity,
                 startAddress: document.getElementById('dmaStartAddress'),
@@ -355,6 +369,9 @@ class MemoryMapping {
         for (let i = 0; i < this.#memoryBuffers.length; i++) {
             let buffer = this.#memoryBuffers[i];
             
+            buffer.device.setBufferChangedCallback(buffer.isReadOnly,
+                (isReadOnly, data) => _this._forceBufferToMemory(buffer, isReadOnly, data));
+            
             buffer.dataBeforeMapping = "";
             buffer.mappedAddress = 0;
             buffer.isMmioEnabled = buffer.enableMmio.checked;
@@ -379,31 +396,46 @@ class MemoryMapping {
             let buffer = this.#memoryBuffers[i];
             buffer.enableMmio.checked = buffer.isMmioEnabled;
             buffer.startAddress.value = buffer.mappedAddress.toString(10);
+            
+            buffer.startAddress.disabled = !buffer.isMmioEnabled;
+            this._onStartAddressChanged(buffer, buffer.startAddress.value);
         }
         
         this.#dialog.classList.add('activeic');
     }
     
     onOK() {
-        for (let i = 0; i < this.#memoryBuffers.length; i++) {
-            let buffer = this.#memoryBuffers[i];
-            this.#memory.markAddresses(buffer.mappedAddress, buffer.capacity, Memory.markType.MmioBuffer, false);
-            this.#memory.setReadOnlyCells(buffer.mappedAddress, buffer.capacity, false);
+        try {
+            this.DisableMemoryNotifications();
             
-            buffer.isMmioEnabled = buffer.enableMmio.checked;
-            buffer.mappedAddress = parseIntOrZero(buffer.startAddress.value);
-        }
-        
-        for (let i = 0; i < this.#memoryBuffers.length; i++) {
-            let buffer = this.#memoryBuffers[i];
-            if (buffer.isMmioEnabled) {
-                this.#memory.markAddresses(buffer.mappedAddress, buffer.capacity, Memory.markType.MmioBuffer, true);
-                this.#memory.setReadOnlyCells(buffer.mappedAddress, buffer.capacity, buffer.isInputBuffer);
-                buffer.dataBeforeMapping = this.#memory.getTextAtAddress(buffer.mappedAddress, buffer.capacity);
-                this._forceBufferToMemory(buffer);
-            } else {
-                this.#memory.setTextAtAddress(buffer.mappedAddress, buffer.dataBeforeMapping);
+            for (let i = 0; i < this.#memoryBuffers.length; i++) {
+                let buffer = this.#memoryBuffers[i];
+                
+                this.#memory.markAddresses(buffer.mappedAddress, buffer.capacity, Memory.markType.MmioBuffer, false);
+                this.#memory.setReadOnlyCells(buffer.mappedAddress, buffer.capacity, false);
+                
+                if (buffer.dataBeforeMapping) {
+                    this.#memory.setTextAtAddress(buffer.mappedAddress, buffer.dataBeforeMapping);
+                    buffer.dataBeforeMapping = "";
+                }
+                
+                buffer.isMmioChanged = buffer.isMmioEnabled != buffer.enableMmio.checked;
+                buffer.isMmioEnabled = buffer.enableMmio.checked;
+                buffer.mappedAddress = parseIntOrZero(buffer.startAddress.value);
             }
+            
+            for (let i = 0; i < this.#memoryBuffers.length; i++) {
+                let buffer = this.#memoryBuffers[i];
+                if (buffer.isMmioEnabled) {
+                    this.#memory.markAddresses(buffer.mappedAddress, buffer.capacity, Memory.markType.MmioBuffer, true);
+                    buffer.dataBeforeMapping = this.#memory.getTextAtAddress(buffer.mappedAddress, buffer.capacity);
+                    buffer.device.onMmioEnabled(buffer.isReadOnly);
+                } else {
+                    buffer.device.onMmioDisabled(buffer.isReadOnly);
+                }
+            }
+        } finally {
+            this.EnableMemoryNotifications();
         }
         
         this._hide();
@@ -413,36 +445,94 @@ class MemoryMapping {
         this._hide();
     }
     
+    _hide() {
+        this.#dialog.classList.remove('activeic');
+    }
+    
     onFlush() {
+        try {
+            this.DisableMemoryNotifications();
+            
+            for (let i = 0; i < this.#memoryBuffers.length; i++) {
+                let buffer = this.#memoryBuffers[i];
+                if (buffer.isMmioEnabled && buffer.device.flush) {
+                    let data = buffer.isReadOnly ? null :
+                        this.#memory.getTextAtAddress(buffer.mappedAddress, buffer.capacity);
+                    buffer.device.flush(data);
+                }
+            }
+        } finally {
+            this.EnableMemoryNotifications();
+        }
+    }
+    
+    EnableMemoryNotifications() {
+        this.#ignoreMemoryNotifications--;
+    }
+    
+    DisableMemoryNotifications() {
+        this.#ignoreMemoryNotifications++;
+    }
+    
+    onMemoryRead(startAddress, value) {
+        if (this.#ignoreMemoryNotifications > 0) {
+            return;
+        }
+        
         for (let i = 0; i < this.#memoryBuffers.length; i++) {
             let buffer = this.#memoryBuffers[i];
-            if (buffer.isMmioEnabled && buffer.device.flush) {
-                let data = buffer.isInputBuffer ? null :
-                    this.#memory.getTextAtAddress(buffer.mappedAddress, buffer.capacity);
-                if (buffer.device.flush(data)) {
-                    this._forceBufferToMemory(buffer);
+            if (buffer.isMmioEnabled && buffer.isReadOnly && buffer.device.onMemoryRead) {
+                let section = this._getSection(startAddress, value.length, buffer);
+                if (section.isValid) {
+                    buffer.device.onMemoryRead(section.indexInBuffer, section.indexAfterEnd);
                 }
             }
         }
     }
     
-    _hide() {
-        this.#dialog.classList.remove('activeic');
+    onMemoryChanged(startAddress, value) {
+        if (this.#ignoreMemoryNotifications > 0) {
+            return;
+        }
+        
+        for (let i = 0; i < this.#memoryBuffers.length; i++) {
+            let buffer = this.#memoryBuffers[i];
+            if (buffer.isMmioEnabled && buffer.device.onMemoryChanged) {
+                let section = this._getSection(startAddress, value.length, buffer);
+                if (section.isValid) {
+                    buffer.device.onMemoryChanged(section.indexInBuffer, section.indexAfterEnd);
+                }
+            }
+        }
     }
     
-    onMemoryRead(startAddress, value) {
+    onMemoryZeroed(startAddress, count) {
+        if (this.#ignoreMemoryNotifications > 0) {
+            return;
+        }
+        
+        for (let i = 0; i < this.#memoryBuffers.length; i++) {
+            let buffer = this.#memoryBuffers[i];
+            if (buffer.isMmioEnabled && buffer.device.onMemoryZeroed) {
+                let section = this._getSection(startAddress, count, buffer);
+                if (section.isValid) {
+                    buffer.device.onMemoryZeroed(section.indexInBuffer, section.indexAfterEnd);
+                }
+            }
+        }
     }
     
-    onMemorySet(startAddress, value) {
-    }
-    
-    onMemoryClear(startAddress, count) {
-    }
-    
-    _forceBufferToMemory(buffer) {
-        this.#memory.setTextAtAddress(buffer.mappedAddress, buffer.isInputBuffer ?
-            buffer.device.getInputMemoryBuffer() :
-            buffer.device.getOutputMemoryBuffer(), true);
+    _forceBufferToMemory(buffer, isReadOnly, data) {
+        if (!buffer.isMmioEnabled) {
+            return;
+        }
+        
+        if (isValid(isReadOnly)) {
+            buffer.isReadOnly = isReadOnly;
+            this.#memory.setReadOnlyCells(buffer.mappedAddress, buffer.capacity, buffer.isReadOnly);
+        }
+        
+        this.#memory.setTextAtAddress(buffer.mappedAddress, data, true);
     }
     
     _onStartAddressChanged(buffer, startAddressStr) {
@@ -458,6 +548,16 @@ class MemoryMapping {
         }
         return newValue;
     }
+    
+    _getSection(memoryAddress, dataSize, buffer) {
+        let indexInBuffer = Math.max(memoryAddress, buffer.mappedAddress) - buffer.mappedAddress;
+        let indexAfterEnd = Math.min(memoryAddress + dataSize - buffer.mappedAddress, buffer.capacity);
+        return {
+            isValid: indexAfterEnd > indexInBuffer && indexInBuffer < buffer.capacity,
+            indexInBuffer: indexInBuffer,
+            indexAfterEnd: indexAfterEnd,
+        };
+    }
 }
 
 class Printer {
@@ -465,47 +565,57 @@ class Printer {
     
     #writerElement;
     #emptyBuffer;
+    #bufferChangedCallback;
     
     constructor(writerElement) {
         this.#writerElement = writerElement;
+        this.#emptyBuffer = null;
         this.clear();
     }
     
     clear() {
+        if (this.#bufferChangedCallback) {
+            this.#bufferChangedCallback(null, this._getEmptyBuffer());
+        }
         this.#writerElement.value = "";
+    }
+    
+    setBufferChangedCallback(isReadOnly, callback) {
+        this.#bufferChangedCallback = callback;
+    }
+    
+    onMmioEnabled(isReadOnly) {
+        this.#bufferChangedCallback(null, this._getEmptyBuffer());
+    }
+    
+    onMmioDisabled(isReadOnly) {
         this.#emptyBuffer = null;
     }
     
     write(value, maxCharCount) {
-        this.#writerElement.value += value.substr(0, maxCharCount);
+        this.#writerElement.value += value.substring(0, maxCharCount);
         return 0;
-    }
-    
-    getOutputMemoryBuffer() {
-        if (!this.#emptyBuffer) {
-            this.#emptyBuffer = "".padEnd(Printer.memoryBufferCapacity, IO.emptyCharacter);
-        }
-        return this.#emptyBuffer;
-    }
-    
-    updateMemoryBuffer(startMemoryAddress, index, data) {
-    }
-    
-    clearMemoryBuffer(startMemoryAddress, index, count) {
     }
     
     flush(data) {
         if (!data) {
-            return false;
+            return;
         }
         
         data = data.replaceAll(IO.emptyCharacter, "");
         if (!data) {
-            return false;
+            return;
         }
         
-        this.#writerElement.value += data;
-        return true;
+        this.#writerElement.value += data; // "print" the data
+        this.#bufferChangedCallback(null, this._getEmptyBuffer());
+    }
+    
+    _getEmptyBuffer() {
+        if (!this.#emptyBuffer) {
+            this.#emptyBuffer = "".padEnd(Printer.memoryBufferCapacity, IO.emptyCharacter);
+        }
+        return this.#emptyBuffer;
     }
 }
 
@@ -554,17 +664,17 @@ class Teleprinter {
     static printCapacity = 10;
     
     #teleprinterElement;
-    #buffer;
+    #inputChangedCallback;
+    #outputChangedCallback;
     
-    #inputMemoryBuffer;
-    #outputMemoryBuffer;
+    #inputBuffer;
+    #emptyBuffer;
     
     constructor(teleprinterElement) {
         this.#teleprinterElement = teleprinterElement;
         
-        this.#buffer = new CircularBuffer(Teleprinter.inputCapacity);
-        this.#inputMemoryBuffer = null;
-        this.#outputMemoryBuffer = null;
+        this.#inputBuffer = new CircularBuffer(Teleprinter.inputCapacity);
+        this.#emptyBuffer = null;
         
         teleprinterElement.addEventListener('select', function() {
             this.selectionStart = this.value.length;
@@ -581,7 +691,8 @@ class Teleprinter {
             
             if (Keys.isEscape(e.key)) {
                 this.value += "\n";
-                _this.#buffer.reset();
+                _this.#inputBuffer.reset();
+                _this.#inputChangedCallback(null, _this._getInputMemoryBuffer());
                 return;
             }
 
@@ -589,10 +700,12 @@ class Teleprinter {
 
             if (Keys.isEnter(e.key)) {
                 this.value += "\n";
-                _this.#buffer.append("\n");
+                _this.#inputBuffer.append("\n");
+                _this.#inputChangedCallback(null, _this._getInputMemoryBuffer());
             } else if (char != null) {
                 this.value += char;
-                _this.#buffer.append(char);
+                _this.#inputBuffer.append(char);
+                _this.#inputChangedCallback(null, _this._getInputMemoryBuffer());
             }
             
             if (!Keys.isTab(e.key)) {
@@ -614,7 +727,8 @@ class Teleprinter {
         teleprinterElement.addEventListener('input', function (e) {
             if (Keys.isEscape(e.data)) {
                 this.value += "\n";
-                _this.#buffer.reset();
+                _this.#inputBuffer.reset();
+                _this.#inputChangedCallback(null, _this._getInputMemoryBuffer());
                 return;
             }
             
@@ -622,10 +736,12 @@ class Teleprinter {
 
             if (Keys.isEnter(e.data)) {
                 this.value += "\n";
-                _this.#buffer.append("\n");
+                _this.#inputBuffer.append("\n");
+                _this.#inputChangedCallback(null, _this._getInputMemoryBuffer());
             } else if (char != null) {
                 this.value += char;
-                _this.#buffer.append(char);
+                _this.#inputBuffer.append(char);
+                _this.#inputChangedCallback(null, _this._getInputMemoryBuffer());
             }
             
             e.preventDefault();
@@ -633,50 +749,80 @@ class Teleprinter {
     }
     
     clear() {
-        this.#buffer.reset();
-        this.#inputMemoryBuffer = null;
-        this.#outputMemoryBuffer = null;
+        this.#inputBuffer.reset();
+        this.#inputChangedCallback(null, this._getInputMemoryBuffer());
+        this.#outputChangedCallback(null, this._getEmptyBuffer());
+        this.#emptyBuffer = null;
         
         this.#teleprinterElement.value = "";
         this.#teleprinterElement.focus();
     }
     
+    setBufferChangedCallback(isReadOnly, callback) {
+        if (isReadOnly) {
+            this.#inputChangedCallback = callback;
+        } else {
+            this.#outputChangedCallback = callback;
+        }
+    }
+    
+    onMmioEnabled(isReadOnly) {
+        if (isReadOnly) {
+            this.#inputChangedCallback(true, this._getInputMemoryBuffer());
+        } else {
+            this.#outputChangedCallback(null, this._getEmptyBuffer());
+        }
+    }
+    
+    onMmioDisabled(isReadOnly) {
+        this.#emptyBuffer = null;
+    }
+    
     read(maxCharCount) {
         maxCharCount = Math.min(maxCharCount, Teleprinter.inputCapacity)
-        return this.#buffer.read(maxCharCount);
+        let res = this.#inputBuffer.read(maxCharCount);
+        this.#inputChangedCallback(null, this._getInputMemoryBuffer());
+        return res;
     }
 
     write(value, maxCharCount) {
         let max = Math.min(maxCharCount, Teleprinter.printCapacity)
-        this.#teleprinterElement.value += value.substr(0, max);
+        this.#teleprinterElement.value += value.substring(0, max);
         return maxCharCount - max;
     }
     
     hasData() {
-        return this.#buffer.hasData();
+        return this.#inputBuffer.hasData();
     }
     
-    getOutputMemoryBuffer() {
-        if (!this.#outputMemoryBuffer) {
-            this.#outputMemoryBuffer = "".padEnd(Teleprinter.printCapacity, IO.emptyCharacter);
+    onMemoryRead(indexInBuffer, indexAfterEnd) {
+        this.#inputBuffer.remove(indexInBuffer, indexAfterEnd);
+        this.#inputChangedCallback(null, this._getInputMemoryBuffer());
+    }
+    
+    flush(data) {
+        if (!data) {
+            return;
         }
-        return this.#outputMemoryBuffer;
-    }
-    
-    getInputMemoryBuffer() {
-        if (!this.#inputMemoryBuffer) {
-            this.#inputMemoryBuffer = "".padEnd(Teleprinter.inputCapacity, IO.emptyCharacter);
+        
+        data = data.replaceAll(IO.emptyCharacter, "");
+        if (!data) {
+            return;
         }
-        return this.#inputMemoryBuffer;
+        
+        this.#teleprinterElement.value += data; // "print" the data
+        this.#outputChangedCallback(null, this._getEmptyBuffer());
     }
     
-    readMemoryBuffer(startMemoryAddress, index, data) {
+    _getEmptyBuffer() {
+        if (!this.#emptyBuffer) {
+            this.#emptyBuffer = "".padEnd(Teleprinter.printCapacity, IO.emptyCharacter);
+        }
+        return this.#emptyBuffer;
     }
     
-    updateMemoryBuffer(startMemoryAddress, index, data) {
-    }
-    
-    clearMemoryBuffer(startMemoryAddress, index, count) {
+    _getInputMemoryBuffer() {
+        return this.#inputBuffer.getEntireData().padEnd(Teleprinter.inputCapacity, IO.emptyCharacter);
     }
     
     static _getPrintableCharacter(key) {
@@ -728,6 +874,8 @@ class Teleprinter {
 class DmaController {
     static #registerSize = 4;
     static #controlData = 2;
+    static #statusDefault = "-";
+    static #statusProgress = ">";
     
     static Registers = {
         Control: 0,
@@ -736,27 +884,52 @@ class DmaController {
         Count: 3,
     }
     
+    static Status = {
+        Idle: 0,
+        Pending: 1,
+        Copy: 2,
+    }
+    
     static bufferCapacity = getPropertiesCount(DmaController.Registers) * DmaController.#registerSize;
+    
+    #memory;
+    #memoryBuffer;
+    #bufferChangedCallback;
     
     #control = "MM";
     #dataRegisters = [0, 0, 0];
-    #memoryBuffer = null;
+    #status;
     
     
-    constructor() {
-        this.reset();
+    constructor(memory) {
+        this.#memory = memory;
+        this._reset();
     }
     
-    reset() {
-        this.#control = this.#control.substr(0, DmaController.#controlData)
-            .padEnd(DmaController.#registerSize, "-");
+    _reset() {
+        this.#memoryBuffer = null;
+        this.#control = this.#control.substring(0, DmaController.#controlData)
+            .padEnd(DmaController.#registerSize, DmaController.#statusDefault);
         this.#dataRegisters.fill(0);
+        this.#status = DmaController.Status.Idle;
+    }
+    
+    setBufferChangedCallback(isReadOnly, callback) {
+        this.#bufferChangedCallback = callback;
+    }
+    
+    onMmioEnabled(isReadOnly) {
+        this._reset();
+        this.#bufferChangedCallback(false, this._getMemoryBuffer());
+    }
+    
+    onMmioDisabled(isReadOnly) {
         this.#memoryBuffer = null;
     }
     
     readRegister(registerIndex, maxCharCount) {
         if (registerIndex == DmaController.Registers.Control) {
-            return this.#control.substr(0, maxCharCount);
+            return this.#control.substring(0, maxCharCount);
         } else {
             return _getDataRegisterAsString(registerIndex - 1, maxCharCount);
         }
@@ -766,14 +939,77 @@ class DmaController {
         this.#memoryBuffer = null;
         
         if (registerIndex == DmaController.Registers.Control) {
-            this.#control = value.substr(0, Math.min(maxCharCount, DmaController.#controlData)) + ">-";
-            this._startCopy();
+            let ioConfig = value.substring(0, Math.min(maxCharCount, DmaController.#controlData));
+            if (this._shouldStartCopy(ioConfig)) {
+                this.#status = DmaController.Status.Pending;
+            } else {
+                throw new InstructionError('The first ("source") and second ("destination") characters of the DMA Control register can be:\n' +
+                    "- 'P' - copy using Port I/O, i.e. the corresponding Source / Destination register contains a Port Address;\n" +
+                    "- 'M' - copy using Memory I/O, i.e. the corresponding Source / Destination register contains a Memory Address.");
+            }
         } else {
             this.#dataRegisters[registerIndex - 1] = this._getRegisterDataFromString(value, maxCharCount);
         }
     }
     
-    getOutputMemoryBuffer() {
+    onMemoryChanged(indexInBuffer, indexAfterEnd) {
+        if (this.#status == DmaController.Status.Idle && this._isControlRegister(indexInBuffer, indexAfterEnd)) {
+            this.#status = DmaController.Status.Pending;
+        }
+    }
+    
+    flush(data) {
+        if (this.#status == DmaController.Status.Idle) {
+            return;
+        }
+        
+        this.#memoryBuffer = null;
+        let makeBufferReadOnly = null;
+        
+        if (this.#status == DmaController.Status.Pending) {
+            if (!data) {
+                return;
+            }
+            
+            this.#control = data.substring(0, DmaController.#registerSize);
+            
+            let ioConfig = this.#control.substring(0, DmaController.#controlData);
+            if (!this._shouldStartCopy(ioConfig)) {
+                this.#status = DmaController.Status.Idle;
+                return;
+            }
+            
+            let startIndex = 0;
+            for (let i = 0; i < this.#dataRegisters.length; i++) {
+                startIndex += DmaController.#registerSize;
+                let endIndex = startIndex + DmaController.#registerSize;
+                
+                this.#dataRegisters[i] = this._getRegisterDataFromString(data.substring(startIndex, endIndex),
+                    DmaController.#registerSize);
+            }
+            
+            this.#status = DmaController.Status.Copy;
+            
+            if (this.#dataRegisters[DmaController.Registers.Count - 1] > 0) {
+                this._setStatusProgress();
+                makeBufferReadOnly = true;
+            }
+        }
+        
+        if (this.#status == DmaController.Status.Copy) {
+            if (this.#dataRegisters[DmaController.Registers.Count - 1] > 0) {
+                this._copyNextData();
+            }
+            if (this.#dataRegisters[DmaController.Registers.Count - 1] <= 0) {
+                this.#status = DmaController.Status.Idle;
+                this._clearStatusProgress();
+                makeBufferReadOnly = false;
+            }
+            this.#bufferChangedCallback(makeBufferReadOnly, this._getMemoryBuffer());
+        }
+    }
+    
+    _getMemoryBuffer() {
         if (!this.#memoryBuffer) {
             this.#memoryBuffer = this.#dataRegisters.reduce(
                 (str, value) => str + padOrCutNumber(value, DmaController.#registerSize),
@@ -782,28 +1018,28 @@ class DmaController {
         return this.#memoryBuffer;
     }
     
-    updateMemoryBuffer(startMemoryAddress, index, data) {
-    }
-    
-    clearMemoryBuffer(startMemoryAddress, index, count) {
-    }
-    
-    _startCopy() {
-        let ioConfig = this.#control.substr(0, DmaController.#controlData);
+    _shouldStartCopy(ioConfig) {
         switch(ioConfig) {
             case "MM":
-                break;
+                return true;
             case "MP":
-                break;
+                return true;
             case "PM":
-                break;
+                return true;
             case "PP":
-                break;
-            default:
-                throw new InstructionError('The first ("source") and second ("destination") characters of the DMA Control register can be:\n' +
-                    "- 'P' - copy using Port I/O, i.e. the corresponding Source / Destination register contains a Port Address;\n" +
-                    "- 'M' - copy using Memory I/O, i.e. the corresponding Source / Destination register contains a Memory Address.");
+                return true;
         }
+        return false;
+    }
+    
+    _copyNextData() {
+        let ioConfig = this.#control.substring(0, DmaController.#controlData);
+        
+        let source = this.#dataRegisters[DmaController.Registers.Source - 1];
+        let destination = this.#dataRegisters[DmaController.Registers.Destination - 1];
+        let count = this.#dataRegisters[DmaController.Registers.Count - 1];
+        
+        this.#dataRegisters[DmaController.Registers.Count - 1] = count - 1;
     }
     
     _getDataRegisterAsString(registerIndex, maxCharCount) {
@@ -812,7 +1048,22 @@ class DmaController {
     }
     
     _getRegisterDataFromString(value, maxCharCount) {
-        let newStringValue = value.substr(0, Math.min(maxCharCount, DmaController.#registerSize));
+        let newStringValue = value.substring(0, Math.min(maxCharCount, DmaController.#registerSize));
         return parseIntOrZero(newStringValue, 10);
+    }
+    
+    _setStatusProgress(isInProgress) {
+        let ioConfig = this.#control.substring(0, DmaController.#controlData);
+        this.#control = (ioConfig + DmaController.#statusProgress)
+            .padEnd(DmaController.#registerSize, DmaController.#statusDefault);
+    }
+    
+    _clearStatusProgress(isInProgress) {
+        this.#control = this.#control.substring(0, DmaController.#controlData)
+            .padEnd(DmaController.#registerSize, DmaController.#statusDefault);
+    }
+    
+    _isControlRegister(indexInBuffer, indexAfterEnd) {
+        return indexInBuffer >= 0 && indexInBuffer < 2 && indexAfterEnd > indexInBuffer;
     }
 }

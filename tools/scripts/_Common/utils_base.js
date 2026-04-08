@@ -149,7 +149,7 @@ class TextCode {
         let result = [];
         let len = hexString.length - 2;
         while (len >= 0) {
-          result.push(hexString.substr(len, 2));
+          result.push(hexString.substring(len, len + 2));
           len -= 2;
         }
         return result.join("");
@@ -393,14 +393,14 @@ function padOrCutNumber(number, charCount) {
     if (number < 0) {
         charCount -= 1;
     }
-    let res = str.length < charCount ? str.padStart(charCount, '0') : str.substr(-charCount);
+    let res = str.length < charCount ? str.padStart(charCount, '0') : str.slice(-charCount);
     
     return number < 0 ? "-" + res : res;
 }
 
 function padOrCutString(str, characterCount, fill = ' ') {
     if (str.length >= characterCount) {
-        return str.substr(0, characterCount);
+        return str.substring(0, characterCount);
     }
     return str.padStart(characterCount, fill);
 }

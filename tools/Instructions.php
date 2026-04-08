@@ -120,7 +120,7 @@ Keyboard shortcuts supported by the emulators (there are also buttons in the CPU
 <ul>
 <li><strong><u>R</u></strong>un (<strong>Alt + R</strong>) - run using Delay between each instruction;<br>
 Delay of 0 <strong>blocks the page and cannot be stopped by the user</strong>.<br><br></li>
-<li><strong><u>C</u></strong>ancel Running (<strong>Alt + C</strong>) - stop the automatic execution initiated by the previous operation.<br><br></li>
+<li><strong><u>C</u></strong>ancel (<strong>Alt + C</strong>) - stop the automatic execution initiated by the previous operation.<br><br></li>
 <li>E<strong><u>x</u></strong>ecute (<strong>Alt + X</strong>) - execute one "Step" depending on the "Is Step by Step" flag:<br>
 <ul>
 <li>if "Is Step by Step" is <strong>true</strong> then <strong>Step In</strong> is performed</li>

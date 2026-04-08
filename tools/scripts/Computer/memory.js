@@ -15,8 +15,8 @@ class Memory {
     #rowCount = 1000;
     
     #memoryReadCallback = null;
-    #memorySetCallback = null;
-    #memoryClearCallback = null;
+    #memoryChangedCallback = null;
+    #memoryZeroedCallback = null;
 
     static markType = {
         NoMark: 0x00,
@@ -95,7 +95,7 @@ class Memory {
 
         this.#elementData.addEventListener('dblclick', function (e) {
             const cell = e.target.closest('td');
-            if (!cell) {
+            if (!cell || "readonly" in cell.dataset) {
                 return;
             }
             if (memory.#editMemoryByRows) {
@@ -169,10 +169,10 @@ class Memory {
         this.#addressEndInput.value = this.#selectedAddressEnd;
     }
     
-    setMemoryMappingCallbacks(memoryReadCallback, memorySetCallback, memoryClearCallback) {
+    setMemoryMappingCallbacks(memoryReadCallback, memoryChangedCallback, memoryZeroedCallback) {
         this.#memoryReadCallback = memoryReadCallback;
-        this.#memorySetCallback = memorySetCallback;
-        this.#memoryClearCallback = memoryClearCallback;
+        this.#memoryChangedCallback = memoryChangedCallback;
+        this.#memoryZeroedCallback = memoryZeroedCallback;
     }
     
     getCapacity() {
@@ -378,10 +378,10 @@ class Memory {
             if (setReadOnlyCells || !("readonly" in cell.dataset)) {
                 let textNode = cell.childNodes[0];
                 textNode.nodeValue = Memory._getValueFromCharacter(ctx.text[ctx.index]);
-                ctx.index++;
             }
+            ctx.index++;
         });
-        this.#memorySetCallback(parseIntOrNull(startCell.id.substring(2)), text);
+        this.#memoryChangedCallback(parseIntOrNull(startCell.id.substring(2)), text);
         return context.index;
     }
 
@@ -391,10 +391,10 @@ class Memory {
             if (!("readonly" in cell.dataset)) {
                 let textNode = cell.childNodes[0];
                 textNode.nodeValue = "0";
-                ctx.index++;
             }
+            ctx.index++;
         });
-        this.#memoryClearCallback(parseIntOrNull(startCell.id.substring(2)), count);
+        this.#memoryZeroedCallback(parseIntOrNull(startCell.id.substring(2)), count);
         return context.index;
     }
 
