@@ -68,7 +68,7 @@ my <?php $page->printInternalLink("simple", "Computer"); ?> and <?php $page->pri
     <h3 class="section-header">Register Identifiers:</h3>
   </div>
   <div class="section-registers flex-row flex-pos-ortogonal-center">
-    <table cellpadding="5" cellspacing="5">
+    <table cellspacing="5">
       <thead>
         <tr>
           <th>Name</th>
@@ -86,7 +86,7 @@ my <?php $page->printInternalLink("simple", "Computer"); ?> and <?php $page->pri
           <td>EAX</td>
           <td>0014</td>
           <td>Accumulator A - data.
-            <table cellpadding="5" cellspacing="5">
+            <table cellspacing="5">
               <thead>
                 <tr><th>Sub-part</th><th>Identifier</th><th>Description</th></tr>
               </thead>
@@ -102,7 +102,7 @@ my <?php $page->printInternalLink("simple", "Computer"); ?> and <?php $page->pri
           <td>EBX</td>
           <td>0024</td>
           <td>Accumulator B - data.
-            <table cellpadding="5" cellspacing="5">
+            <table cellspacing="5">
               <thead>
                 <tr><th>Sub-part</th><th>Identifier</th><th>Description</th></tr>
               </thead>
@@ -118,7 +118,7 @@ my <?php $page->printInternalLink("simple", "Computer"); ?> and <?php $page->pri
           <td>ECX</td>
           <td>0034</td>
           <td>Accumulator C - counter.
-            <table cellpadding="5" cellspacing="5">
+            <table cellspacing="5">
               <thead>
                 <tr><th>Sub-part</th><th>Identifier</th><th>Description</th></tr>
               </thead>
@@ -171,7 +171,7 @@ my <?php $page->printInternalLink("simple", "Computer"); ?> and <?php $page->pri
               <li>the address of a handler for "breakpoint";</li>
               <li>the address of a handler for hardware interrupts from the Teleprinter.</li>
               <li>the address of a handler for end of data copy by the DMA device.</li>
-              <li>the address of a handler for a custom interrupt (API).</li>
+              <li>the address of a handler for a custom interrupt (System API).</li>
             </ol>
             <br>Note - only non-zero values are accepted as valid addresses.
             </div>

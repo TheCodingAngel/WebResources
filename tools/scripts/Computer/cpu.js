@@ -320,10 +320,11 @@ class CPU {
         return getPropertiesCount(IO.Interrupts) * CPU.registerSize;
     }
     
-    setInterruptData(eax, ebx, ecx) {
+    setInterruptData(eax, ebx, ecx, ebp) {
         this.setGeneralRegisterValueSafe("eax", eax);
         this.setGeneralRegisterValueSafe("ebx", ebx);
         this.setGeneralRegisterValueSafe("ecx", ecx);
+        this.setGeneralRegisterValueSafe("ebp", ebp);
     }
     
     getRegisterValueById(registerId) {

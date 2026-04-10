@@ -71,7 +71,7 @@ my <?php $page->printInternalLink("simple", "Computer"); ?> and <?php $page->pri
     <h3 class="section-header">Suffixes for 1 operand:</h3>
   </div>
   <div class="section-registers flex-row">
-    <table cellpadding="5" cellspacing="5">
+    <table cellspacing="5">
       <thead>
         <tr>
           <th>Suffix</th>
@@ -105,7 +105,7 @@ my <?php $page->printInternalLink("simple", "Computer"); ?> and <?php $page->pri
     <h3 class="section-header">Suffixes for 2 operands:</h3>
   </div>
   <div class="section-registers flex-row flex-pos-ortogonal-center">
-    <table cellpadding="5" cellspacing="5">
+    <table cellspacing="5">
       <thead>
         <tr>
           <th>Suffix</th>

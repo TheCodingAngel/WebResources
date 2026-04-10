@@ -336,14 +336,30 @@ the instructions here have things from
     <h4>T - INT</h4>
     </p>
     <p>
-    Execute an interrupt (also called a "trap").<br>
+    Execute an interrupt. When used with that instruction an interrupt is called a "trap".<br><br>
     The first operand is the interrupt mumber.<br><br>
-    If IDTR has a valid value and (IDTR + interrupt mumber * 4) contains a valid address
-    a jump to that address is performed.<br>
+    If <?php $page->printInternalLink("IDTR", "Registers"); ?> has a valid value and
+    (IDTR + interrupt mumber * 4) contains a valid address, a jump to that address is performed.<br>
     Otherwise a default handler for the interrupt is executed.<br>
     Note - address of zero is <strong>not</strong> valid for custom interrupt handlers (just like non-numeric values).<br><br>
     Before jumping to a custom handler all registers are pushed in the stack
     (so <?php $page->printInternalLink("ESP", "Registers"); ?>'s value should allow for 36 characters to be pushed).<br><br>
+    Available interrupts:
+    <table cellspacing="10">
+      <tbody>
+        <tr><td>0</td><td>(fault)</td><td>Division by Zero</td></tr>
+        <tr><td>1</td><td>(fault)</td><td>Invalid Opcode</td></tr>
+        <tr><td>2</td><td>(trap)</td><td>Halt</td></tr>
+        <tr><td>3</td><td>(trap)</td><td>Breakpoint</td></tr>
+        <tr><td>4</td><td>(hardware)</td><td>A character was typed on the Teletype</td></tr>
+        <tr><td>5</td><td>(hardware)</td><td>DMA has finished copying data</td></tr>
+        <tr><td>6</td><td>(trap)</td><td>Custom (for system APIs)</td></tr>
+      </tbody>
+    </table>
+    Traps are specific interrupts that are meant to be used <strong>only</strong> by INT but
+    in reality any of the numbers above can be passed to the INT instruction.<br><br>
+    After the execution of <a href="#iret">IRET</a> the first 4 interrupts return to the very instruction
+    that caused them while the following interrupts return to the instruction after the one that caused them.<br><br>
     <a name="hlt">Allowed</a> suffixes are the default value of space and its equivalent - 'V'.<br>
     No second operand.
     </p>
@@ -375,11 +391,14 @@ the instructions here have things from
     <h4>: - IRET</h4>
     </p>
     <p>
-    Return from a custom interrupt handler.<br><br>
-    Register values are restored from the stack which includes the Instruction Pointer (EIP) and
-    the Code Segment (CS).<br>
-    <a name="clgi">So, the 36 characters</a> pointed by <?php $page->printInternalLink("ESP", "Registers"); ?> determine from where the execution will continue
-    as well as the "context" - the values of all registers (including the flag registers).<br><br>
+    Return from a custom <a href="#int">interrupt handler</a> registered in a descriptor table
+    identified by <?php $page->printInternalLink("IDTR", "Registers"); ?>.<br><br>
+    Register values are restored from the stack which includes the Instruction Pointer
+    (<?php $page->printInternalLink("EIP", "Registers"); ?>) and the Code Segment
+    (<?php $page->printInternalLink("CS", "Registers"); ?>).<br>
+    <a name="clgi">So, the 36 characters</a> pointed by <?php $page->printInternalLink("ESP", "Registers"); ?>
+    determine from where the execution will continue as well as the "context" -
+    the values of all registers (including the flag registers).<br><br>
     The suffix and the operands are ignored.
     </p>
     <br><hr><br>
@@ -406,7 +425,7 @@ the instructions here have things from
     </p>
     <p>
     Call a sub-routine (aka a procedure or a function).<br><br>
-    Similar to <a href="#jmp">jmp</a> but first <a href="#push">pushes</a> in the stack a "return" address
+    Similar to <a href="#jmp">JMP</a> but first <a href="#push">pushes</a> in the stack a "return" address
     which is the address of the instruction that follows the <strong>CALL</strong> instruction.<br><br>
     <a name="ret">The</a> <a href="#ret">RET</a> instruction pops the "return" address from the stack and jumps there.<br><br>
     The first operand contains the address of the sub-routine and the second is not used (so - just like <a href="#jmp">JMP</a>).
@@ -547,8 +566,12 @@ the instructions here have things from
     Input from a port in the second operand to an address or register in the first operand.<br>
     <br>
     <ul>
-    <li>Port 1 is the Card Reader (an input devise);</li>
-    <li>Port 2 is the Teleprinter (an input and output device).</li>
+    <li>Port 1 is the Card Reader (an input devise) - 10 characters;</li>
+    <li>Port 2 is the Teleprinter (an input and output device) - 10 characters.</li>
+    <li>Port 3 is the DMA Control register - 4 characters.</li>
+    <li>Port 4 is the DMA Source register - 4 characters.</li>
+    <li>Port 5 is the DMA Destination register - 4 characters.</li>
+    <li>Port 6 is the DMA Count register - 4 characters.</li>
     </ul>
     <br>
     <br>
@@ -563,8 +586,12 @@ the instructions here have things from
     Output the data from the second operand to a port in the first operand.<br>
     <br>
     <ul>
-    <li>Port 0 is the Printer (an output device);</li>
-    <li>Port 2 is the Teleprinter (an input and output device).</li>
+    <li>Port 0 is the Printer (an output device) - 10 characters;</li>
+    <li>Port 2 is the Teleprinter (an input and output device) - 10 characters.</li>
+    <li>Port 3 is the DMA Control register - 4 characters.</li>
+    <li>Port 4 is the DMA Source register - 4 characters.</li>
+    <li>Port 5 is the DMA Destination register - 4 characters.</li>
+    <li>Port 6 is the DMA Count register - 4 characters.</li>
     </ul>
     <br>
     The <strong>"Is Overflown"</strong> flag is set to 1 (true) if not all characters could be sent.

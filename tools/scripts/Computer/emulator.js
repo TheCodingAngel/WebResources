@@ -350,7 +350,8 @@ class Emulator {
             case IO.Interrupts.Custom:
                 break;
             default:
-                throw new InstructionError(`Incorrect interrupt number: ${interruptNumber}.`);
+                let interruptValues = Object.entries(IO.Interrupts).reduce((str, value) => str + `\n${value[1]} - ${value[0]}`, "");
+                throw new InstructionError(`Incorrect interrupt number: ${interruptNumber}.\nSupported numbers: ${interruptValues}`);
         }
     }
     

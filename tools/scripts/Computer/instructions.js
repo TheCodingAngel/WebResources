@@ -107,7 +107,7 @@ class Instructions {
         let opcode = characters[0];
         let instruction = this.#all.get(opcode);
         if (!instruction) {
-            throw new InstructionError("Unknown opcode: " + opcode);
+            return this.#emulator.executeError(IO.Interrupts.InvalidOpcode);
         }
         return instruction.execute(opcode, characters[1], characters.substring(2, 6), characters.substring(6));
     }

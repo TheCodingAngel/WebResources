@@ -93,6 +93,14 @@ class IO {
         return !this.#BlockingTraps.includes(interruptNumber);
     }
     
+    EnableMemoryNotifications() {
+        this.#memoryMapping.EnableMemoryNotifications();
+    }
+    
+    DisableMemoryNotifications() {
+        this.#memoryMapping.DisableMemoryNotifications();
+    }
+    
     onFlush() {
         this.#memoryMapping.onFlush();
     }
@@ -111,7 +119,7 @@ class IO {
     
     onMemoryZeroed(startAddress, count) {
         if (isValid(startAddress)) {
-            this.#memoryMapping.onMemoryZeroed(startAddress, value);
+            this.#memoryMapping.onMemoryZeroed(startAddress, count);
         }
     }
     
@@ -183,7 +191,17 @@ class IO {
                 let _this = this;
                 let data = this.#teleprinter.read(CPU.registerSize);
                 return new InterruptHandler(IO.Interrupts.Teleprinter, IO.Ports.Teleprinter, handlerAddress,
-                    (ih) => _this.#cpu.setInterruptData(data, null, data.length));
+                    (ih) => _this.#cpu.setInterruptData(data, null, data.length, null));
+            }
+        }
+        
+        if (this.#dmaController.hasData()) {
+            let handlerAddress = this.getValidInterruptHandler(IO.Interrupts.DmaFinished, true);
+            if (!this.isDefaultInterrupt(handlerAddress, IO.Interrupts.DmaFinished)) {
+                let _this = this;
+                let data = this.#dmaController.getParameters();
+                return new InterruptHandler(IO.Interrupts.DmaFinished, IO.Ports.DmaControl, handlerAddress,
+                    (ih) => _this.#cpu.setInterruptData(data[1], data[2], data[3], data[0]));
             }
         }
         
@@ -267,6 +285,10 @@ class IO {
             return false;
         }
         return device.hasData();
+    }
+    
+    isInMappedBuffer(address) {
+        return this.#memoryMapping ? this.#memoryMapping.isInMappedBuffer(address) : false;
     }
 }
 
@@ -405,6 +427,9 @@ class MemoryMapping {
     }
     
     onOK() {
+        let mmioBuffers = [];
+        let isConfigurationInvalid = false;
+
         try {
             this.DisableMemoryNotifications();
             
@@ -427,6 +452,9 @@ class MemoryMapping {
             for (let i = 0; i < this.#memoryBuffers.length; i++) {
                 let buffer = this.#memoryBuffers[i];
                 if (buffer.isMmioEnabled) {
+                    isConfigurationInvalid = isConfigurationInvalid || this._intersectsWith(buffer, mmioBuffers);
+                    mmioBuffers.push(buffer);
+                    
                     this.#memory.markAddresses(buffer.mappedAddress, buffer.capacity, Memory.markType.MmioBuffer, true);
                     buffer.dataBeforeMapping = this.#memory.getTextAtAddress(buffer.mappedAddress, buffer.capacity);
                     buffer.device.onMmioEnabled(buffer.isReadOnly);
@@ -438,7 +466,11 @@ class MemoryMapping {
             this.EnableMemoryNotifications();
         }
         
-        this._hide();
+        if (isConfigurationInvalid) {
+            alert("The memory mapped buffers must not intersect!");
+        } else {
+            this._hide();
+        }
     }
     
     onCancel() {
@@ -450,19 +482,23 @@ class MemoryMapping {
     }
     
     onFlush() {
-        try {
-            this.DisableMemoryNotifications();
-            
-            for (let i = 0; i < this.#memoryBuffers.length; i++) {
-                let buffer = this.#memoryBuffers[i];
-                if (buffer.isMmioEnabled && buffer.device.flush) {
-                    let data = buffer.isReadOnly ? null :
-                        this.#memory.getTextAtAddress(buffer.mappedAddress, buffer.capacity);
-                    buffer.device.flush(data);
+        for (let i = 0; i < this.#memoryBuffers.length; i++) {
+            let buffer = this.#memoryBuffers[i];
+            if (buffer.isMmioEnabled && buffer.device.flush) {
+                let data = null;
+                try {
+                    this.DisableMemoryNotifications();
+                    if (!buffer.isReadOnly) {
+                        data = this.#memory.getTextAtAddress(buffer.mappedAddress, buffer.capacity);
+                    }
+                } finally {
+                    this.EnableMemoryNotifications();
                 }
+                buffer.device.flush(data);
             }
-        } finally {
-            this.EnableMemoryNotifications();
+            if (!buffer.isMmioEnabled && buffer.device.flushNoMmio) {
+                buffer.device.flushNoMmio();
+            }
         }
     }
     
@@ -522,17 +558,35 @@ class MemoryMapping {
         }
     }
     
+    isInMappedBuffer(address) {
+        for (let i = 0; i < this.#memoryBuffers.length; i++) {
+            let buffer = this.#memoryBuffers[i];
+            if (buffer.isMmioEnabled && address >= buffer.mappedAddress &&
+                address < buffer.mappedAddress + buffer.capacity) {
+                return true;
+            }
+        }
+        return false;
+    }
+    
     _forceBufferToMemory(buffer, isReadOnly, data) {
+        if (isValid(isReadOnly)) {
+            buffer.isReadOnly = isReadOnly;
+            if (buffer.isMmioEnabled) {
+                this.#memory.setReadOnlyCells(buffer.mappedAddress, buffer.capacity, buffer.isReadOnly);
+            }
+        }
+        
         if (!buffer.isMmioEnabled) {
             return;
         }
         
-        if (isValid(isReadOnly)) {
-            buffer.isReadOnly = isReadOnly;
-            this.#memory.setReadOnlyCells(buffer.mappedAddress, buffer.capacity, buffer.isReadOnly);
+        try {
+            this.DisableMemoryNotifications();
+            this.#memory.setTextAtAddress(buffer.mappedAddress, data, true);
+        } finally {
+            this.EnableMemoryNotifications();
         }
-        
-        this.#memory.setTextAtAddress(buffer.mappedAddress, data, true);
     }
     
     _onStartAddressChanged(buffer, startAddressStr) {
@@ -557,6 +611,21 @@ class MemoryMapping {
             indexInBuffer: indexInBuffer,
             indexAfterEnd: indexAfterEnd,
         };
+    }
+    
+    _intersectsWith(buffer, mmioBuffers) {
+        for (const b of mmioBuffers) {
+            if (buffer.mappedAddress >= b.mappedAddress &&
+                buffer.mappedAddress < b.mappedAddress + b.capacity) {
+                    return true;
+            }
+            let end = buffer.mappedAddress + buffer.capacity - 1;
+            if (end >= b.mappedAddress &&
+                end < b.mappedAddress + b.capacity) {
+                    return true;
+            }
+        }
+        return false;
     }
 }
 
@@ -594,7 +663,7 @@ class Printer {
     
     write(value, maxCharCount) {
         this.#writerElement.value += value.substring(0, maxCharCount);
-        return 0;
+        return Math.max(0, maxCharCount - value.length);
     }
     
     flush(data) {
@@ -786,9 +855,9 @@ class Teleprinter {
     }
 
     write(value, maxCharCount) {
-        let max = Math.min(maxCharCount, Teleprinter.printCapacity)
-        this.#teleprinterElement.value += value.substring(0, max);
-        return maxCharCount - max;
+        let capacity = Math.min(maxCharCount, Teleprinter.printCapacity)
+        this.#teleprinterElement.value += value.substring(0, capacity);
+        return Math.max(0, maxCharCount - Math.min(capacity, value.length));
     }
     
     hasData() {
@@ -796,8 +865,10 @@ class Teleprinter {
     }
     
     onMemoryRead(indexInBuffer, indexAfterEnd) {
-        this.#inputBuffer.remove(indexInBuffer, indexAfterEnd);
-        this.#inputChangedCallback(null, this._getInputMemoryBuffer());
+        if (this.#inputBuffer.hasData()) {
+            this.#inputBuffer.remove(indexInBuffer, indexAfterEnd);
+            this.#inputChangedCallback(null, this._getInputMemoryBuffer());
+        }
     }
     
     flush(data) {
@@ -899,6 +970,10 @@ class DmaController {
     #control = "MM";
     #dataRegisters = [0, 0, 0];
     #status;
+    #executeInterrupt;
+    
+    #inverseDirection;
+    #initialDataRegisters = [0, 0, 0];
     
     
     constructor(memory) {
@@ -908,10 +983,15 @@ class DmaController {
     
     _reset() {
         this.#memoryBuffer = null;
+        
         this.#control = this.#control.substring(0, DmaController.#controlData)
             .padEnd(DmaController.#registerSize, DmaController.#statusDefault);
         this.#dataRegisters.fill(0);
         this.#status = DmaController.Status.Idle;
+        this.#executeInterrupt = false;
+        
+        this.#inverseDirection = false;
+        this.#initialDataRegisters.fill(0);
     }
     
     setBufferChangedCallback(isReadOnly, callback) {
@@ -919,8 +999,7 @@ class DmaController {
     }
     
     onMmioEnabled(isReadOnly) {
-        this._reset();
-        this.#bufferChangedCallback(false, this._getMemoryBuffer());
+        this.#bufferChangedCallback(isReadOnly, this._getMemoryBuffer());
     }
     
     onMmioDisabled(isReadOnly) {
@@ -938,8 +1017,11 @@ class DmaController {
     writeRegister(registerIndex, value, maxCharCount) {
         this.#memoryBuffer = null;
         
+        let capacity = Math.min(maxCharCount, DmaController.#registerSize);
         if (registerIndex == DmaController.Registers.Control) {
-            let ioConfig = value.substring(0, Math.min(maxCharCount, DmaController.#controlData));
+            this.#control = value.substring(0, capacity)
+                .padEnd(DmaController.#registerSize, DmaController.#statusDefault);
+            let ioConfig = this.#control.substring(0, DmaController.#controlData);
             if (this._shouldStartCopy(ioConfig)) {
                 this.#status = DmaController.Status.Pending;
             } else {
@@ -947,9 +1029,24 @@ class DmaController {
                     "- 'P' - copy using Port I/O, i.e. the corresponding Source / Destination register contains a Port Address;\n" +
                     "- 'M' - copy using Memory I/O, i.e. the corresponding Source / Destination register contains a Memory Address.");
             }
-        } else {
-            this.#dataRegisters[registerIndex - 1] = this._getRegisterDataFromString(value, maxCharCount);
+            
+            this.#bufferChangedCallback(null, this._getMemoryBuffer());
+            return maxCharCount - capacity;
         }
+        
+        this.#dataRegisters[registerIndex - 1] = this._getRegisterDataFromString(value, maxCharCount);
+        this.#bufferChangedCallback(null, this._getMemoryBuffer());
+        return Math.max(0, maxCharCount - Math.min(capacity, value.length));
+    }
+    
+    hasData() {
+        let result = this.#executeInterrupt;
+        this.#executeInterrupt = false;
+        return result;
+    }
+    
+    getParameters() {
+        return [this.#control].concat(this.#initialDataRegisters);
     }
     
     onMemoryChanged(indexInBuffer, indexAfterEnd) {
@@ -965,9 +1062,11 @@ class DmaController {
         
         this.#memoryBuffer = null;
         let makeBufferReadOnly = null;
+        this.#executeInterrupt = false;
         
         if (this.#status == DmaController.Status.Pending) {
             if (!data) {
+                this.#status = DmaController.Status.Idle;
                 return;
             }
             
@@ -984,28 +1083,34 @@ class DmaController {
                 startIndex += DmaController.#registerSize;
                 let endIndex = startIndex + DmaController.#registerSize;
                 
-                this.#dataRegisters[i] = this._getRegisterDataFromString(data.substring(startIndex, endIndex),
+                let value = this._getRegisterDataFromString(data.substring(startIndex, endIndex),
                     DmaController.#registerSize);
+                
+                this.#dataRegisters[i] = value;
+                this.#initialDataRegisters[i] = value;
             }
             
             this.#status = DmaController.Status.Copy;
-            
-            if (this.#dataRegisters[DmaController.Registers.Count - 1] > 0) {
-                this._setStatusProgress();
-                makeBufferReadOnly = true;
-            }
+            this._setStatusProgress();
+            makeBufferReadOnly = true;
         }
         
         if (this.#status == DmaController.Status.Copy) {
-            if (this.#dataRegisters[DmaController.Registers.Count - 1] > 0) {
-                this._copyNextData();
-            }
-            if (this.#dataRegisters[DmaController.Registers.Count - 1] <= 0) {
+            if (!this._copyNextData(makeBufferReadOnly === true)) {
                 this.#status = DmaController.Status.Idle;
                 this._clearStatusProgress();
+                this.#executeInterrupt = true;
+                this.#inverseDirection = false;
                 makeBufferReadOnly = false;
             }
+            
             this.#bufferChangedCallback(makeBufferReadOnly, this._getMemoryBuffer());
+        }
+    }
+    
+    flushNoMmio() {
+        if (this.#status != DmaController.Status.Idle) {
+            this.flush(this.#status == DmaController.Status.Pending ? this._getMemoryBuffer() : 0);
         }
     }
     
@@ -1032,14 +1137,83 @@ class DmaController {
         return false;
     }
     
-    _copyNextData() {
+    _copyNextData(isFirstCopy) {
         let ioConfig = this.#control.substring(0, DmaController.#controlData);
+        let isSourceMemory = ioConfig[0] == "M";
+        let isDestinationMemory = ioConfig[1] == "M";
         
         let source = this.#dataRegisters[DmaController.Registers.Source - 1];
         let destination = this.#dataRegisters[DmaController.Registers.Destination - 1];
         let count = this.#dataRegisters[DmaController.Registers.Count - 1];
         
-        this.#dataRegisters[DmaController.Registers.Count - 1] = count - 1;
+        if (count <= 0 || destination == source) {
+            this.#dataRegisters[DmaController.Registers.Count - 1] = 0;
+            return false;
+        }
+        
+        let isSourceMapped = io.isInMappedBuffer(source);
+        let isDestinationMapped = io.isInMappedBuffer(destination);
+        
+        
+        if (isFirstCopy) {
+            this.#inverseDirection = isSourceMemory && isDestinationMemory &&
+                destination > source && destination < source + count;
+            if (this.#inverseDirection) {
+                source += count;
+                destination += count;
+            }
+        }
+        
+        let data = null;
+        let chunk = Math.min(count, DmaController.#registerSize);
+        
+        if (isSourceMemory) {
+            if (this.#inverseDirection) {
+                data = this.#memory.getTextAtAddress(source - chunk, chunk);
+                if (!isSourceMapped) {
+                    this.#dataRegisters[DmaController.Registers.Source - 1] = source - chunk;
+                }
+            } else {
+                data = this.#memory.getTextAtAddress(source, chunk);
+                if (!isSourceMapped) {
+                    this.#dataRegisters[DmaController.Registers.Source - 1] = source + chunk;
+                }
+            }
+            if (isSourceMapped) {
+                data = data.replaceAll(IO.emptyCharacter, "");
+            }
+        } else {
+            data = io.readFromPort(source, chunk);
+            if (data === null || data === 0) {
+                return false;
+            }
+        }
+        
+        if (isDestinationMemory) {
+            chunk = data.length;
+            try {
+                io.DisableMemoryNotifications();
+                
+                if (this.#inverseDirection) {
+                    this.#memory.setTextAtAddress(destination - chunk, data);
+                    if (!isDestinationMapped) {
+                        this.#dataRegisters[DmaController.Registers.Destination - 1] = destination - chunk;
+                    }
+                } else {
+                    this.#memory.setTextAtAddress(destination, data);
+                    if (!isDestinationMapped) {
+                        this.#dataRegisters[DmaController.Registers.Destination - 1] = destination + chunk;
+                    }
+                }
+            } finally {
+                io.EnableMemoryNotifications();
+            }
+        } else {
+            chunk -= io.writeToPort(destination, data, chunk);
+        }
+        
+        this.#dataRegisters[DmaController.Registers.Count - 1] = count - chunk;
+        return count > chunk;
     }
     
     _getDataRegisterAsString(registerIndex, maxCharCount) {
