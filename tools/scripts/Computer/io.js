@@ -427,9 +427,19 @@ class MemoryMapping {
     }
     
     onOK() {
-        let mmioBuffers = [];
-        let isConfigurationInvalid = false;
-
+        let mmioBufferRanges = [];
+        for (let i = 0; i < this.#memoryBuffers.length; i++) {
+            let buffer = this.#memoryBuffers[i];
+            if (buffer.enableMmio.checked) {
+                let bufferRange = this._getBufferRange(buffer);
+                if (this._intersectsWith(bufferRange, mmioBufferRanges)) {
+                    alert("The memory mapped buffers must not intersect!");
+                    return;
+                }
+                mmioBufferRanges.push(bufferRange);
+            }
+        }
+        
         try {
             this.DisableMemoryNotifications();
             
@@ -444,7 +454,6 @@ class MemoryMapping {
                     buffer.dataBeforeMapping = "";
                 }
                 
-                buffer.isMmioChanged = buffer.isMmioEnabled != buffer.enableMmio.checked;
                 buffer.isMmioEnabled = buffer.enableMmio.checked;
                 buffer.mappedAddress = parseIntOrZero(buffer.startAddress.value);
             }
@@ -452,9 +461,6 @@ class MemoryMapping {
             for (let i = 0; i < this.#memoryBuffers.length; i++) {
                 let buffer = this.#memoryBuffers[i];
                 if (buffer.isMmioEnabled) {
-                    isConfigurationInvalid = isConfigurationInvalid || this._intersectsWith(buffer, mmioBuffers);
-                    mmioBuffers.push(buffer);
-                    
                     this.#memory.markAddresses(buffer.mappedAddress, buffer.capacity, Memory.markType.MmioBuffer, true);
                     buffer.dataBeforeMapping = this.#memory.getTextAtAddress(buffer.mappedAddress, buffer.capacity);
                     buffer.device.onMmioEnabled(buffer.isReadOnly);
@@ -466,11 +472,7 @@ class MemoryMapping {
             this.EnableMemoryNotifications();
         }
         
-        if (isConfigurationInvalid) {
-            alert("The memory mapped buffers must not intersect!");
-        } else {
-            this._hide();
-        }
+        this._hide();
     }
     
     onCancel() {
@@ -613,19 +615,21 @@ class MemoryMapping {
         };
     }
     
-    _intersectsWith(buffer, mmioBuffers) {
-        for (const b of mmioBuffers) {
-            if (buffer.mappedAddress >= b.mappedAddress &&
-                buffer.mappedAddress < b.mappedAddress + b.capacity) {
+    _intersectsWith(bufferRange, mmioBufferRanges) {
+        for (const br of mmioBufferRanges) {
+            if (bufferRange.startAddress >= br.startAddress && bufferRange.startAddress <= br.endAddress) {
                     return true;
             }
-            let end = buffer.mappedAddress + buffer.capacity - 1;
-            if (end >= b.mappedAddress &&
-                end < b.mappedAddress + b.capacity) {
+            if (bufferRange.endAddress >= br.startAddress && bufferRange.endAddress <= br.endAddress) {
                     return true;
             }
         }
         return false;
+    }
+    
+    _getBufferRange(buffer) {
+        let startAddress = parseIntOrZero(buffer.startAddress.value);
+        return {startAddress: startAddress, endAddress: startAddress + buffer.capacity - 1};
     }
 }
 
