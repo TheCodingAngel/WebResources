@@ -486,10 +486,10 @@ the instructions here have things from
     <p>
     Subtract the value identified by the second operand
     from a value at an address or a register identified by the first operand.<br><br>
-    <a name="mul">The first</a> operand determines where the result is stored.<br><br>
+    The first operand determines where the result is stored.<br><br>
     The <strong>"Is Negative"</strong> and <strong>"Is Positive"</strong> flags are set appropriately.
     Both flags are set to 1 (or true) to indicate an error (such as using a negative value for an address).<br><br>
-    The <strong>"Is Overflown"</strong> flag is set to 1 (true) if the result value has more digits
+    <a name="mul">The</a> <strong>"Is Overflown"</strong> flag is set to 1 (true) if the result value has more digits
     than the number of characters allowed for it (4 for a register and the value of ECX for pointers / addresses).
     </p>
     <br><hr><br>
@@ -500,10 +500,10 @@ the instructions here have things from
     <p>
     Multiply the value identified by the second operand,
     by a value at an address or a register identified by the first operand.<br><br>
-    <a name="div">The first</a> operand determines where the result is stored.<br><br>
+    The first operand determines where the result is stored.<br><br>
     The <strong>"Is Negative"</strong> and <strong>"Is Positive"</strong> flags are set appropriately.
     Both flags are set to 1 (or true) to indicate an error (such as using a negative value for an address).<br><br>
-    The <strong>"Is Overflown"</strong> flag is set to 1 (true) if the result value has more digits
+    <a name="div">The</a> <strong>"Is Overflown"</strong> flag is set to 1 (true) if the result value has more digits
     than the number of characters allowed for it (4 for a register and the value of ECX for pointers / addresses).
     </p>
     <br><hr><br>
@@ -514,9 +514,9 @@ the instructions here have things from
     <p>
     Integer division of the value at an address or a register identified by the first operand, by
     the value identified by the second operand.<br><br>
-    <a name="mod">The first</a> operand determines where the result is stored.<br><br>
+    The first operand determines where the result is stored.<br><br>
     The <strong>"Is Negative"</strong> and <strong>"Is Positive"</strong> flags are set appropriately.
-    Both flags are set to 1 (or true) to indicate an error (such as using a negative value for an address).<br><br>
+    <a name="mod">Both</a> flags are set to 1 (or true) to indicate an error (such as using a negative value for an address).<br><br>
     Note - dividing by zero generates an error (interrupt 0).
     </p>
     <br><hr><br>
@@ -527,34 +527,34 @@ the instructions here have things from
     <p>
     Modulo (the remainder after an integer division) of the value at an address or a register identified by the first operand, by
     the value identified by the second operand.<br><br>
-    <a name="inc">The first</a> operand determines where the result is stored.<br><br>
-    The <strong>"Is Negative"</strong> and <strong>"Is Positive"</strong> flags are set appropriately.
+    The first operand determines where the result is stored.<br><br>
+    <a name="inc">The</a> <strong>"Is Negative"</strong> and <strong>"Is Positive"</strong> flags are set appropriately.
     Both flags are set to 1 (or true) to indicate an error (such as using a negative value for an address).
     </p>
     <br><hr><br>
     
     <p>
-    <h4><a name="dec"># - INC</a></h4>
+    <h4># - INC</h4>
     </p>
     <p>
     Increment (add 1) to a value at an address or a register identified by the first operand.<br>
     The second operand is not used.<br><br>
     The <strong>"Is Negative"</strong> and <strong>"Is Positive"</strong> flags are set appropriately.
     Both flags are set to 1 (or true) to indicate an error (such as using a negative value for an address).<br><br>
-    The <strong>"Is Overflown"</strong> flag is set to 1 (true) if the result value has more digits
+    <a name="dec">The</a> <strong>"Is Overflown"</strong> flag is set to 1 (true) if the result value has more digits
     than the number of characters allowed for it (4 for a register and the value of ECX for pointers / addresses).
     </p>
     <br><hr><br>
     
     <p>
-    <h4><a name="in">D - DEC</a></h4>
+    <h4>D - DEC</h4>
     </p>
     <p>
     Decrement (subtract 1) from a value at an address or a register identified by the first operand.<br>
     The second operand is not used.<br><br>
     The <strong>"Is Negative"</strong> and <strong>"Is Positive"</strong> flags are set appropriately.
     Both flags are set to 1 (or true) to indicate an error (such as using a negative value for an address).<br><br>
-    The <strong>"Is Overflown"</strong> flag is set to 1 (true) if the result value has more digits
+    <a name="in">The</a> <strong>"Is Overflown"</strong> flag is set to 1 (true) if the result value has more digits
     than the number of characters allowed for it (4 for a register and the value of ECX for pointers / addresses).
     </p>
     <br><hr><br>
