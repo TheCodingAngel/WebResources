@@ -618,10 +618,10 @@ class MemoryMapping {
     _intersectsWith(bufferRange, mmioBufferRanges) {
         for (const br of mmioBufferRanges) {
             if (bufferRange.startAddress >= br.startAddress && bufferRange.startAddress <= br.endAddress) {
-                    return true;
+                return true;
             }
             if (bufferRange.endAddress >= br.startAddress && bufferRange.endAddress <= br.endAddress) {
-                    return true;
+                return true;
             }
         }
         return false;
@@ -647,9 +647,7 @@ class Printer {
     }
     
     clear() {
-        if (this.#bufferChangedCallback) {
-            this.#bufferChangedCallback(null, this._getEmptyBuffer());
-        }
+        this._onBufferChanged();
         this.#writerElement.value = "";
     }
     
@@ -658,7 +656,7 @@ class Printer {
     }
     
     onMmioEnabled(isReadOnly) {
-        this.#bufferChangedCallback(null, this._getEmptyBuffer());
+        this._onBufferChanged();
     }
     
     onMmioDisabled(isReadOnly) {
@@ -681,7 +679,7 @@ class Printer {
         }
         
         this.#writerElement.value += data; // "print" the data
-        this.#bufferChangedCallback(null, this._getEmptyBuffer());
+        this._onBufferChanged();
     }
     
     _getEmptyBuffer() {
@@ -689,6 +687,12 @@ class Printer {
             this.#emptyBuffer = "".padEnd(Printer.memoryBufferCapacity, IO.emptyCharacter);
         }
         return this.#emptyBuffer;
+    }
+    
+    _onBufferChanged() {
+        if (this.#bufferChangedCallback) {
+            this.#bufferChangedCallback(null, this._getEmptyBuffer());
+        }
     }
 }
 
@@ -765,7 +769,7 @@ class Teleprinter {
             if (Keys.isEscape(e.key)) {
                 this.value += "\n";
                 _this.#inputBuffer.reset();
-                _this.#inputChangedCallback(null, _this._getInputMemoryBuffer());
+                _this._onInputBufferChanged(null);
                 return;
             }
 
@@ -774,11 +778,11 @@ class Teleprinter {
             if (Keys.isEnter(e.key)) {
                 this.value += "\n";
                 _this.#inputBuffer.append("\n");
-                _this.#inputChangedCallback(null, _this._getInputMemoryBuffer());
+                _this._onInputBufferChanged(null);
             } else if (char != null) {
                 this.value += char;
                 _this.#inputBuffer.append(char);
-                _this.#inputChangedCallback(null, _this._getInputMemoryBuffer());
+                _this._onInputBufferChanged(null);
             }
             
             if (!Keys.isTab(e.key)) {
@@ -801,7 +805,7 @@ class Teleprinter {
             if (Keys.isEscape(e.data)) {
                 this.value += "\n";
                 _this.#inputBuffer.reset();
-                _this.#inputChangedCallback(null, _this._getInputMemoryBuffer());
+                _this._onInputBufferChanged(null);
                 return;
             }
             
@@ -810,11 +814,11 @@ class Teleprinter {
             if (Keys.isEnter(e.data)) {
                 this.value += "\n";
                 _this.#inputBuffer.append("\n");
-                _this.#inputChangedCallback(null, _this._getInputMemoryBuffer());
+                _this._onInputBufferChanged(null);
             } else if (char != null) {
                 this.value += char;
                 _this.#inputBuffer.append(char);
-                _this.#inputChangedCallback(null, _this._getInputMemoryBuffer());
+                _this._onInputBufferChanged(null);
             }
             
             e.preventDefault();
@@ -823,8 +827,8 @@ class Teleprinter {
     
     clear() {
         this.#inputBuffer.reset();
-        this.#inputChangedCallback(null, this._getInputMemoryBuffer());
-        this.#outputChangedCallback(null, this._getEmptyBuffer());
+        this._onInputBufferChanged(null);
+        this._onOutputBufferChanged();
         this.#emptyBuffer = null;
         
         this.#teleprinterElement.value = "";
@@ -841,9 +845,9 @@ class Teleprinter {
     
     onMmioEnabled(isReadOnly) {
         if (isReadOnly) {
-            this.#inputChangedCallback(true, this._getInputMemoryBuffer());
+            this._onInputBufferChanged(true);
         } else {
-            this.#outputChangedCallback(null, this._getEmptyBuffer());
+            this._onOutputBufferChanged();
         }
     }
     
@@ -854,7 +858,7 @@ class Teleprinter {
     read(maxCharCount) {
         maxCharCount = Math.min(maxCharCount, Teleprinter.inputCapacity)
         let res = this.#inputBuffer.read(maxCharCount);
-        this.#inputChangedCallback(null, this._getInputMemoryBuffer());
+        this._onInputBufferChanged(null);
         return res;
     }
 
@@ -871,7 +875,7 @@ class Teleprinter {
     onMemoryRead(indexInBuffer, indexAfterEnd) {
         if (this.#inputBuffer.hasData()) {
             this.#inputBuffer.remove(indexInBuffer, indexAfterEnd);
-            this.#inputChangedCallback(null, this._getInputMemoryBuffer());
+            this._onInputBufferChanged(null);
         }
     }
     
@@ -886,7 +890,7 @@ class Teleprinter {
         }
         
         this.#teleprinterElement.value += data; // "print" the data
-        this.#outputChangedCallback(null, this._getEmptyBuffer());
+        this._onOutputBufferChanged();
     }
     
     _getEmptyBuffer() {
@@ -898,6 +902,18 @@ class Teleprinter {
     
     _getInputMemoryBuffer() {
         return this.#inputBuffer.getEntireData().padEnd(Teleprinter.inputCapacity, IO.emptyCharacter);
+    }
+    
+    _onInputBufferChanged(isReadOnly) {
+        if (this.#inputChangedCallback) {
+            this.#inputChangedCallback(isReadOnly, this._getInputMemoryBuffer());
+        }
+    }
+    
+    _onOutputBufferChanged() {
+        if (this.#outputChangedCallback) {
+            this.#outputChangedCallback(null, this._getEmptyBuffer());
+        }
     }
     
     static _getPrintableCharacter(key) {
@@ -1003,7 +1019,7 @@ class DmaController {
     }
     
     onMmioEnabled(isReadOnly) {
-        this.#bufferChangedCallback(isReadOnly, this._getMemoryBuffer());
+        this._onBufferChanged(isReadOnly);
     }
     
     onMmioDisabled(isReadOnly) {
@@ -1034,12 +1050,12 @@ class DmaController {
                     "- 'M' - copy using Memory I/O, i.e. the corresponding Source / Destination register contains a Memory Address.");
             }
             
-            this.#bufferChangedCallback(null, this._getMemoryBuffer());
+            this._onBufferChanged(null);
             return maxCharCount - capacity;
         }
         
         this.#dataRegisters[registerIndex - 1] = this._getRegisterDataFromString(value, maxCharCount);
-        this.#bufferChangedCallback(null, this._getMemoryBuffer());
+        this._onBufferChanged(null);
         return Math.max(0, maxCharCount - Math.min(capacity, value.length));
     }
     
@@ -1108,13 +1124,19 @@ class DmaController {
                 makeBufferReadOnly = false;
             }
             
-            this.#bufferChangedCallback(makeBufferReadOnly, this._getMemoryBuffer());
+            this._onBufferChanged(makeBufferReadOnly);
         }
     }
     
     flushNoMmio() {
         if (this.#status != DmaController.Status.Idle) {
             this.flush(this.#status == DmaController.Status.Pending ? this._getMemoryBuffer() : 0);
+        }
+    }
+    
+    _onBufferChanged(isReadOnly) {
+        if (this.#bufferChangedCallback) {
+            this.#bufferChangedCallback(isReadOnly, this._getMemoryBuffer());
         }
     }
     
