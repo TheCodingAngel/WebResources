@@ -172,11 +172,13 @@ Big endian is used for ordering the digits of a multidigit decimal number.
 <p>
 The first line of each description is: <strong>[opcode] - [mnemonic]</strong>.<br>
 <a name="nop">The opcodes</a> use always capital letters.<br>
-The mnemonics are <?php $page->printInternalLink("used by the Assembly", "Computer-Full"); ?> and both capital and small letters are valid.<br>
+The mnemonics are <?php $page->printInternalLink("used by the Assembler", "Computer-Full"); ?> (as part of its flavour of the Assembly language)
+and both capital and small letters are valid.<br>
 Even though similar to the
 <a href="https://edge.edx.org/c4x/BITSPilani/EEE231/asset/8086_family_Users_Manual_1_.pdf">x86 instruction set</a>
 the instructions here have things from
-<a href="https://github.com/TheCodingAngel/RCA-301-Emulator">RCA-301</a>:
+<a href="https://github.com/TheCodingAngel/RCA-301-Emulator">RCA-301</a>
+(such as always being able to access memory while many x86 instructions work only with registers):
 </p>
 
 </div>
