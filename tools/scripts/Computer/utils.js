@@ -105,6 +105,16 @@ class CircularBuffer {
     }
 }
 
+function appendWithLimit(element, value, maxCharCount) {
+    element.value += value.substring(0, maxCharCount);
+    return Math.min(maxCharCount, value.length);
+}
+
+function appendSection(element, value, sectionSize, capacity) {
+    let appended = appendWithLimit(element, value, Math.min(sectionSize, capacity));
+    return Math.max(0, sectionSize - appended);
+}
+
 function padWithHaltOrCut(str, characterCount) {
     // '.' is the halt instruction
     return padOrCutString(str, characterCount, '.');

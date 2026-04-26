@@ -664,8 +664,7 @@ class Printer {
     }
     
     write(value, maxCharCount) {
-        this.#writerElement.value += value.substring(0, maxCharCount);
-        return Math.max(0, maxCharCount - value.length);
+        return appendSection(this.#writerElement, value, maxCharCount, Printer.memoryBufferCapacity);
     }
     
     flush(data) {
@@ -863,9 +862,7 @@ class Teleprinter {
     }
 
     write(value, maxCharCount) {
-        let capacity = Math.min(maxCharCount, Teleprinter.printCapacity)
-        this.#teleprinterElement.value += value.substring(0, capacity);
-        return Math.max(0, maxCharCount - Math.min(capacity, value.length));
+        return appendSection(this.#teleprinterElement, value, maxCharCount, Teleprinter.printCapacity);
     }
     
     hasData() {
