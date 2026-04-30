@@ -341,7 +341,7 @@ the instructions here have things from
     Execute an interrupt. When used with that instruction an interrupt is called a "trap".<br><br>
     The first operand is the interrupt mumber.<br><br>
     If <?php $page->printInternalLink("IDTR", "Registers"); ?> has a valid value and
-    (IDTR + interrupt mumber * 4) contains a valid address, a jump to that address is performed.<br>
+    (IDTR + interrupt mumber * 4) points to a valid address, a jump to that address is performed.<br>
     Otherwise a default handler for the interrupt is executed.<br>
     Note - address of zero is <strong>not</strong> valid for custom interrupt handlers (just like non-numeric values).<br><br>
     Before jumping to a custom handler all registers are pushed in the stack

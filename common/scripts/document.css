@@ -42,6 +42,14 @@ body {
   font-size: 10px;
 }
 
+.text-medium {
+  font-size: 18px !important;
+}
+
+.text-big {
+  font-size: 25px !important;
+}
+
 .gallery {
   margin: var(--margin-xs);
   display: grid;

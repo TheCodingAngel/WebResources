@@ -43,17 +43,41 @@ $page = new Page('.');
 <p><br></p>
 
 <div id="intro" class="section flex-column">
-  <div id="hardwareHeader" class="section-header flex-row flex-pos-ortogonal-center">
-    <h4><p class="introduction">
-    To give programmers <a href="https://thecodingangel.org/tools/">hands on experience</a>
-    and <a href="https://www.youtube.com/@thecodingangel/videos">deep understanding</a> of what controls our civilization.<br><br>
-    Software is everywhere - it is not only in phones, laptops, microwave ovens, cars and vending machines.<br><br>
-    Software is invloved in the manufactoring and transmitting of the electricity you use.<br><br>
-    Software is used when you pay with a credit or a debit card.<br><br>
-    Software is used by voting systems - both in parliaments and during elections.<br><br>
-    Software is used by the entire transportation system both for managing airplanes and trains and inside each of them.<br><br>
-    Sometimes human lives directly depend on software because it is in the equipment in hospitals and factories.<br><br>
-    Software is everywhere, so we, programmers, must understand what we are doing!
+  <div id="hardwareHeader" class="section-header link_style flex-row flex-pos-ortogonal-center">
+    <h4><p class="introduction text-medium">
+    To give programmers <a class="text-medium" href="https://thecodingangel.org/tools/">hands on experience</a>
+    and <a class="text-medium" href="https://www.youtube.com/@thecodingangel/videos">deep understanding</a>
+    of what controls our civilization.<br><br>
+    Software is everywhere:
+    <a class="text-big" title="Computers" href="https://www.geeksforgeeks.org/operating-systems/difference-between-system-software-and-application-software/">&#x1F4BB;</a> <!-- 💻 -->
+    <a class="text-big" title="Mobile Devices" href="https://developer.ibm.com/articles/choosing-the-best-programming-language-for-mobile-app-development/">&#x1F4F1;</a> <!-- 📱 -->
+    <a class="text-big" title="Cameras" href="https://developer.ridgerun.com/wiki/index.php/Camera_Sensor_Basics">&#x1F4F7;</a> <!-- 📷 -->
+    <a class="text-big" title="Television" href="https://en.wikipedia.org/wiki/List_of_smart_TV_platforms">&#x1F4FA;</a> <!-- 📺 -->
+    <a class="text-big" title="Communications" href="https://en.wikipedia.org/wiki/Internet_of_things">&#x1F4E1;</a> <!-- 📡 -->
+    <a class="text-big" title="Cars" href="https://intechhouse.com/blog/driving-the-future-automotive-embedded-software-development">&#x1F697;</a> <!-- 🚗 -->
+    <a class="text-big" title="Credit / Debit Card Payments" href="https://stripe.com/en-bg/resources/more/how-to-create-a-card-program-a-step-by-step-guide">&#x1F4B3;</a> <!-- 💳 -->
+    <a class="text-big" title="Transportation" href="https://en.wikipedia.org/wiki/Transportation_management_system">&#x1F69A;</a> <!-- 🚚 -->
+    <a class="text-big" title="Music" href="https://en.wikipedia.org/wiki/List_of_music_software">&#x1F3A7;</a> <!-- 🎧 -->
+    <a class="text-big" title="Movies" href="https://www.softwarehow.com/video-editing-software-hollywood-movies-use/">&#x1F3AC;</a> <!-- 🎬 -->
+    <a class="text-big" title="Teaching" href="https://www.educationcorner.com/35-incredible-classroom-apps/">&#x1F469;&#x1F3FB;&#x200D;&#x1F3EB;</a> <!-- 👩🏻‍🏫 -->
+    <a class="text-big" title="Voting" href="https://en.wikipedia.org/wiki/Open-source_voting_system">&#x1F5F3;&#xFE0F;</a> <!-- 🗳️ -->
+    <a class="text-big" title="Government" href="https://research.com/software/best-government-software">&#x1F4CA;</a> <!-- 📊 -->
+    <a class="text-big" title="Science" href="https://en.wikipedia.org/wiki/List_of_data_science_software">&#x1F52C;</a> <!-- 🔬 -->
+    <a class="text-big" title="Robots / AI" href="https://roboticcoding.com/robotics-programming-for-beginners/">&#x1F916;</a> <!-- 🤖 -->
+    <a class="text-big" title="Space Technologies" href="https://www.nasa.gov/smallsat-institute/space-mission-design-tools/">&#x1F6F0;&#xFE0F;</a> <!-- 🛰️ -->
+    <br><br>
+    Sometimes human lives directly depend on it:
+    <a class="text-big" title="Energy Infrastructure" href="https://www.verifiedmarketresearch.com/blog/best-advanced-distribution-management-systems/">&#x1F5F2;</a> <!-- 🗲 -->
+    <a class="text-big" title="Industry (Dangerous Production)" href="https://roboticsandautomationnews.com/2025/04/24/top-20-industrial-software-suppliers-theres-an-app-for-that/90043/">&#x2699;&#xFE0F;</a> <!-- ⚙️ -->
+    <a class="text-big" title="Trains" href="https://www.devopsschool.com/blog/top-10-rail-operations-management-software-features-pros-cons-comparison/">&#x1F685;</a> <!-- 🚅 -->
+    <a class="text-big" title="Airplanes" href="https://en.wikipedia.org/wiki/Avionics_software">&#x2708;&#xFE0F;</a> <!-- ✈️ -->
+    <a class="text-big" title="Emergency Rooms / Intensive Care Units" href="https://vantagemedtech.com/embedded-medical-device-software/">&#x1F1E8;&#x1F1ED;</a> <!-- 🇨🇭 -->
+    <a class="text-big" title="Surgery (Robotic Helpers)" href="https://standardbots.com/blog/surgical-robotics-companies">&#x1F468;&#x200D;&#x2695;&#xFE0F;</a> <!-- 👨‍⚕️ -->
+    <a class="text-big" title="Specialized Complex Machines" href="https://www.mordorintelligence.com/industry-reports/cardiopulmonary-bypass-equipment-market">&#x1F9EC;</a> <!-- 🧬 -->
+    <a class="text-big" title="Diagnosis (X-Ray/MRI/CT-Scan Images)" href="https://topbusinesssoftware.com/categories/medical-imaging/">&#x1F321;&#xFE0F;</a> <!-- 🌡️ -->
+    <a class="text-big" title="Pharmaceutical Manufactoring" href="https://www.pharmaceuticalonline.com/solution/pharmaceutical-software">&#x1F48A;</a> <!-- 💊 -->
+    <br><br>
+    So, we, programmers, must understand what we are doing!
     </p></h4>
   </div>
 </div>
