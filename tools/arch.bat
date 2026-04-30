@@ -104,6 +104,7 @@ echo %FN_Computer%.zip
   "scripts\_Common\fonts_local.css" ^
   "scripts\_Common\responsive.css" ^
   "scripts\_Common\style.css" ^
+  "scripts\_Common\document.css" ^
   "scripts\_Common\utils_base.js" ^
   "scripts\_Common\popups.js" ^
   "scripts\_Common\wizard_base.js" ^
@@ -124,6 +125,7 @@ echo %FN_Computer_FULL%.zip
   "scripts\_Common\fonts_local.css" ^
   "scripts\_Common\responsive.css" ^
   "scripts\_Common\style.css" ^
+  "scripts\_Common\document.css" ^
   "scripts\_Common\utils_base.js" ^
   "scripts\_Common\popups.js" ^
   "scripts\_Common\wizard_base.js" ^

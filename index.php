@@ -67,13 +67,14 @@ $page = new Page('.');
     <a class="text-big" title="Space Technologies" href="https://www.nasa.gov/smallsat-institute/space-mission-design-tools/">&#x1F6F0;&#xFE0F;</a> <!-- 🛰️ -->
     <br><br>
     Sometimes human lives directly depend on it:
-    <a class="text-big" title="Energy Infrastructure" href="https://www.verifiedmarketresearch.com/blog/best-advanced-distribution-management-systems/">&#x1F5F2;</a> <!-- 🗲 -->
+    <!-- a class="text-big" title="Electrical Infrastructure" href="https://www.verifiedmarketresearch.com/blog/best-advanced-distribution-management-systems/">&#x1F5F2;</a --> <!-- 🗲 -->
+    <a class="text-big" title="High Voltage Infrastructure" href="https://diversedaily.com/high-voltage-engineering-software-tools-a-comprehensive-overview/">&#x1F5F2;</a> <!-- 🗲 -->
     <a class="text-big" title="Industry (Dangerous Production)" href="https://roboticsandautomationnews.com/2025/04/24/top-20-industrial-software-suppliers-theres-an-app-for-that/90043/">&#x2699;&#xFE0F;</a> <!-- ⚙️ -->
-    <a class="text-big" title="Trains" href="https://www.devopsschool.com/blog/top-10-rail-operations-management-software-features-pros-cons-comparison/">&#x1F685;</a> <!-- 🚅 -->
+    <a class="text-big" title="Trains (Tight Schedules without Crashes)" href="https://www.devopsschool.com/blog/top-10-rail-operations-management-software-features-pros-cons-comparison/">&#x1F685;</a> <!-- 🚅 -->
     <a class="text-big" title="Airplanes" href="https://en.wikipedia.org/wiki/Avionics_software">&#x2708;&#xFE0F;</a> <!-- ✈️ -->
     <a class="text-big" title="Emergency Rooms / Intensive Care Units" href="https://vantagemedtech.com/embedded-medical-device-software/">&#x1F1E8;&#x1F1ED;</a> <!-- 🇨🇭 -->
     <a class="text-big" title="Surgery (Robotic Helpers)" href="https://standardbots.com/blog/surgical-robotics-companies">&#x1F468;&#x200D;&#x2695;&#xFE0F;</a> <!-- 👨‍⚕️ -->
-    <a class="text-big" title="Specialized Complex Machines" href="https://www.mordorintelligence.com/industry-reports/cardiopulmonary-bypass-equipment-market">&#x1F9EC;</a> <!-- 🧬 -->
+    <a class="text-big" title="Life Saving Machines (e.g. Heart-Lung)" href="https://www.mordorintelligence.com/industry-reports/cardiopulmonary-bypass-equipment-market">&#x1F9EC;</a> <!-- 🧬 -->
     <a class="text-big" title="Diagnosis (X-Ray/MRI/CT-Scan Images)" href="https://topbusinesssoftware.com/categories/medical-imaging/">&#x1F321;&#xFE0F;</a> <!-- 🌡️ -->
     <a class="text-big" title="Pharmaceutical Manufactoring" href="https://www.pharmaceuticalonline.com/solution/pharmaceutical-software">&#x1F48A;</a> <!-- 💊 -->
     <br><br>
