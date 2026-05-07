@@ -100,7 +100,7 @@ class Memory {
             }
             if (memory.#editMemoryByRows) {
                 memory._showEditRowPopup(cell.parentElement);
-            } else {
+            } else if (cell.cellIndex > 0) {
                 memory._showEditCellPopup(cell);
             }
         });
