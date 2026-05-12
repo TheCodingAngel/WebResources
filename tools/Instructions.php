@@ -478,7 +478,7 @@ the instructions here have things from
     The <strong>"Is Negative"</strong> and <strong>"Is Positive"</strong> flags are set appropriately.
     Both flags are set to 1 (or true) to indicate an error (such as using a negative value for an address).<br><br>
     <a name="sub">The</a> <strong>"Is Overflown"</strong> flag is set to 1 (true) if the result value has more digits
-    than the number of characters allowed for it (4 for a register and the value of ECX for pointers / addresses).
+    than the number of characters allowed for it (4 for a register and the value of ECX up to 10 for pointers / addresses).
     </p>
     <br><hr><br>
     
@@ -492,7 +492,7 @@ the instructions here have things from
     The <strong>"Is Negative"</strong> and <strong>"Is Positive"</strong> flags are set appropriately.
     Both flags are set to 1 (or true) to indicate an error (such as using a negative value for an address).<br><br>
     <a name="mul">The</a> <strong>"Is Overflown"</strong> flag is set to 1 (true) if the result value has more digits
-    than the number of characters allowed for it (4 for a register and the value of ECX for pointers / addresses).
+    than the number of characters allowed for it (4 for a register and the value of ECX up to 10 for pointers / addresses).
     </p>
     <br><hr><br>
     
@@ -506,7 +506,7 @@ the instructions here have things from
     The <strong>"Is Negative"</strong> and <strong>"Is Positive"</strong> flags are set appropriately.
     Both flags are set to 1 (or true) to indicate an error (such as using a negative value for an address).<br><br>
     <a name="div">The</a> <strong>"Is Overflown"</strong> flag is set to 1 (true) if the result value has more digits
-    than the number of characters allowed for it (4 for a register and the value of ECX for pointers / addresses).
+    than the number of characters allowed for it (4 for a register and the value of ECX up to 10 for pointers / addresses).
     </p>
     <br><hr><br>
     
@@ -519,6 +519,7 @@ the instructions here have things from
     The first operand determines where the result is stored.<br><br>
     The <strong>"Is Negative"</strong> and <strong>"Is Positive"</strong> flags are set appropriately.
     <a name="mod">Both</a> flags are set to 1 (or true) to indicate an error (such as using a negative value for an address).<br><br>
+    The number of characters for the values is 4 for a register or the value of ECX (up to 10) for pointers / addresses.<br><br>
     Note - dividing by zero generates an error (interrupt 0).
     </p>
     <br><hr><br>
@@ -531,7 +532,8 @@ the instructions here have things from
     the value identified by the second operand.<br><br>
     The first operand determines where the result is stored.<br><br>
     <a name="inc">The</a> <strong>"Is Negative"</strong> and <strong>"Is Positive"</strong> flags are set appropriately.
-    Both flags are set to 1 (or true) to indicate an error (such as using a negative value for an address).
+    Both flags are set to 1 (or true) to indicate an error (such as using a negative value for an address).<br><br>
+    The number of characters for the values is 4 for a register or the value of ECX (up to 10) for pointers / addresses.
     </p>
     <br><hr><br>
     
@@ -544,7 +546,7 @@ the instructions here have things from
     The <strong>"Is Negative"</strong> and <strong>"Is Positive"</strong> flags are set appropriately.
     Both flags are set to 1 (or true) to indicate an error (such as using a negative value for an address).<br><br>
     <a name="dec">The</a> <strong>"Is Overflown"</strong> flag is set to 1 (true) if the result value has more digits
-    than the number of characters allowed for it (4 for a register and the value of ECX for pointers / addresses).
+    than the number of characters allowed for it (4 for a register and the value of ECX up to 10 for pointers / addresses).
     </p>
     <br><hr><br>
     
@@ -557,7 +559,7 @@ the instructions here have things from
     The <strong>"Is Negative"</strong> and <strong>"Is Positive"</strong> flags are set appropriately.
     Both flags are set to 1 (or true) to indicate an error (such as using a negative value for an address).<br><br>
     <a name="in">The</a> <strong>"Is Overflown"</strong> flag is set to 1 (true) if the result value has more digits
-    than the number of characters allowed for it (4 for a register and the value of ECX for pointers / addresses).
+    than the number of characters allowed for it (4 for a register and the value of ECX up to 10 for pointers / addresses).
     </p>
     <br><hr><br>
     

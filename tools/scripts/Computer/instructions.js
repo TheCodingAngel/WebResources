@@ -16,6 +16,7 @@ class Instructions {
     
     static INVALID_OPCODE = '&';
     static IRET_OPCODE = ':';
+    static MAX_DIGITS_FOR_NUMBERS = 10;
     
     #all = new Map([
         [' ', {mnemonic: "NOP",  execute: this._nop.bind(this)}],
@@ -543,9 +544,15 @@ class Instructions {
                 this.#cpu.setFlags(true, true, null);
                 return newValue;
             }
-            let fixedValue = fixIfOverflown(newValue, valuesInfo.getCharacterCount());
-            this.#cpu.setFlags(fixedValue > 0, fixedValue < 0, fixedValue != newValue);
-            newValue = fixedValue;
+            let characterCount = valuesInfo.getCharacterCount();
+            if (characterCount >= 0 && characterCount <= Instructions.MAX_DIGITS_FOR_NUMBERS) {
+                let fixedValue = fixIfOverflown(newValue, characterCount);
+                this.#cpu.setFlags(fixedValue > 0, fixedValue < 0, fixedValue != newValue);
+                newValue = fixedValue;
+            } else {
+                // Setting both positive and negative flags means "Invalid" state
+                this.#cpu.setFlags(true, true, true);
+            }
         } else {
             // Setting both positive and negative flags means "Invalid" state
             this.#cpu.setFlags(true, true, null);
@@ -574,8 +581,14 @@ class Instructions {
                 this.#cpu.setFlags(true, true, null);
                 return newValue;
             }
-            let isOverflown = newValue.toString(10).length > valuesInfo.getCharacterCount();
-            this.#cpu.setFlags(newValue > 0, newValue < 0, isOverflown);
+            let characterCount = valuesInfo.getCharacterCount();
+            if (characterCount >= 0 && characterCount <= Instructions.MAX_DIGITS_FOR_NUMBERS) {
+                let isOverflown = newValue.toString(10).length > characterCount;
+                this.#cpu.setFlags(newValue > 0, newValue < 0, isOverflown);
+            } else {
+                // Setting both positive and negative flags means "Invalid" state
+                this.#cpu.setFlags(true, true, true);
+            }
         } else {
             // Setting both positive and negative flags means "Invalid" state
             this.#cpu.setFlags(true, true, null);

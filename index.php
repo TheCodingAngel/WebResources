@@ -45,7 +45,7 @@ $page = new Page('.');
 <div id="intro" class="section flex-column">
   <div id="hardwareHeader" class="section-header link_style flex-row flex-pos-ortogonal-center">
     <h4><p class="introduction text-medium">
-    To give programmers <a class="text-medium" href="https://thecodingangel.org/tools/">hands on experience</a>
+    To give <strong>programmers</strong> <a class="text-medium" href="https://thecodingangel.org/tools/">hands on experience</a>
     and <a class="text-medium" href="https://www.youtube.com/@thecodingangel/videos">deep understanding</a>
     of what controls our civilization.<br><br>
     Software is everywhere:
@@ -78,7 +78,7 @@ $page = new Page('.');
     <a class="text-big" title="Diagnosis (X-Ray/MRI/CT-Scan Images)" href="https://topbusinesssoftware.com/categories/medical-imaging/">&#x1F321;&#xFE0F;</a> <!-- 🌡️ -->
     <a class="text-big" title="Pharmaceutical Manufactoring" href="https://www.pharmaceuticalonline.com/solution/pharmaceutical-software">&#x1F48A;</a> <!-- 💊 -->
     <br><br>
-    So, we, programmers, must understand what we are doing!
+    So we, <strong>programmers</strong>, must understand what we are doing!
     </p></h4>
   </div>
 </div>
