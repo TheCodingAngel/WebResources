@@ -246,7 +246,8 @@ body {
 
 .memory-panel {
   width: 28em;
-  overflow: auto;
+  overflow-x: hidden;
+  overflow-y: auto;
   user-select: none;
   margin: 3px;
   font-family:Consolas,Monaco,Lucida Console,Liberation Mono,DejaVu Sans Mono,Bitstream Vera Sans Mono,Courier New, monospace;
