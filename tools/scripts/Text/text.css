@@ -89,6 +89,7 @@
 .codepoint-panel-table {
   padding: 0px; /* non-zero values would lead to problems with the table's scrolling*/
   user-select: none;
+  -webkit-user-select: none; /* Safari */
   max-height: 12rem;
 }
 
@@ -145,6 +146,7 @@
 .caret {
   cursor: pointer;
   user-select: none; /* Prevent text selection */
+  -webkit-user-select: none; /* Safari */
 }
 
 /* Create the caret/arrow with a unicode, and style it */
