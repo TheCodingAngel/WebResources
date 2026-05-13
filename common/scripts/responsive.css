@@ -430,7 +430,7 @@
     max-height: 830px;
   }
   .io_config_popup .mp_card .optional_visibility {
-    visibility: collapse;
+    display: none;
   }
   .middle_area button.button_style.btn_w {
     white-space: nowrap;
