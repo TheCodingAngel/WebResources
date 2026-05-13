@@ -170,7 +170,7 @@ class IO {
         try {
             this.#memoryMapping.DisableMemoryNotifications();
             let text = this.#memory.onGetTextAtSelectedAddresses();
-            this.#printer.dump(text, text.length);
+            this.#printer.dump(text);
         } finally {
             this.#memoryMapping.EnableMemoryNotifications();
         }
@@ -667,8 +667,8 @@ class Printer {
         return appendSection(this.#writerElement, value, maxCharCount, Printer.memoryBufferCapacity);
     }
     
-    dump(value, maxCharCount) {
-        return appendSection(this.#writerElement, value, maxCharCount, maxCharCount);
+    dump(text) {
+        this.#writerElement.value += text;
     }
     
     flush(data) {
