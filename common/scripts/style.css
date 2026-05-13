@@ -938,6 +938,26 @@ button.button_style:hover {
   max-height: 200px;
 }
 
+.io_config_popup .mp_card {
+  max-width: 680px;
+  max-height: 510px;
+}
+.io_config_popup .mp_card .header {
+  position: absolute;
+  top: 15px;
+  left: calc(50% - 70px);
+}
+.io_config_popup .mp_card .footer_left {
+  position: absolute;
+  bottom: 20px;
+  left: 20px;
+}
+.io_config_popup .mp_card .footer_right {
+  position: absolute;
+  bottom: 20px;
+  right: 20px;
+}
+
 .how_use_svg path {
   -webkit-transform: scale(1.2);
   -moz-transform: scale(1.2);

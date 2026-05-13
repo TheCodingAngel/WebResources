@@ -373,17 +373,20 @@ $page = new Page('..');
        onclick="document.querySelector('.io_config_popup').classList.remove('activeic')">
   </div>
   <div class="mp_card">
+    <div class="header">
+      <h3>Memory Mappings</h3>
+    </div>
     <div class="clos_btn"
          onclick="document.querySelector('.io_config_popup').classList.remove('activeic')">
       <img src="<?php $page->printImagePath('close.png'); ?>" />
     </div>
     <hr>
-    <div class="flex-column">
+    <div class="flex-column io_config_margins">
       <label class="label flex-pos-ortogonal-center"><strong>Printer</strong> (port 0) - Output buffer with 10 characters:</label>
       <div class="flex-column">
         <div class="checkbox_simple">
           <input type="checkbox" class="checkbox flex-pos-ortogonal-center" id="enablePrinterMMIO">
-          <label for="enablePrinterMMIO" class="label flex-pos-ortogonal-center">Enable Memory Mapping for Write</label>
+          <label for="enablePrinterMMIO" class="label flex-pos-ortogonal-center">Enable Memory Mapping for Output (Write)</label>
         </div>
         <div class="flex-row">
           <label for="printerStartAddress" class="label flex-pos-ortogonal-center">Start address:</label>
@@ -393,14 +396,14 @@ $page = new Page('..');
         </div>
       </div>
     </div>
-    <br><hr>
-    <div class="flex-column">
+    <hr>
+    <div class="flex-column io_config_margins">
       <label class="label flex-pos-ortogonal-center"><strong>Teleprinter</strong> (port 2) - Input and Output buffers with 10 characters:</label>
       <div class="flex-row flex-stretch-ortogonal">
         <div class="flex-column">
           <div class="checkbox_simple">
             <input type="checkbox" class="checkbox flex-pos-ortogonal-center" id="enableTeleprinterInputMMIO">
-            <label for="enableTeleprinterInputMMIO" class="label flex-pos-ortogonal-center">Enable Memory Mapping for Read</label>
+            <label for="enableTeleprinterInputMMIO" class="label flex-pos-ortogonal-center">Enable Memory Mapping for Input (Read)</label>
           </div>
           <div class="flex-row">
             <label for="teleprinterInputStartAddress" class="label flex-pos-ortogonal-center">Start address:</label>
@@ -412,7 +415,7 @@ $page = new Page('..');
         <div class="flex-column flex-space-left">
           <div class="checkbox_simple">
             <input type="checkbox" class="checkbox flex-pos-ortogonal-center" id="enableTeleprinterOuputMMIO">
-            <label for="enableTeleprinterOuputMMIO" class="label flex-pos-ortogonal-center">Enable Memory Mapping for Write</label>
+            <label for="enableTeleprinterOuputMMIO" class="label flex-pos-ortogonal-center">Enable Memory Mapping for Output (Write)</label>
           </div>
           <div class="flex-row">
             <label for="teleprinterOutputStartAddress" class="label flex-pos-ortogonal-center">Start address:</label>
@@ -423,54 +426,52 @@ $page = new Page('..');
         </div>
       </div>
     </div>
-    <br><hr>
-    <div class="flex-column">
+    <hr>
+    <div class="flex-column io_config_margins">
       <label class="label flex-pos-ortogonal-center "><strong>Direct Memory Access</strong> - a List of 4 registers (4 characters each):</label>
       <div class="flex-column">
         <div class="checkbox_simple">
           <input type="checkbox" class="checkbox flex-pos-ortogonal-center" id="enableDmaMMIO">
-          <label for="enableDmaMMIO" class="label flex-pos-ortogonal-center">Enable Memory Mapping for Read and Write of the 4 registers;</label>
+          <label for="enableDmaMMIO" class="label flex-pos-ortogonal-center">Enable Memory Mapping for Read and Write of the 4 registers</label>
         </div>
-        <label class="label flex-pos-ortogonal-center flex-space-left">Note - <strong>Source</strong> and <strong>Destination</strong> contain either Memory or Port Addresses:</label>
+        <label class="label flex-pos-ortogonal-center flex-space-left io_config_margins optional_visibility">Note - <strong>Source</strong> and <strong>Destination</strong> contain either Memory or Port Addresses:</label>
         <div class="dma-registers">
           <label for="dmaStartAddress" class="label flex-pos-ortogonal-center">Start address:</label>
           <input type="number" inputmode="numeric" class="numedit flex-pos-ortogonal-center" id="dmaStartAddress" min="0" max="9990" maxlength="4" size="5">
-          <label class="label flex-pos-ortogonal-center">The first character of</label>
+          <label class="label flex-pos-ortogonal-center"></label>
           <label for="dmaControlStartAddress" class="label flex-pos-ortogonal-center">Control (port 3):</label>
           <div class="flex-row">
             <input type="text" id="dmaControlStartAddress" class="numedit flex-pos-ortogonal-center" readonly maxlength="4" size="5">
             <label class="label flex-pos-ortogonal-center"> - </label>
             <input type="text" id="dmaControlEndAddress" class="numedit flex-pos-ortogonal-center" readonly maxlength="4" size="5">
           </div>
-          <label class="label flex-pos-ortogonal-center"><strong>Control</strong> is for <strong>Src</strong>,</label>
+          <label class="label flex-pos-ortogonal-center">The first character of <strong>Control</strong> is for <strong>Source</strong>,</label>
           <label for="dmaSourceStartAddress" class="label flex-pos-ortogonal-center">Source (port 4):</label>
           <div class="flex-row">
             <input type="text" id="dmaSourceStartAddress" class="numedit flex-pos-ortogonal-center" readonly maxlength="4" size="5">
             <label class="label flex-pos-ortogonal-center"> - </label>
             <input type="text" id="dmaSourceEndAddress" class="numedit flex-pos-ortogonal-center" readonly maxlength="4" size="5">
           </div>
-          <label class="label flex-pos-ortogonal-center">the second - for <strong>Dest</strong>:</label>
+          <label class="label flex-pos-ortogonal-center">the second character - for <strong>Destination</strong>:</label>
           <label for="dmaDestinationStartAddress" class="label flex-pos-ortogonal-center">Destination (port 5):</label>
           <div class="flex-row">
             <input type="text" id="dmaDestinationStartAddress" class="numedit flex-pos-ortogonal-center" readonly maxlength="4" size="5">
             <label class="label flex-pos-ortogonal-center"> - </label>
             <input type="text" id="dmaDestinationEndAddress" class="numedit flex-pos-ortogonal-center" readonly maxlength="4" size="5">
           </div>
-          <label class="label flex-pos-ortogonal-center">- 'M' means Memory I/O</label>
+          <label class="label flex-pos-ortogonal-center">- 'M' means Memory I/O (Memory Address)</label>
           <label for="dmaCountStartAddress" class="label flex-pos-ortogonal-center">Count (port 6):</label>
           <div class="flex-row">
             <input type="text" id="dmaCountStartAddress" class="numedit flex-pos-ortogonal-center" readonly maxlength="4" size="5">
             <label class="label flex-pos-ortogonal-center"> - </label>
             <input type="text" id="dmaCountEndAddress" class="numedit flex-pos-ortogonal-center" readonly maxlength="4" size="5">
           </div>
-          <label class="label flex-pos-ortogonal-center">- 'P' means Port I/O</label>
+          <label class="label flex-pos-ortogonal-center">- 'P' means Port I/O (Port Address)</label>
         </div>
       </div>
     </div>
-    <div class="flex-row">
-      <button id="btnIoConfigOK" class="button button_style">OK</button>
-      <button id="btnIoConfigCancel" class="button button_style flex-space-left">Cancel</button>
-    </div>
+    <button id="btnIoConfigOK" class="button button_style footer_left">OK</button>
+    <button id="btnIoConfigCancel" class="button button_style flex-space-left footer_right">Cancel</button>
   </div>
 </div>
 <!-- end io configuration  -->

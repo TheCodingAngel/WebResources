@@ -40,7 +40,7 @@ body {
 
 .dma-registers {
   display: grid;
-  grid-template-columns: 1fr 1fr 1fr;
+  grid-template-columns: 1fr 1fr 2.2fr;
   grid-column-gap: var(--margin-xs);
 }
 
@@ -57,6 +57,16 @@ body {
   background-color: rgb(230, 230, 230);
   border: none;
   outline: none;
+}
+
+.io_config_margins {
+  margin-top: var(--margin-s);
+  margin-bottom: var(--margin-s);
+}
+
+.io_config_margins .checkbox_simple {
+  margin-top: var(--margin-s);
+  margin-bottom: var(--margin-xxs);
 }
 
 .disable-wrap {

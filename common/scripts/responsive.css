@@ -426,6 +426,12 @@
   .character_popup .mp_card {
     max-width: 320px;
   }
+  .io_config_popup .mp_card {
+    max-height: 830px;
+  }
+  .io_config_popup .mp_card .optional_visibility {
+    visibility: collapse;
+  }
   .middle_area button.button_style.btn_w {
     white-space: nowrap;
   }
